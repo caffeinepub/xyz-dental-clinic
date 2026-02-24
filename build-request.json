@@ -1,0 +1,374 @@
+{
+  "kind": "build_request",
+  "title": "Build XYZ Dental Clinic premium website with animations and admin panel",
+  "projectName": "XYZ Dental Clinic",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Implement scroll-triggered reveal animations (fade-in and slide-up effects) for text and images throughout the website using Framer Motion or similar React animation library",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Text elements fade in smoothly when scrolling into view",
+        "Images slide up with fade effect when entering viewport",
+        "Animations trigger once per element on first scroll"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Add parallax scrolling effect to background images creating depth perception as users scroll",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Background images move slower than foreground content",
+        "Parallax effect is smooth without janky performance",
+        "Effect works on hero section and key image sections"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Create micro-interactions for buttons with hover effects including smooth glow and scale-up animations",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Buttons scale up slightly on hover (1.05x)",
+        "Glow effect appears smoothly on hover",
+        "Transitions are smooth and professional"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Integrate Lottie animations for dental procedures (cleaning, implants) that sync with accompanying text descriptions",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Lottie animations load and play for dental procedures",
+        "Animations sync with text scroll position or trigger",
+        "Animations are lightweight and don't impact performance"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Create hero section with high-quality image slider or static hero image featuring dental work with prominent 'Book Appointment' call-to-action button",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Hero section displays full-width with professional dental imagery",
+        "Book Appointment button is prominent and easily clickable",
+        "Hero includes heading about perfect smiles",
+        "Responsive layout works on mobile and desktop"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Build interactive before/after slider component where users can drag to compare treatment results with left showing before and right showing after",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Slider handle can be dragged horizontally",
+        "Left side shows before image, right side shows after image",
+        "Smooth dragging experience without lag",
+        "Mobile touch support for dragging"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Create services grid displaying dental services (Root Canal, Braces, Whitening, etc.) with animated icons and links to detail pages for each service",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Grid layout displays multiple services in organized manner",
+        "Each service has an animated icon",
+        "Clicking a service navigates to its detail page",
+        "Icons animate on hover or scroll into view"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Build doctor profile section with photo, smooth entry animation, and details including expertise and education credentials",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Doctor photo displays prominently",
+        "Section animates smoothly when scrolling into view",
+        "Expertise and education information is clearly displayed",
+        "Professional and trustworthy layout"
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Create auto-sliding testimonial carousel section for patient reviews with manual navigation controls",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Testimonials auto-slide every few seconds",
+        "Users can manually navigate between reviews",
+        "Smooth transitions between testimonials",
+        "Displays patient name and review text clearly"
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Add live contact features including WhatsApp chat button, embedded Google Maps location, and clickable phone number",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "WhatsApp button opens chat with clinic number",
+        "Google Maps embed shows clinic location",
+        "Phone number is clickable and initiates call on mobile",
+        "All contact options are easily accessible"
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "text": "Build backend data model for appointments including patient name, contact info, preferred date/time, service type, and status",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Appointments can be created with patient details",
+        "Each appointment has unique ID",
+        "Appointments can be queried and filtered",
+        "Status field supports pending/confirmed/cancelled states"
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "text": "Create backend clinic status toggle functionality that tracks whether clinic is open, closed, or in emergency mode",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Clinic status can be set to open, closed, or emergency",
+        "Status persists across canister upgrades",
+        "Status can be queried by frontend",
+        "Only authorized users can modify status"
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "text": "Build backend content management system for storing and retrieving photos, reviews, and before-after images with metadata",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Images can be uploaded with descriptions",
+        "Reviews can be added with patient name and rating",
+        "Before-after pairs are linked together",
+        "Content can be retrieved for frontend display"
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "text": "Create backend doctor availability schedule management supporting multiple doctors with time slots and date ranges",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Doctor schedules can be created and updated",
+        "Availability includes days, time ranges, and exceptions",
+        "Frontend can query available slots for booking",
+        "Schedules persist across upgrades"
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "text": "Build admin dashboard page with clinic status toggle displaying real-time banner on public site when status is Emergency or Closed",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Dashboard has toggle switch for clinic status",
+        "Toggling status immediately updates backend",
+        "Public website displays banner when status is Closed or Emergency",
+        "Banner is prominent and clearly visible"
+      ]
+    },
+    {
+      "id": "REQ-16",
+      "text": "Create appointment manager interface in admin panel displaying all bookings with filtering by date and status, allowing status updates",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All appointments display in organized table or list",
+        "Admin can filter appointments by date range and status",
+        "Admin can update appointment status",
+        "Display shows patient details and service requested"
+      ]
+    },
+    {
+      "id": "REQ-17",
+      "text": "Build content management interface in admin panel for uploading photos, reviews, and before-after images without requiring code changes",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin can upload new images through form interface",
+        "Admin can add reviews with patient name and text",
+        "Admin can create before-after pairs by uploading two images",
+        "Uploaded content immediately appears on public site"
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "text": "Create doctor availability scheduler interface in admin panel allowing modification of doctor schedules with date pickers and time range selectors",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin can view current doctor schedules",
+        "Admin can add new availability blocks with date and time",
+        "Admin can mark doctors as unavailable for specific dates",
+        "Changes save to backend immediately"
+      ]
+    },
+    {
+      "id": "REQ-19",
+      "text": "Implement authentication system restricting admin panel access to authorized users only",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin panel requires authentication to access",
+        "Unauthorized users cannot view or modify admin content",
+        "Authentication uses Internet Identity",
+        "Authenticated users can access all admin features"
+      ]
+    },
+    {
+      "id": "REQ-20",
+      "text": "Apply minimalist white, deep royal blue, and teal color palette throughout the website creating a boutique, high-end medical-professional aesthetic",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Primary colors are white, royal blue, and teal",
+        "Color scheme is consistent across all pages",
+        "Design feels modern, clean, and professional",
+        "High contrast for readability"
+      ]
+    },
+    {
+      "id": "REQ-21",
+      "text": "Render all generated images as static assets in frontend/public/assets/generated directory",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Generated images are stored in public/assets/generated",
+        "Images are referenced correctly in components",
+        "All images load properly on the website"
+      ]
+    }
+  ],
+  "constraints": [
+    "Must use Motoko for backend, React with TypeScript for frontend, and Tailwind CSS for styling",
+    "All backend logic must remain in a single actor file (backend/main.mo)",
+    "Cannot use real-time WebSocket features or external video streaming",
+    "Cannot integrate external authentication providers besides Internet Identity",
+    "WhatsApp integration must use web.whatsapp.com links, not API calls",
+    "Google Maps must use embed iframe, not Maps API"
+  ],
+  "nonGoals": [
+    "Real-time video calls with doctors",
+    "Integration with external medical record systems",
+    "Payment processing for appointments",
+    "SMS notifications for appointments",
+    "Email marketing campaigns",
+    "Multi-language support",
+    "Mobile app development"
+  ],
+  "imageRequirements": {
+    "required": [
+      "Hero background image showing modern dental clinic interior with bright lighting (hero-bg.dim_1920x1080.png)",
+      "Perfect smile close-up photo for hero slider (smile-hero.dim_1200x800.png)",
+      "Root canal procedure icon illustration in royal blue and teal (icon-root-canal.dim_256x256.png)",
+      "Braces treatment icon illustration in royal blue and teal (icon-braces.dim_256x256.png)",
+      "Teeth whitening icon illustration in royal blue and teal (icon-whitening.dim_256x256.png)",
+      "Dental implants icon illustration in royal blue and teal (icon-implants.dim_256x256.png)",
+      "Doctor profile photo showing professional dentist in white coat (doctor-profile.dim_600x800.png)",
+      "Before treatment teeth photo showing discoloration (before-whitening.dim_800x600.png)",
+      "After treatment teeth photo showing bright white smile (after-whitening.dim_800x600.png)",
+      "Before braces photo showing misaligned teeth (before-braces.dim_800x600.png)",
+      "After braces photo showing perfectly aligned teeth (after-braces.dim_800x600.png)",
+      "Clinic exterior photo showing modern building entrance (clinic-exterior.dim_1200x800.png)",
+      "Waiting room interior showing comfortable seating area (waiting-room.dim_1200x800.png)"
+    ],
+    "edits": []
+  }
+}
