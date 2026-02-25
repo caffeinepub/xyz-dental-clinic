@@ -1,140 +1,112 @@
 import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useGetAllAppointments, useUpdateAppointmentStatus } from '../../hooks/useQueries';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+import { AppointmentStatus } from '../../backend';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Link } from '@tanstack/react-router';
-import type { AppointmentStatus } from '../../backend';
+
+const statusColors: Record<string, string> = {
+  pending: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
+  confirmed: 'bg-teal-500/20 text-teal-300 border-teal-400/30',
+  completed: 'bg-blue-500/20 text-blue-300 border-blue-400/30',
+  cancelled: 'bg-red-500/20 text-red-300 border-red-400/30',
+};
 
 export default function Appointments() {
-  const { data: appointments = [] } = useGetAllAppointments();
+  const navigate = useNavigate();
+  const { data: appointments, isLoading } = useGetAllAppointments();
   const updateStatus = useUpdateAppointmentStatus();
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<string>('all');
 
-  const filteredAppointments = appointments.filter((apt) => {
-    if (statusFilter === 'all') return true;
-    return apt.status === statusFilter;
-  });
+  const filtered = appointments?.filter(a =>
+    filter === 'all' ? true : a.status === filter
+  ) ?? [];
 
-  const handleStatusChange = async (appointmentId: bigint, newStatus: AppointmentStatus) => {
+  const handleStatusChange = async (id: bigint, status: AppointmentStatus) => {
     try {
-      await updateStatus.mutateAsync({ appointmentId, newStatus });
-      toast.success('Appointment status updated');
-    } catch (error) {
-      console.error('Failed to update status:', error);
-      toast.error('Failed to update appointment status');
+      await updateStatus.mutateAsync({ id, status });
+      toast.success('Status updated');
+    } catch {
+      toast.error('Failed to update status');
     }
   };
 
-  const getStatusBadge = (status: AppointmentStatus) => {
-    const variants: Record<AppointmentStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-      pending: 'secondary',
-      confirmed: 'default',
-      completed: 'outline',
-      cancelled: 'destructive',
-    };
-    return <Badge variant={variants[status]}>{status}</Badge>;
-  };
-
   return (
-    <div className="container py-12">
-      <div className="mb-8">
-        <Link to="/admin/dashboard">
-          <Button variant="ghost" className="mb-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Button>
-        </Link>
-        <h1 className="text-4xl font-bold mb-2">Appointment Manager</h1>
-        <p className="text-muted-foreground">View and manage all patient appointments</p>
-      </div>
+    <div className="min-h-screen p-6 md:p-10">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <button onClick={() => navigate({ to: '/admin/dashboard' })} className="text-white/60 hover:text-white transition-colors">
+            ← Back
+          </button>
+          <h1 className="text-3xl font-bold text-white">Appointments</h1>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <CardTitle>All Appointments</CardTitle>
-              <CardDescription>Total: {filteredAppointments.length}</CardDescription>
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="confirmed">Confirmed</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Filter */}
+        <div className="glass-card rounded-2xl p-4 mb-6 flex flex-wrap gap-2">
+          {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all border ${
+                filter === f
+                  ? 'bg-teal-500 border-teal-400 text-white'
+                  : 'bg-white/10 border-white/20 text-white/70 hover:bg-white/20'
+              }`}
+            >
+              {f.charAt(0).toUpperCase() + f.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {isLoading ? (
+          <div className="text-white/60 text-center py-20">Loading appointments...</div>
+        ) : filtered.length === 0 ? (
+          <div className="glass-card rounded-2xl p-10 text-center text-white/50">No appointments found.</div>
+        ) : (
+          <div className="glass-card rounded-2xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th className="text-left p-4 text-white/60 font-medium">Patient</th>
+                  <th className="text-left p-4 text-white/60 font-medium">Contact</th>
+                  <th className="text-left p-4 text-white/60 font-medium">Service</th>
+                  <th className="text-left p-4 text-white/60 font-medium">Date</th>
+                  <th className="text-left p-4 text-white/60 font-medium">Status</th>
+                  <th className="text-left p-4 text-white/60 font-medium">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((appt) => (
+                  <tr key={String(appt.id)} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td className="p-4 text-white font-medium">{appt.patientName}</td>
+                    <td className="p-4 text-white/70">{appt.contactInfo}</td>
+                    <td className="p-4 text-white/70">{appt.serviceType}</td>
+                    <td className="p-4 text-white/70">
+                      {new Date(Number(appt.preferredDate) / 1_000_000).toLocaleDateString()}
+                    </td>
+                    <td className="p-4">
+                      <span className={`px-2 py-1 rounded-full text-xs border ${statusColors[appt.status] ?? ''}`}>
+                        {appt.status}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <select
+                        className="bg-white/10 border border-white/20 text-white text-xs rounded-lg px-2 py-1"
+                        value={appt.status}
+                        onChange={e => handleStatusChange(appt.id, e.target.value as AppointmentStatus)}
+                        disabled={updateStatus.isPending}
+                      >
+                        {['pending', 'confirmed', 'completed', 'cancelled'].map(s => (
+                          <option key={s} value={s} className="bg-gray-900">{s}</option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Patient Name</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Service</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredAppointments.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
-                      No appointments found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredAppointments.map((appointment) => (
-                    <TableRow key={appointment.id.toString()}>
-                      <TableCell className="font-mono text-sm">
-                        #{appointment.id.toString()}
-                      </TableCell>
-                      <TableCell className="font-medium">{appointment.patientName}</TableCell>
-                      <TableCell>{appointment.contactInfo}</TableCell>
-                      <TableCell>{appointment.serviceType}</TableCell>
-                      <TableCell>
-                        {format(new Date(Number(appointment.preferredDate) / 1_000_000), 'PPP')}
-                      </TableCell>
-                      <TableCell>{getStatusBadge(appointment.status)}</TableCell>
-                      <TableCell>
-                        <Select
-                          value={appointment.status}
-                          onValueChange={(value) =>
-                            handleStatusChange(appointment.id, value as AppointmentStatus)
-                          }
-                        >
-                          <SelectTrigger className="w-[140px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="confirmed">Confirmed</SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+        )}
+      </div>
     </div>
   );
 }

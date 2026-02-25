@@ -25,6 +25,13 @@ export const DoctorAvailability = IDL.Record({
   'availableSlots' : IDL.Vec(Time),
 });
 export const ExternalBlob = IDL.Vec(IDL.Nat8);
+export const ReviewInput = IDL.Record({
+  'beforeAfterImage' : IDL.Opt(ExternalBlob),
+  'text' : IDL.Text,
+  'reviewerName' : IDL.Text,
+  'rating' : IDL.Nat,
+  'photo' : IDL.Opt(ExternalBlob),
+});
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
@@ -51,11 +58,23 @@ export const Doctor = IDL.Record({
   'specialty' : IDL.Text,
   'availability' : IDL.Vec(DoctorAvailability),
 });
+export const Service = IDL.Record({
+  'id' : IDL.Text,
+  'displayName' : IDL.Text,
+  'featuredPhoto' : IDL.Opt(ExternalBlob),
+  'description' : IDL.Text,
+});
+export const ReviewState = IDL.Variant({
+  'pending' : IDL.Null,
+  'approved' : IDL.Null,
+  'rejected' : IDL.Null,
+});
 export const Review = IDL.Record({
   'id' : IDL.Nat,
   'beforeAfterImage' : IDL.Opt(ExternalBlob),
   'text' : IDL.Text,
   'reviewerName' : IDL.Text,
+  'state' : ReviewState,
   'rating' : IDL.Nat,
   'photo' : IDL.Opt(ExternalBlob),
 });
@@ -100,17 +119,13 @@ export const idlService = IDL.Service({
       [IDL.Nat],
       [],
     ),
-  'addReview' : IDL.Func(
-      [
-        IDL.Text,
-        IDL.Text,
-        IDL.Nat,
-        IDL.Opt(ExternalBlob),
-        IDL.Opt(ExternalBlob),
-      ],
+  'addOrUpdateService' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(ExternalBlob)],
       [],
       [],
     ),
+  'addReview' : IDL.Func([ReviewInput], [], []),
+  'approveReview' : IDL.Func([IDL.Nat], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'createAppointment' : IDL.Func(
       [IDL.Text, IDL.Text, Time, IDL.Text],
@@ -119,7 +134,8 @@ export const idlService = IDL.Service({
     ),
   'getAllAppointments' : IDL.Func([], [IDL.Vec(Appointment)], ['query']),
   'getAllDoctors' : IDL.Func([], [IDL.Vec(Doctor)], ['query']),
-  'getAllReviews' : IDL.Func([], [IDL.Vec(Review)], ['query']),
+  'getAllServices' : IDL.Func([], [IDL.Vec(Service)], ['query']),
+  'getApprovedReviews' : IDL.Func([], [IDL.Vec(Review)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getClinicStatus' : IDL.Func([], [ClinicStatus], ['query']),
@@ -128,12 +144,15 @@ export const idlService = IDL.Service({
       [IDL.Opt(IDL.Vec(DoctorAvailability))],
       ['query'],
     ),
+  'getPendingReviews' : IDL.Func([], [IDL.Vec(Review)], ['query']),
+  'getService' : IDL.Func([IDL.Text], [IDL.Opt(Service)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'rejectReview' : IDL.Func([IDL.Nat], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'setClinicStatus' : IDL.Func([ClinicStatus], [], []),
   'updateAppointmentStatus' : IDL.Func([IDL.Nat, AppointmentStatus], [], []),
@@ -159,6 +178,13 @@ export const idlFactory = ({ IDL }) => {
     'availableSlots' : IDL.Vec(Time),
   });
   const ExternalBlob = IDL.Vec(IDL.Nat8);
+  const ReviewInput = IDL.Record({
+    'beforeAfterImage' : IDL.Opt(ExternalBlob),
+    'text' : IDL.Text,
+    'reviewerName' : IDL.Text,
+    'rating' : IDL.Nat,
+    'photo' : IDL.Opt(ExternalBlob),
+  });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
@@ -185,11 +211,23 @@ export const idlFactory = ({ IDL }) => {
     'specialty' : IDL.Text,
     'availability' : IDL.Vec(DoctorAvailability),
   });
+  const Service = IDL.Record({
+    'id' : IDL.Text,
+    'displayName' : IDL.Text,
+    'featuredPhoto' : IDL.Opt(ExternalBlob),
+    'description' : IDL.Text,
+  });
+  const ReviewState = IDL.Variant({
+    'pending' : IDL.Null,
+    'approved' : IDL.Null,
+    'rejected' : IDL.Null,
+  });
   const Review = IDL.Record({
     'id' : IDL.Nat,
     'beforeAfterImage' : IDL.Opt(ExternalBlob),
     'text' : IDL.Text,
     'reviewerName' : IDL.Text,
+    'state' : ReviewState,
     'rating' : IDL.Nat,
     'photo' : IDL.Opt(ExternalBlob),
   });
@@ -234,17 +272,13 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         [],
       ),
-    'addReview' : IDL.Func(
-        [
-          IDL.Text,
-          IDL.Text,
-          IDL.Nat,
-          IDL.Opt(ExternalBlob),
-          IDL.Opt(ExternalBlob),
-        ],
+    'addOrUpdateService' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(ExternalBlob)],
         [],
         [],
       ),
+    'addReview' : IDL.Func([ReviewInput], [], []),
+    'approveReview' : IDL.Func([IDL.Nat], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createAppointment' : IDL.Func(
         [IDL.Text, IDL.Text, Time, IDL.Text],
@@ -253,7 +287,8 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getAllAppointments' : IDL.Func([], [IDL.Vec(Appointment)], ['query']),
     'getAllDoctors' : IDL.Func([], [IDL.Vec(Doctor)], ['query']),
-    'getAllReviews' : IDL.Func([], [IDL.Vec(Review)], ['query']),
+    'getAllServices' : IDL.Func([], [IDL.Vec(Service)], ['query']),
+    'getApprovedReviews' : IDL.Func([], [IDL.Vec(Review)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getClinicStatus' : IDL.Func([], [ClinicStatus], ['query']),
@@ -262,12 +297,15 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(IDL.Vec(DoctorAvailability))],
         ['query'],
       ),
+    'getPendingReviews' : IDL.Func([], [IDL.Vec(Review)], ['query']),
+    'getService' : IDL.Func([IDL.Text], [IDL.Opt(Service)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'rejectReview' : IDL.Func([IDL.Nat], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'setClinicStatus' : IDL.Func([ClinicStatus], [], []),
     'updateAppointmentStatus' : IDL.Func([IDL.Nat, AppointmentStatus], [], []),

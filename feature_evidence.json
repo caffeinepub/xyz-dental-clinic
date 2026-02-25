@@ -2,75 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-micro-interactions-for-buttons-with-hover-effects-including-smooth-glow-and-scale-up-animations",
-      "featureTitle": "Create micro-interactions for buttons with hover effects including smooth glow and scale-up animations",
-      "files": [
-        "frontend/src/index.css"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-hero-section-with-high-quality-image-slider-or-static-hero-image-featuring-dental-work-with-prominent-book-appointment-call-to-action-button",
-      "featureTitle": "Create hero section with high-quality image slider or static hero image featuring dental work with prominent 'Book Appointment' call-to-action button",
-      "files": [
-        "frontend/src/components/HeroSection.tsx",
-        "frontend/src/pages/Home.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-build-interactive-before-after-slider-component-where-users-can-drag-to-compare-treatment-results-with-left-showing-before-and-right-showing-after",
-      "featureTitle": "Build interactive before/after slider component where users can drag to compare treatment results with left showing before and right showing after",
-      "files": [
-        "frontend/src/components/BeforeAfterSlider.tsx",
-        "frontend/src/pages/Home.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-services-grid-displaying-dental-services-root-canal-braces-whitening-etc-with-animated-icons-and-links-to-detail-pages-for-each-service",
-      "featureTitle": "Create services grid displaying dental services (Root Canal, Braces, Whitening, etc.) with animated icons and links to detail pages for each service",
+      "featureId": "feature-add-a-service-manager-section-to-the-admin-panel-that-allows-the-admin-to-edit-the-display-name-description-text-and-upload-replace-the-featured-photo-for-each-of-the-5-premium-services-dental-implants-invisalign-pediatric-dentistry-kids-smile-makeover-and-laser-dentistry-changes-must-be-persisted-in-the-backend-and-reflected-on-the-public-facing-service-cards-and-detail-pages",
+      "featureTitle": "Add a 'Service Manager' section to the admin panel that allows the admin to edit the display name, description text, and upload/replace the featured photo for each of the 5 premium services: Dental Implants, Invisalign, Pediatric Dentistry (Kids), Smile Makeover, and Laser Dentistry. Changes must be persisted in the backend and reflected on the public-facing service cards and detail pages.",
       "files": [
         "frontend/src/App.tsx",
-        "frontend/src/components/ServicesGrid.tsx",
-        "frontend/src/pages/Home.tsx",
-        "frontend/src/pages/ServiceDetail.tsx"
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/admin/Dashboard.tsx",
+        "frontend/src/pages/admin/ServiceManager.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -82,143 +20,45 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-7"
+        "REQ-32"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-build-doctor-profile-section-with-photo-smooth-entry-animation-and-details-including-expertise-and-education-credentials",
-      "featureTitle": "Build doctor profile section with photo, smooth entry animation, and details including expertise and education credentials",
+      "featureId": "feature-implement-a-review-approver-workflow-patient-submitted-reviews-must-be-held-in-a-pending-state-and-only-appear-on-the-public-website-after-an-admin-explicitly-approves-them-in-the-admin-panel-the-admin-panel-must-display-all-pending-reviews-with-approve-and-reject-actions",
+      "featureTitle": "Implement a Review Approver workflow: patient-submitted reviews must be held in a 'pending' state and only appear on the public website after an admin explicitly approves them in the admin panel. The admin panel must display all pending reviews with Approve and Reject actions.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/TestimonialCarousel.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/admin/ContentManager.tsx",
+        "frontend/src/pages/admin/Dashboard.tsx",
+        "frontend/src/pages/admin/ReviewApprover.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-33"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-apply-a-glassmorphism-design-treatment-to-all-service-cards-testimonial-cards-doctor-profile-card-and-admin-panel-content-cards-use-a-frosted-blurred-glass-background-backdrop-filter-blur-semi-transparent-white-teal-background-so-the-animated-mesh-gradient-background-shows-softly-through-the-card-surfaces",
+      "featureTitle": "Apply a glassmorphism design treatment to all service cards, testimonial cards, doctor profile card, and admin panel content cards: use a frosted/blurred glass background (backdrop-filter: blur, semi-transparent white/teal background) so the animated mesh gradient background shows softly through the card surfaces.",
       "files": [
         "frontend/src/components/DoctorProfile.tsx",
-        "frontend/src/pages/Home.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-8"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-auto-sliding-testimonial-carousel-section-for-patient-reviews-with-manual-navigation-controls",
-      "featureTitle": "Create auto-sliding testimonial carousel section for patient reviews with manual navigation controls",
-      "files": [
+        "frontend/src/components/ServicesGrid.tsx",
         "frontend/src/components/TestimonialCarousel.tsx",
-        "frontend/src/pages/Home.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-9"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-live-contact-features-including-whatsapp-chat-button-embedded-google-maps-location-and-clickable-phone-number",
-      "featureTitle": "Add live contact features including WhatsApp chat button, embedded Google Maps location, and clickable phone number",
-      "files": [
-        "frontend/src/components/ContactSection.tsx",
-        "frontend/src/pages/Home.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-10"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-build-admin-dashboard-page-with-clinic-status-toggle-displaying-real-time-banner-on-public-site-when-status-is-emergency-or-closed",
-      "featureTitle": "Build admin dashboard page with clinic status toggle displaying real-time banner on public site when status is Emergency or Closed",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/ClinicStatusBanner.tsx",
-        "frontend/src/pages/Home.tsx",
-        "frontend/src/pages/admin/Dashboard.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-15"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-appointment-manager-interface-in-admin-panel-displaying-all-bookings-with-filtering-by-date-and-status-allowing-status-updates",
-      "featureTitle": "Create appointment manager interface in admin panel displaying all bookings with filtering by date and status, allowing status updates",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/pages/admin/Appointments.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-16"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-build-content-management-interface-in-admin-panel-for-uploading-photos-reviews-and-before-after-images-without-requiring-code-changes",
-      "featureTitle": "Build content management interface in admin panel for uploading photos, reviews, and before-after images without requiring code changes",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/pages/admin/ContentManager.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-17"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-doctor-availability-scheduler-interface-in-admin-panel-allowing-modification-of-doctor-schedules-with-date-pickers-and-time-range-selectors",
-      "featureTitle": "Create doctor availability scheduler interface in admin panel allowing modification of doctor schedules with date pickers and time range selectors",
-      "files": [
-        "frontend/src/App.tsx",
+        "frontend/src/pages/admin/Appointments.tsx",
+        "frontend/src/pages/admin/ContentManager.tsx",
+        "frontend/src/pages/admin/Dashboard.tsx",
         "frontend/src/pages/admin/DoctorScheduler.tsx"
       ],
       "components": [
@@ -231,19 +71,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-18"
+        "REQ-34"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-authentication-system-restricting-admin-panel-access-to-authorized-users-only",
-      "featureTitle": "Implement authentication system restricting admin panel access to authorized users only",
+      "featureId": "feature-add-a-scroll-progress-indicator-a-thin-3-4px-horizontal-bar-fixed-at-the-very-top-of-the-viewport-above-the-sticky-header-that-fills-from-left-to-right-as-the-user-scrolls-down-the-page-using-the-site-s-teal-or-royal-blue-accent-color-and-resets-to-empty-when-the-user-returns-to-the-top",
+      "featureTitle": "Add a scroll-progress indicator: a thin (3–4px) horizontal bar fixed at the very top of the viewport (above the sticky header) that fills from left to right as the user scrolls down the page, using the site's teal or royal-blue accent color, and resets to empty when the user returns to the top.",
       "files": [
         "frontend/src/App.tsx",
-        "frontend/src/components/AdminGuard.tsx",
-        "frontend/src/components/LoginButton.tsx",
-        "frontend/src/components/UserProfileSetup.tsx",
-        "frontend/src/pages/AccessDenied.tsx"
+        "frontend/src/components/ScrollProgressBar.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -255,16 +92,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-19"
+        "REQ-35"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-apply-minimalist-white-deep-royal-blue-and-teal-color-palette-throughout-the-website-creating-a-boutique-high-end-medical-professional-aesthetic",
-      "featureTitle": "Apply minimalist white, deep royal blue, and teal color palette throughout the website creating a boutique, high-end medical-professional aesthetic",
+      "featureId": "feature-add-floating-dental-element-decorations-in-the-corners-and-edges-of-the-page-small-64-96px-semi-transparent-png-images-of-dental-icons-tooth-dental-mirror-toothbrush-plus-cross-that-gently-float-and-apply-a-subtle-parallax-offset-as-the-user-scrolls-creating-depth-without-obstructing-any-content",
+      "featureTitle": "Add floating dental element decorations in the corners and edges of the page: small (64–96px) semi-transparent PNG images of dental icons (tooth, dental mirror, toothbrush, plus/cross) that gently float and apply a subtle parallax offset as the user scrolls, creating depth without obstructing any content.",
       "files": [
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
+        "frontend/src/components/FloatingDentalElements.tsx",
+        "frontend/src/pages/Home.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -276,19 +113,18 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-20"
+        "REQ-36"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-render-all-generated-images-as-static-assets-in-frontend-public-assets-generated-directory",
-      "featureTitle": "Render all generated images as static assets in frontend/public/assets/generated directory",
+      "featureId": "feature-enhance-the-existing-custom-cursor-so-that-when-the-mouse-hovers-over-any-service-card-in-the-services-section-the-cursor-icon-changes-to-a-dental-themed-icon-tooth-or-medical-plus-cross-svg-the-cursor-must-revert-to-the-standard-custom-cursor-when-moving-off-service-cards-this-is-a-magnetic-context-sensitive-cursor-enhancement-on-top-of-the-existing-customcursor-component",
+      "featureTitle": "Enhance the existing custom cursor so that when the mouse hovers over any service card in the Services section, the cursor icon changes to a dental-themed icon (tooth or medical plus/cross SVG). The cursor must revert to the standard custom cursor when moving off service cards. This is a magnetic/context-sensitive cursor enhancement on top of the existing CustomCursor component.",
       "files": [
-        "frontend/src/components/BeforeAfterSlider.tsx",
-        "frontend/src/components/ContactSection.tsx",
-        "frontend/src/components/DoctorProfile.tsx",
-        "frontend/src/components/HeroSection.tsx",
-        "frontend/src/components/ServicesGrid.tsx"
+        "frontend/src/App.tsx",
+        "frontend/src/components/CustomCursor.tsx",
+        "frontend/src/components/ServicesGrid.tsx",
+        "frontend/src/context/CursorContext.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -300,7 +136,27 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-21"
+        "REQ-37"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-render-all-new-floating-dental-element-images-as-static-assets-in-the-frontend-public-assets-generated-directory",
+      "featureTitle": "Render all new floating dental element images as static assets in the frontend/public/assets/generated directory.",
+      "files": [
+        "frontend/src/components/FloatingDentalElements.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-38"
       ],
       "confidence": "high"
     }

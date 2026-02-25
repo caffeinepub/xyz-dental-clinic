@@ -1,17 +1,19 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 3,
-  "summary": "Premium dental clinic website with smooth animations, before/after sliders, patient reviews, and admin panel for managing appointments, content, and clinic status",
+  "projectStateVersion": 7,
+  "summary": "Premium dental clinic website with smooth animations, before/after sliders, patient reviews, hidden admin panel (triple-click footer logo or invisible dot/logo click), 5 new premium services (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry), advanced cursor interactions (magnetic cursor with dental icons), animated mesh gradient background, text scramble effects, interactive review wall, glassmorphism card design, scroll-progress bar, and floating dental element parallax corners",
   "architectural_notes": [
     "Color palette: Minimalist White, Deep Royal Blue, and Teal for boutique high-end feel",
     "Design theme: Modern, clean, medical-professional yet high-tech",
     "Animation library: Consider Framer Motion or GSAP for scroll-triggered and parallax effects",
     "Lottie animations for dental procedure visualizations",
-    "Admin panel needs authentication and role-based access control"
+    "Admin panel needs authentication and role-based access control",
+    "Hidden admin entry: triple-click on footer copyright logo triggers login popup (no visible admin link)",
+    "Glassmorphism card style: backdrop-filter blur with semi-transparent backgrounds so mesh gradient shows through"
   ],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Hero background image showing modern dental clinic interior with bright lighting (hero-bg.dim_1920x1080.png)\n- Perfect smile close-up photo for hero slider (smile-hero.dim_1200x800.png)\n- Root canal procedure icon illustration in royal blue and teal (icon-root-canal.dim_256x256.png)\n- Braces treatment icon illustration in royal blue and teal (icon-braces.dim_256x256.png)\n- Teeth whitening icon illustration in royal blue and teal (icon-whitening.dim_256x256.png)\n- Dental implants icon illustration in royal blue and teal (icon-implants.dim_256x256.png)\n- Doctor profile photo showing professional dentist in white coat (doctor-profile.dim_600x800.png)\n- Before treatment teeth photo showing discoloration (before-whitening.dim_800x600.png)\n- After treatment teeth photo showing bright white smile (after-whitening.dim_800x600.png)\n- Before braces photo showing misaligned teeth (before-braces.dim_800x600.png)\n- After braces photo showing perfectly aligned teeth (after-braces.dim_800x600.png)\n- Clinic exterior photo showing modern building entrance (clinic-exterior.dim_1200x800.png)\n- Waiting room interior showing comfortable seating area (waiting-room.dim_1200x800.png)",
+  "imageRequirements": "## Required Images\n- Semi-transparent tooth icon illustration for floating dental element and magnetic cursor, white/teal tones on transparent background (tooth-float-icon.dim_96x96.png)\n- Semi-transparent dental mirror icon illustration for floating dental element, white/teal tones on transparent background (dental-mirror-float-icon.dim_96x96.png)\n- Semi-transparent toothbrush icon illustration for floating dental element, white/teal tones on transparent background (toothbrush-float-icon.dim_96x96.png)\n- Semi-transparent medical plus/cross icon illustration for floating dental element and magnetic cursor, teal/royal-blue tones on transparent background (plus-float-icon.dim_96x96.png)",
   "existing_features": [
     {
       "id": "feature-create-micro-interactions-for-buttons-with-hover-effects-including-smooth-glow-and-scale-up-animations",
@@ -122,6 +124,142 @@
       "title": "Render all generated images as static assets in frontend/public/assets/generated directory",
       "reqIds": [
         "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-hidden-admin-access-via-triple-click-on-the-footer-copyright-logo-clicking-the-copyright-text-logo-three-times-in-quick-succession-opens-a-login-popup-modal-the-modal-accepts-username-6352174912-and-password-63521-authenticates-locally-and-on-success-navigates-to-the-admin-dashboard-no-admin-link-should-be-visible-anywhere-in-the-public-ui",
+      "title": "Implement hidden admin access via triple-click on the footer copyright logo. Clicking the copyright text/logo three times in quick succession opens a login popup modal. The modal accepts username '6352174912' and password '63521', authenticates locally, and on success navigates to the admin dashboard. No admin link should be visible anywhere in the public UI.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-dental-implants-as-a-new-premium-service-card-in-the-services-section-the-card-must-feature-a-3d-animated-model-using-three-js-react-three-fiber-or-css-3d-transforms-that-illustrates-how-a-dental-implant-is-fixed-into-the-jaw-triggered-on-hover-or-card-entry",
+      "title": "Add 'Dental Implants' as a new premium service card in the Services section. The card must feature a 3D animated model (using Three.js / React Three Fiber or CSS 3D transforms) that illustrates how a dental implant is fixed into the jaw, triggered on hover or card entry.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-invisalign-invisible-braces-as-a-new-premium-service-card-include-a-slide-to-compare-feature-embedded-in-or-linked-from-the-card-showing-teeth-gradually-aligning-using-the-existing-beforeafterslider-component-pattern-with-before-misaligned-teeth-and-after-aligned-teeth-images",
+      "title": "Add 'Invisalign (Invisible Braces)' as a new premium service card. Include a slide-to-compare feature embedded in or linked from the card showing teeth gradually aligning, using the existing BeforeAfterSlider component pattern with before=misaligned teeth and after=aligned teeth images.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-pediatric-dentistry-kids-as-a-new-premium-service-card-the-card-and-its-section-must-feature-playful-floating-bubble-animations-css-keyframe-bubbles-rising-in-the-background-to-create-a-child-friendly-fun-visual-atmosphere",
+      "title": "Add 'Pediatric Dentistry (Kids)' as a new premium service card. The card and its section must feature playful floating bubble animations (CSS keyframe bubbles rising in the background) to create a child-friendly, fun visual atmosphere.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-smile-makeover-as-a-new-premium-service-card-the-card-and-its-detail-page-must-heavily-feature-before-after-comparison-sliders-using-the-existing-beforeafterslider-component-showing-multiple-smile-transformation-examples",
+      "title": "Add 'Smile Makeover' as a new premium service card. The card and its detail page must heavily feature Before/After comparison sliders using the existing BeforeAfterSlider component, showing multiple smile transformation examples.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-laser-dentistry-as-a-new-premium-service-card-the-card-must-feature-a-glowing-animated-laser-beam-effect-css-animation-with-teal-blue-glow-sweeping-across-the-card-that-highlights-the-service-card-on-hover-or-on-scroll-entry",
+      "title": "Add 'Laser Dentistry' as a new premium service card. The card must feature a glowing animated laser beam effect (CSS animation with teal/blue glow sweeping across the card) that highlights the service card on hover or on scroll entry.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-custom-cursor-interaction-as-the-user-moves-their-mouse-across-the-page-a-subtle-semi-transparent-water-ripple-or-medical-cross-shadow-trail-follows-the-cursor-with-a-slight-delay-the-effect-must-be-faint-and-not-obstruct-any-clickable-elements-or-text",
+      "title": "Implement a custom cursor interaction: as the user moves their mouse across the page, a subtle semi-transparent 'water ripple' or 'medical cross' shadow/trail follows the cursor with a slight delay. The effect must be faint and not obstruct any clickable elements or text.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-plain-white-background-with-a-slow-moving-animated-mesh-gradient-background-throughout-the-site-the-gradient-should-subtly-shift-between-very-light-shades-of-white-pale-teal-and-pale-royal-blue-over-a-15-20-second-loop-creating-depth-without-distracting-from-content",
+      "title": "Replace the plain white background with a slow-moving animated mesh gradient background throughout the site. The gradient should subtly shift between very light shades of white, pale teal, and pale royal-blue over a 15-20 second loop, creating depth without distracting from content.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-text-scramble-effect-on-major-section-headings-throughout-the-site-when-a-heading-scrolls-into-the-viewport-it-briefly-displays-random-letters-that-rapidly-resolve-into-the-correct-final-heading-text-cyberpunk-style-but-at-a-professional-measured-speed-use-an-intersectionobserver-to-trigger-the-effect-once-per-heading-per-page-load",
+      "title": "Implement a text scramble effect on major section headings throughout the site. When a heading scrolls into the viewport, it briefly displays random letters that rapidly resolve into the correct final heading text (cyberpunk-style but at a professional, measured speed). Use an IntersectionObserver to trigger the effect once per heading per page load.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-existing-static-list-style-testimonial-display-with-an-infinite-auto-scrolling-carousel-marquee-style-that-shows-patient-review-cards-floating-horizontally-the-carousel-must-pause-scrolling-when-the-user-hovers-over-it-and-resume-on-mouse-out-use-data-from-the-existing-reviews-backend-query",
+      "title": "Replace the existing static/list-style testimonial display with an infinite auto-scrolling carousel (marquee-style) that shows patient review cards floating horizontally. The carousel must pause scrolling when the user hovers over it, and resume on mouse-out. Use data from the existing reviews backend query.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-service-manager-section-to-the-admin-panel-that-allows-the-admin-to-edit-the-display-name-description-text-and-upload-replace-the-featured-photo-for-each-of-the-5-premium-services-dental-implants-invisalign-pediatric-dentistry-kids-smile-makeover-and-laser-dentistry-changes-must-be-persisted-in-the-backend-and-reflected-on-the-public-facing-service-cards-and-detail-pages",
+      "title": "Add a 'Service Manager' section to the admin panel that allows the admin to edit the display name, description text, and upload/replace the featured photo for each of the 5 premium services: Dental Implants, Invisalign, Pediatric Dentistry (Kids), Smile Makeover, and Laser Dentistry. Changes must be persisted in the backend and reflected on the public-facing service cards and detail pages.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-review-approver-workflow-patient-submitted-reviews-must-be-held-in-a-pending-state-and-only-appear-on-the-public-website-after-an-admin-explicitly-approves-them-in-the-admin-panel-the-admin-panel-must-display-all-pending-reviews-with-approve-and-reject-actions",
+      "title": "Implement a Review Approver workflow: patient-submitted reviews must be held in a 'pending' state and only appear on the public website after an admin explicitly approves them in the admin panel. The admin panel must display all pending reviews with Approve and Reject actions.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-glassmorphism-design-treatment-to-all-service-cards-testimonial-cards-doctor-profile-card-and-admin-panel-content-cards-use-a-frosted-blurred-glass-background-backdrop-filter-blur-semi-transparent-white-teal-background-so-the-animated-mesh-gradient-background-shows-softly-through-the-card-surfaces",
+      "title": "Apply a glassmorphism design treatment to all service cards, testimonial cards, doctor profile card, and admin panel content cards: use a frosted/blurred glass background (backdrop-filter: blur, semi-transparent white/teal background) so the animated mesh gradient background shows softly through the card surfaces.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-scroll-progress-indicator-a-thin-3-4px-horizontal-bar-fixed-at-the-very-top-of-the-viewport-above-the-sticky-header-that-fills-from-left-to-right-as-the-user-scrolls-down-the-page-using-the-site-s-teal-or-royal-blue-accent-color-and-resets-to-empty-when-the-user-returns-to-the-top",
+      "title": "Add a scroll-progress indicator: a thin (3–4px) horizontal bar fixed at the very top of the viewport (above the sticky header) that fills from left to right as the user scrolls down the page, using the site's teal or royal-blue accent color, and resets to empty when the user returns to the top.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-floating-dental-element-decorations-in-the-corners-and-edges-of-the-page-small-64-96px-semi-transparent-png-images-of-dental-icons-tooth-dental-mirror-toothbrush-plus-cross-that-gently-float-and-apply-a-subtle-parallax-offset-as-the-user-scrolls-creating-depth-without-obstructing-any-content",
+      "title": "Add floating dental element decorations in the corners and edges of the page: small (64–96px) semi-transparent PNG images of dental icons (tooth, dental mirror, toothbrush, plus/cross) that gently float and apply a subtle parallax offset as the user scrolls, creating depth without obstructing any content.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-the-existing-custom-cursor-so-that-when-the-mouse-hovers-over-any-service-card-in-the-services-section-the-cursor-icon-changes-to-a-dental-themed-icon-tooth-or-medical-plus-cross-svg-the-cursor-must-revert-to-the-standard-custom-cursor-when-moving-off-service-cards-this-is-a-magnetic-context-sensitive-cursor-enhancement-on-top-of-the-existing-customcursor-component",
+      "title": "Enhance the existing custom cursor so that when the mouse hovers over any service card in the Services section, the cursor icon changes to a dental-themed icon (tooth or medical plus/cross SVG). The cursor must revert to the standard custom cursor when moving off service cards. This is a magnetic/context-sensitive cursor enhancement on top of the existing CustomCursor component.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-render-all-new-floating-dental-element-images-as-static-assets-in-the-frontend-public-assets-generated-directory",
+      "title": "Render all new floating dental element images as static assets in the frontend/public/assets/generated directory.",
+      "reqIds": [
+        "REQ-38"
       ],
       "version": 1
     }
@@ -265,6 +403,78 @@
       "reqIds": [
         "REQ-14"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-29",
+      "summary": "Hidden admin access via triple-click on footer copyright logo, opening a login popup (username: 6352174912, password: 63521) with Open/Closed toggle, review approval, and before/after photo upload",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-30",
+      "summary": "Add 5 new premium services: Dental Implants (3D animated implant model), Invisalign (slide-to-compare teeth alignment), Pediatric Dentistry (floating bubble animations), Smile Makeover (heavy before/after use), Laser Dentistry (glowing beam animation on service card)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-31",
+      "summary": "Custom cursor interaction: water ripple or medical cross subtle shadow that follows mouse movement",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-32",
+      "summary": "Animated mesh gradient background (slow-moving) instead of plain white background",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-33",
+      "summary": "Text scramble effect on headings: random letters on scroll that resolve into final text (cyberpunk-professional style)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-34",
+      "summary": "Interactive review wall as infinite auto-scroll carousel (floating cloud style) that pauses on mouse hover",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "Service Manager in admin panel: allow editing text and photos for the 5 premium services (Implants, Invisalign, Kids, Smile Makeover, Laser)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-36",
+      "summary": "Review Approver in admin panel: submitted reviews held for approval before going live on the website",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-37",
+      "summary": "Magnetic cursor: cursor changes to dental icons (tooth or plus sign) when hovering over service cards",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-38",
+      "summary": "Glassmorphism design for cards: blurred glass effect so background animations show through subtly",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-39",
+      "summary": "Scroll-progress bar: thin line at top of screen showing how far user has scrolled",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-40",
+      "summary": "Floating dental elements in corners: small transparent images of dental equipment/teeth floating with parallax effect",
+      "reqIds": [],
       "status": "pending"
     }
   ],

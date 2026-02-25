@@ -2,205 +2,172 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-    :root {
-        --radius: 0.625rem;
-        --background: 1 0 0;
-        --foreground: 0.145 0 0;
-        --card: 1 0 0;
-        --card-foreground: 0.145 0 0;
-        --popover: 1 0 0;
-        --popover-foreground: 0.145 0 0;
-        --primary: 0.205 0 0;
-        --primary-foreground: 0.985 0 0;
-        --secondary: 0.97 0 0;
-        --secondary-foreground: 0.205 0 0;
-        --muted: 0.97 0 0;
-        --muted-foreground: 0.556 0 0;
-        --accent: 0.97 0 0;
-        --accent-foreground: 0.205 0 0;
-        --destructive: 0.577 0.245 27.325;
-        --destructive-foreground: 0.985 0 0;
-        --border: 0.922 0 0;
-        --input: 0.922 0 0;
-        --ring: 0.708 0 0;
-        --chart-1: 0.646 0.222 41.116;
-        --chart-2: 0.6 0.118 184.704;
-        --chart-3: 0.398 0.07 227.392;
-        --chart-4: 0.828 0.189 84.429;
-        --chart-5: 0.769 0.188 70.08;
-        --sidebar: 0.985 0 0;
-        --sidebar-foreground: 0.145 0 0;
-        --sidebar-primary: 0.205 0 0;
-        --sidebar-primary-foreground: 0.985 0 0;
-        --sidebar-accent: 0.97 0 0;
-        --sidebar-accent-foreground: 0.205 0 0;
-        --sidebar-border: 0.922 0 0;
-        --sidebar-ring: 0.708 0 0;
-        
-        /* Custom colors for dental clinic */
-        --royal-blue: 0.45 0.18 250;
-        --teal: 0.65 0.15 180;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap');
 
-    .dark {
-        --background: 0.145 0 0;
-        --foreground: 0.985 0 0;
-        --card: 0.205 0 0;
-        --card-foreground: 0.985 0 0;
-        --popover: 0.269 0 0;
-        --popover-foreground: 0.985 0 0;
-        --primary: 0.922 0 0;
-        --primary-foreground: 0.205 0 0;
-        --secondary: 0.269 0 0;
-        --secondary-foreground: 0.985 0 0;
-        --muted: 0.269 0 0;
-        --muted-foreground: 0.708 0 0;
-        --accent: 0.371 0 0;
-        --accent-foreground: 0.985 0 0;
-        --destructive: 0.704 0.191 22.216;
-        --destructive-foreground: 0.205 0 0;
-        --border: 1 0 0 / 10%;
-        --input: 1 0 0 / 15%;
-        --ring: 0.556 0 0;
-        --chart-1: 0.488 0.243 264.376;
-        --chart-2: 0.696 0.17 162.48;
-        --chart-3: 0.769 0.188 70.08;
-        --chart-4: 0.627 0.265 303.9;
-        --chart-5: 0.645 0.246 16.439;
-        --sidebar: 0.205 0 0;
-        --sidebar-foreground: 0.985 0 0;
-        --sidebar-primary: 0.488 0.243 264.376;
-        --sidebar-primary-foreground: 0.985 0 0;
-        --sidebar-accent: 0.269 0 0;
-        --sidebar-accent-foreground: 0.985 0 0;
-        --sidebar-border: 1 0 0 / 10%;
-        --sidebar-ring: 0.439 0 0;
-        
-        /* Custom colors for dental clinic - dark mode */
-        --royal-blue: 0.55 0.20 250;
-        --teal: 0.70 0.18 180;
-    }
-
-    * {
-        @apply border-border;
-    }
-    body {
-        @apply bg-background text-foreground;
-        font-feature-settings: "rlig" 1, "calt" 1;
-    }
+:root {
+  --background: oklch(0.12 0.02 240);
+  --foreground: oklch(0.97 0.01 240);
+  --card: oklch(0.16 0.025 240);
+  --card-foreground: oklch(0.97 0.01 240);
+  --popover: oklch(0.16 0.025 240);
+  --popover-foreground: oklch(0.97 0.01 240);
+  --primary: oklch(0.62 0.18 185);
+  --primary-foreground: oklch(0.12 0.02 240);
+  --secondary: oklch(0.22 0.04 240);
+  --secondary-foreground: oklch(0.97 0.01 240);
+  --muted: oklch(0.22 0.04 240);
+  --muted-foreground: oklch(0.65 0.04 240);
+  --accent: oklch(0.55 0.2 240);
+  --accent-foreground: oklch(0.97 0.01 240);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.97 0.01 240);
+  --border: oklch(0.28 0.04 240);
+  --input: oklch(0.22 0.04 240);
+  --ring: oklch(0.62 0.18 185);
+  --radius: 0.75rem;
 }
 
-@layer utilities {
-    .animated-button {
-        @apply transition-all duration-300 hover:scale-105 hover:shadow-lg;
-    }
-    
-    .text-royal-blue {
-        color: oklch(var(--royal-blue));
-    }
-    
-    .bg-royal-blue {
-        background-color: oklch(var(--royal-blue));
-    }
-    
-    .text-teal {
-        color: oklch(var(--teal));
-    }
-    
-    .bg-teal {
-        background-color: oklch(var(--teal));
-    }
-    
-    .from-royal-blue {
-        --tw-gradient-from: oklch(var(--royal-blue));
-        --tw-gradient-to: oklch(var(--royal-blue) / 0);
-        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-    }
-    
-    .to-teal {
-        --tw-gradient-to: oklch(var(--teal));
-    }
-    
-    /* Custom animations */
-    @keyframes fade-in {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slide-up {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes slide-in-left {
-        from {
-            opacity: 0;
-            transform: translateX(-50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    @keyframes slide-in-right {
-        from {
-            opacity: 0;
-            transform: translateX(50px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    @keyframes fade-in-up {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .animate-fade-in {
-        animation: fade-in 1.5s ease-out;
-    }
-    
-    .animate-slide-up {
-        animation: slide-up 0.8s ease-out;
-    }
-    
-    .animate-slide-in-left {
-        animation: slide-in-left 0.8s ease-out;
-    }
-    
-    .animate-slide-in-right {
-        animation: slide-in-right 0.8s ease-out;
-    }
-    
-    .animate-fade-in-up {
-        animation: fade-in-up 0.6s ease-out;
-    }
-    
-    .animation-delay-200 {
-        animation-delay: 200ms;
-    }
-    
-    .animation-delay-400 {
-        animation-delay: 400ms;
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── Animated Mesh Gradient Background ─────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 30%, oklch(0.35 0.12 185 / 0.45) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 80% 70%, oklch(0.30 0.14 240 / 0.40) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 50% 50%, oklch(0.18 0.06 220 / 0.60) 0%, transparent 70%),
+    oklch(0.12 0.02 240);
+  animation: meshShift 18s ease-in-out infinite alternate;
+}
+
+@keyframes meshShift {
+  0%   { background-position: 0% 0%, 100% 100%, 50% 50%; }
+  33%  { background-position: 30% 20%, 70% 80%, 60% 40%; }
+  66%  { background-position: 60% 40%, 40% 60%, 30% 70%; }
+  100% { background-position: 100% 100%, 0% 0%, 50% 50%; }
+}
+
+/* ── Glassmorphism Utility ──────────────────────────────────────────────────── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ── Testimonial Carousel ───────────────────────────────────────────────────── */
+@keyframes testimonialScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ── Bubble Rise (Pediatric) ────────────────────────────────────────────────── */
+.bubble-rise {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  animation: bubbleRise 4s ease-in infinite;
+  pointer-events: none;
+}
+.bubble-1 { width: 12px; height: 12px; left: 15%; bottom: -20px; animation-delay: 0s; }
+.bubble-2 { width: 8px;  height: 8px;  left: 50%; bottom: -20px; animation-delay: 1.5s; }
+.bubble-3 { width: 16px; height: 16px; left: 75%; bottom: -20px; animation-delay: 0.8s; }
+
+@keyframes bubbleRise {
+  0%   { transform: translateY(0) scale(1); opacity: 0.7; }
+  100% { transform: translateY(-200px) scale(0.5); opacity: 0; }
+}
+
+/* ── Laser Beam (Laser Dentistry) ───────────────────────────────────────────── */
+.laser-beam {
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 2px;
+  background: linear-gradient(90deg, transparent, oklch(0.75 0.25 185), transparent);
+  animation: laserSweep 3s ease-in-out infinite;
+  pointer-events: none;
+}
+.laser-pulse {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, oklch(0.62 0.18 185 / 0.15) 0%, transparent 70%);
+  animation: laserPulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes laserSweep {
+  0%   { left: -60%; top: 20%; }
+  50%  { left: 100%; top: 60%; }
+  100% { left: -60%; top: 20%; }
+}
+@keyframes laserPulse {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.8; }
+}
+
+/* ── Implant Drop ───────────────────────────────────────────────────────────── */
+.implant-drop {
+  position: absolute;
+  top: -20px; left: 50%;
+  transform: translateX(-50%);
+  width: 4px; height: 40px;
+  background: linear-gradient(180deg, transparent, oklch(0.62 0.18 185 / 0.6));
+  animation: implantDrop 2.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes implantDrop {
+  0%   { top: -20px; opacity: 0; }
+  30%  { opacity: 1; }
+  70%  { top: 80%; opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* ── Float Bob (Floating Dental Elements) ───────────────────────────────────── */
+@keyframes floatBob {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25%       { transform: translateY(-12px) rotate(3deg); }
+  75%       { transform: translateY(6px) rotate(-2deg); }
+}
+
+/* ── Scroll-triggered fade-in ───────────────────────────────────────────────── */
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Utility ────────────────────────────────────────────────────────────────── */
+::selection {
+  background: oklch(0.62 0.18 185 / 0.4);
+  color: white;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: oklch(0.12 0.02 240); }
+::-webkit-scrollbar-thumb { background: oklch(0.35 0.1 185); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: oklch(0.50 0.15 185); }

@@ -1,373 +1,168 @@
 {
   "kind": "build_request",
-  "title": "Build XYZ Dental Clinic premium website with animations and admin panel",
+  "title": "Admin Panel Enhancements + Glassmorphism, Scroll Progress Bar, Floating Dental Elements & Magnetic Cursor",
   "projectName": "XYZ Dental Clinic",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Implement scroll-triggered reveal animations (fade-in and slide-up effects) for text and images throughout the website using Framer Motion or similar React animation library",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Text elements fade in smoothly when scrolling into view",
-        "Images slide up with fade effect when entering viewport",
-        "Animations trigger once per element on first scroll"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Add parallax scrolling effect to background images creating depth perception as users scroll",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Background images move slower than foreground content",
-        "Parallax effect is smooth without janky performance",
-        "Effect works on hero section and key image sections"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Create micro-interactions for buttons with hover effects including smooth glow and scale-up animations",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Buttons scale up slightly on hover (1.05x)",
-        "Glow effect appears smoothly on hover",
-        "Transitions are smooth and professional"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Integrate Lottie animations for dental procedures (cleaning, implants) that sync with accompanying text descriptions",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Lottie animations load and play for dental procedures",
-        "Animations sync with text scroll position or trigger",
-        "Animations are lightweight and don't impact performance"
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Create hero section with high-quality image slider or static hero image featuring dental work with prominent 'Book Appointment' call-to-action button",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Hero section displays full-width with professional dental imagery",
-        "Book Appointment button is prominent and easily clickable",
-        "Hero includes heading about perfect smiles",
-        "Responsive layout works on mobile and desktop"
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Build interactive before/after slider component where users can drag to compare treatment results with left showing before and right showing after",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Slider handle can be dragged horizontally",
-        "Left side shows before image, right side shows after image",
-        "Smooth dragging experience without lag",
-        "Mobile touch support for dragging"
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "text": "Create services grid displaying dental services (Root Canal, Braces, Whitening, etc.) with animated icons and links to detail pages for each service",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Grid layout displays multiple services in organized manner",
-        "Each service has an animated icon",
-        "Clicking a service navigates to its detail page",
-        "Icons animate on hover or scroll into view"
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "text": "Build doctor profile section with photo, smooth entry animation, and details including expertise and education credentials",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Doctor photo displays prominently",
-        "Section animates smoothly when scrolling into view",
-        "Expertise and education information is clearly displayed",
-        "Professional and trustworthy layout"
-      ]
-    },
-    {
-      "id": "REQ-9",
-      "text": "Create auto-sliding testimonial carousel section for patient reviews with manual navigation controls",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Testimonials auto-slide every few seconds",
-        "Users can manually navigate between reviews",
-        "Smooth transitions between testimonials",
-        "Displays patient name and review text clearly"
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "text": "Add live contact features including WhatsApp chat button, embedded Google Maps location, and clickable phone number",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "WhatsApp button opens chat with clinic number",
-        "Google Maps embed shows clinic location",
-        "Phone number is clickable and initiates call on mobile",
-        "All contact options are easily accessible"
-      ]
-    },
-    {
-      "id": "REQ-11",
-      "text": "Build backend data model for appointments including patient name, contact info, preferred date/time, service type, and status",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Appointments can be created with patient details",
-        "Each appointment has unique ID",
-        "Appointments can be queried and filtered",
-        "Status field supports pending/confirmed/cancelled states"
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "text": "Create backend clinic status toggle functionality that tracks whether clinic is open, closed, or in emergency mode",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Clinic status can be set to open, closed, or emergency",
-        "Status persists across canister upgrades",
-        "Status can be queried by frontend",
-        "Only authorized users can modify status"
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "text": "Build backend content management system for storing and retrieving photos, reviews, and before-after images with metadata",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Images can be uploaded with descriptions",
-        "Reviews can be added with patient name and rating",
-        "Before-after pairs are linked together",
-        "Content can be retrieved for frontend display"
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "text": "Create backend doctor availability schedule management supporting multiple doctors with time slots and date ranges",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Doctor schedules can be created and updated",
-        "Availability includes days, time ranges, and exceptions",
-        "Frontend can query available slots for booking",
-        "Schedules persist across upgrades"
-      ]
-    },
-    {
-      "id": "REQ-15",
-      "text": "Build admin dashboard page with clinic status toggle displaying real-time banner on public site when status is Emergency or Closed",
+      "id": "REQ-32",
+      "text": "Add a 'Service Manager' section to the admin panel that allows the admin to edit the display name, description text, and upload/replace the featured photo for each of the 5 premium services: Dental Implants, Invisalign, Pediatric Dentistry (Kids), Smile Makeover, and Laser Dentistry. Changes must be persisted in the backend and reflected on the public-facing service cards and detail pages.",
       "target": "both",
       "source": {
         "messageIds": [
           "msg-1"
+        ],
+        "quotes": [
+          "Service Manager: 5 nayi services (Implants, Invisalign, Kids, Smile Makeover, Laser) ka text aur photo badalne ka option."
         ]
       },
       "acceptanceCriteria": [
-        "Dashboard has toggle switch for clinic status",
-        "Toggling status immediately updates backend",
-        "Public website displays banner when status is Closed or Emergency",
-        "Banner is prominent and clearly visible"
+        "Admin panel has a 'Service Manager' tab/section listing all 5 premium services.",
+        "Each service entry has an editable name field, description/text area, and an image upload control.",
+        "Saving changes persists the updated text and image to the backend.",
+        "Updated service text and image appear on the public Services grid cards and corresponding detail pages without a code change."
       ]
     },
     {
-      "id": "REQ-16",
-      "text": "Create appointment manager interface in admin panel displaying all bookings with filtering by date and status, allowing status updates",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "All appointments display in organized table or list",
-        "Admin can filter appointments by date range and status",
-        "Admin can update appointment status",
-        "Display shows patient details and service requested"
-      ]
-    },
-    {
-      "id": "REQ-17",
-      "text": "Build content management interface in admin panel for uploading photos, reviews, and before-after images without requiring code changes",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin can upload new images through form interface",
-        "Admin can add reviews with patient name and text",
-        "Admin can create before-after pairs by uploading two images",
-        "Uploaded content immediately appears on public site"
-      ]
-    },
-    {
-      "id": "REQ-18",
-      "text": "Create doctor availability scheduler interface in admin panel allowing modification of doctor schedules with date pickers and time range selectors",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin can view current doctor schedules",
-        "Admin can add new availability blocks with date and time",
-        "Admin can mark doctors as unavailable for specific dates",
-        "Changes save to backend immediately"
-      ]
-    },
-    {
-      "id": "REQ-19",
-      "text": "Implement authentication system restricting admin panel access to authorized users only",
+      "id": "REQ-33",
+      "text": "Implement a Review Approver workflow: patient-submitted reviews must be held in a 'pending' state and only appear on the public website after an admin explicitly approves them in the admin panel. The admin panel must display all pending reviews with Approve and Reject actions.",
       "target": "both",
       "source": {
         "messageIds": [
           "msg-1"
+        ],
+        "quotes": [
+          "Review Approver: Log jo reviews likhenge, wo pehle aapko admin panel mein dikhenge. Aap 'Approve' karoge tabhi website par live honge."
         ]
       },
       "acceptanceCriteria": [
-        "Admin panel requires authentication to access",
-        "Unauthorized users cannot view or modify admin content",
-        "Authentication uses Internet Identity",
-        "Authenticated users can access all admin features"
+        "Newly submitted reviews have a 'pending' status and are not visible in the public testimonial carousel.",
+        "Admin panel shows a 'Review Approver' section listing all pending reviews with patient name, review text, star rating, and submission date.",
+        "Admin can click 'Approve' to make a review live or 'Reject' to discard it.",
+        "Only approved reviews appear in the public-facing auto-scrolling testimonial carousel.",
+        "Backend stores approval status per review and filters by status on public queries."
       ]
     },
     {
-      "id": "REQ-20",
-      "text": "Apply minimalist white, deep royal blue, and teal color palette throughout the website creating a boutique, high-end medical-professional aesthetic",
+      "id": "REQ-34",
+      "text": "Apply a glassmorphism design treatment to all service cards, testimonial cards, doctor profile card, and admin panel content cards: use a frosted/blurred glass background (backdrop-filter: blur, semi-transparent white/teal background) so the animated mesh gradient background shows softly through the card surfaces.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
+        ],
+        "quotes": [
+          "Glassmorphism Design: Cards ko 'Dhundhla Kaanch' (Blurred Glass) jaisa look do taaki background ki animations piche se halki dikhti rahein."
         ]
       },
       "acceptanceCriteria": [
-        "Primary colors are white, royal blue, and teal",
-        "Color scheme is consistent across all pages",
-        "Design feels modern, clean, and professional",
-        "High contrast for readability"
+        "Service grid cards use backdrop-filter blur with a semi-transparent background.",
+        "Testimonial carousel cards use the same glassmorphism treatment.",
+        "Doctor profile card uses glassmorphism styling.",
+        "Admin panel dashboard/content cards adopt glassmorphism.",
+        "The animated mesh gradient background is subtly visible through all glassmorphism cards.",
+        "Text and interactive elements remain fully legible on all glass cards."
       ]
     },
     {
-      "id": "REQ-21",
-      "text": "Render all generated images as static assets in frontend/public/assets/generated directory",
+      "id": "REQ-35",
+      "text": "Add a scroll-progress indicator: a thin (3–4px) horizontal bar fixed at the very top of the viewport (above the sticky header) that fills from left to right as the user scrolls down the page, using the site's teal or royal-blue accent color, and resets to empty when the user returns to the top.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
+        ],
+        "quotes": [
+          "Scroll-Progress Bar: Screen ke upar ek patli line chale jo dikhaye user ne kitna scroll kiya hai."
         ]
       },
       "acceptanceCriteria": [
-        "Generated images are stored in public/assets/generated",
-        "Images are referenced correctly in components",
-        "All images load properly on the website"
+        "A fixed bar is rendered at the very top of the viewport (z-index above header).",
+        "The bar width is proportional to scroll progress (0% at top, 100% at bottom of page).",
+        "The bar uses the site teal or royal-blue accent color.",
+        "The bar is 3–4px tall and spans full viewport width.",
+        "It is present on all public pages."
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "text": "Add floating dental element decorations in the corners and edges of the page: small (64–96px) semi-transparent PNG images of dental icons (tooth, dental mirror, toothbrush, plus/cross) that gently float and apply a subtle parallax offset as the user scrolls, creating depth without obstructing any content.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Floating Elements: Website ke corners mein dental equipment ya healthy teeth ki small transparent images 'float' karti rahein (Parallax effect)."
+        ]
+      },
+      "acceptanceCriteria": [
+        "At least 4 floating dental element icons are positioned near the corners/edges of the home page.",
+        "Each element has a gentle CSS float/bob animation (up-down or rotation).",
+        "Elements shift position slightly based on scroll position (parallax offset).",
+        "Elements are semi-transparent and do not overlap or obstruct text, CTAs, or interactive UI.",
+        "Images are served from frontend/public/assets/generated."
+      ]
+    },
+    {
+      "id": "REQ-37",
+      "text": "Enhance the existing custom cursor so that when the mouse hovers over any service card in the Services section, the cursor icon changes to a dental-themed icon (tooth or medical plus/cross SVG). The cursor must revert to the standard custom cursor when moving off service cards. This is a magnetic/context-sensitive cursor enhancement on top of the existing CustomCursor component.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Magnetic Cursor: Mouse ka cursor dental icons (daant ya plus sign) mein badal jaye jab wo services par jaye."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Hovering over a service card switches the custom cursor SVG to a tooth or plus-sign dental icon.",
+        "Moving off the service card reverts the cursor to the default custom cursor (medical cross trail).",
+        "The transition between cursor states is smooth (no flicker).",
+        "The behavior works for all service cards including the 5 premium service cards.",
+        "The cursor does not obstruct or interfere with click targets on the cards."
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "text": "Render all new floating dental element images as static assets in the frontend/public/assets/generated directory.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Website ke corners mein dental equipment ya healthy teeth ki small transparent images"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All floating dental element PNG files are present in frontend/public/assets/generated.",
+        "The floating element components reference these static asset paths."
       ]
     }
   ],
   "constraints": [
-    "Must use Motoko for backend, React with TypeScript for frontend, and Tailwind CSS for styling",
-    "All backend logic must remain in a single actor file (backend/main.mo)",
-    "Cannot use real-time WebSocket features or external video streaming",
-    "Cannot integrate external authentication providers besides Internet Identity",
-    "WhatsApp integration must use web.whatsapp.com links, not API calls",
-    "Google Maps must use embed iframe, not Maps API"
+    "Do not break or modify the existing hidden admin triple-click footer login mechanism (credentials: 6352174912 / 63521).",
+    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
+    "All Motoko logic must remain in the single backend/main.mo actor.",
+    "Floating elements and scroll progress bar must not obstruct any clickable elements or readable text.",
+    "Glassmorphism must preserve full text legibility on all cards."
   ],
   "nonGoals": [
-    "Real-time video calls with doctors",
-    "Integration with external medical record systems",
-    "Payment processing for appointments",
-    "SMS notifications for appointments",
-    "Email marketing campaigns",
-    "Multi-language support",
-    "Mobile app development"
+    "Adding OTP, CAPTCHA, or any additional security layer to the admin login flow.",
+    "Creating a separate admin login page (modal popup only).",
+    "Integrating any third-party authentication provider.",
+    "Adding real-time WebSocket or push notification features.",
+    "Changing the existing color palette (white, deep royal blue, teal).",
+    "Modifying the existing BeforeAfterSlider, TestimonialCarousel, or HeroSection core logic."
   ],
   "imageRequirements": {
     "required": [
-      "Hero background image showing modern dental clinic interior with bright lighting (hero-bg.dim_1920x1080.png)",
-      "Perfect smile close-up photo for hero slider (smile-hero.dim_1200x800.png)",
-      "Root canal procedure icon illustration in royal blue and teal (icon-root-canal.dim_256x256.png)",
-      "Braces treatment icon illustration in royal blue and teal (icon-braces.dim_256x256.png)",
-      "Teeth whitening icon illustration in royal blue and teal (icon-whitening.dim_256x256.png)",
-      "Dental implants icon illustration in royal blue and teal (icon-implants.dim_256x256.png)",
-      "Doctor profile photo showing professional dentist in white coat (doctor-profile.dim_600x800.png)",
-      "Before treatment teeth photo showing discoloration (before-whitening.dim_800x600.png)",
-      "After treatment teeth photo showing bright white smile (after-whitening.dim_800x600.png)",
-      "Before braces photo showing misaligned teeth (before-braces.dim_800x600.png)",
-      "After braces photo showing perfectly aligned teeth (after-braces.dim_800x600.png)",
-      "Clinic exterior photo showing modern building entrance (clinic-exterior.dim_1200x800.png)",
-      "Waiting room interior showing comfortable seating area (waiting-room.dim_1200x800.png)"
+      "Semi-transparent tooth icon illustration for floating dental element and magnetic cursor, white/teal tones on transparent background (tooth-float-icon.dim_96x96.png)",
+      "Semi-transparent dental mirror icon illustration for floating dental element, white/teal tones on transparent background (dental-mirror-float-icon.dim_96x96.png)",
+      "Semi-transparent toothbrush icon illustration for floating dental element, white/teal tones on transparent background (toothbrush-float-icon.dim_96x96.png)",
+      "Semi-transparent medical plus/cross icon illustration for floating dental element and magnetic cursor, teal/royal-blue tones on transparent background (plus-float-icon.dim_96x96.png)"
     ],
     "edits": []
   }

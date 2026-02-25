@@ -1,116 +1,93 @@
 import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useGetAllDoctors, useAddDoctor } from '../../hooks/useQueries';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowLeft, UserPlus } from 'lucide-react';
-import { Link } from '@tanstack/react-router';
 
 export default function DoctorScheduler() {
-  const { data: doctors = [] } = useGetAllDoctors();
+  const navigate = useNavigate();
+  const { data: doctors, isLoading } = useGetAllDoctors();
   const addDoctor = useAddDoctor();
-  const [doctorName, setDoctorName] = useState('');
-  const [specialty, setSpecialty] = useState('');
+  const [form, setForm] = useState({ name: '', specialty: '' });
 
-  const handleAddDoctor = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!doctorName.trim() || !specialty.trim()) {
+    if (!form.name.trim() || !form.specialty.trim()) {
       toast.error('Please fill in all fields');
       return;
     }
-
     try {
-      await addDoctor.mutateAsync({
-        name: doctorName.trim(),
-        specialty: specialty.trim(),
-        availability: [],
-      });
-      toast.success('Doctor added successfully!');
-      setDoctorName('');
-      setSpecialty('');
-    } catch (error) {
-      console.error('Failed to add doctor:', error);
+      await addDoctor.mutateAsync({ name: form.name, specialty: form.specialty, availability: [] });
+      toast.success('Doctor added successfully');
+      setForm({ name: '', specialty: '' });
+    } catch {
       toast.error('Failed to add doctor');
     }
   };
 
   return (
-    <div className="container py-12">
-      <div className="mb-8">
-        <Link to="/admin/dashboard">
-          <Button variant="ghost" className="mb-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Button>
-        </Link>
-        <h1 className="text-4xl font-bold mb-2">Doctor Scheduler</h1>
-        <p className="text-muted-foreground">Manage doctor profiles and availability</p>
-      </div>
+    <div className="min-h-screen p-6 md:p-10">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <button onClick={() => navigate({ to: '/admin/dashboard' })} className="text-white/60 hover:text-white transition-colors">
+            ← Back
+          </button>
+          <h1 className="text-3xl font-bold text-white">Doctor Scheduler</h1>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UserPlus className="h-5 w-5" />
-              Add New Doctor
-            </CardTitle>
-            <CardDescription>Add a new doctor to the clinic</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleAddDoctor} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="doctorName">Doctor Name</Label>
-                <Input
-                  id="doctorName"
-                  placeholder="Dr. John Smith"
-                  value={doctorName}
-                  onChange={(e) => setDoctorName(e.target.value)}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Add Doctor Form */}
+          <div className="glass-card rounded-2xl p-6">
+            <h2 className="text-white font-semibold text-lg mb-5">Add New Doctor</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-white/70 text-sm mb-1.5">Doctor Name</label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder="Dr. Full Name"
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-teal-400/60 transition-colors"
                 />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="specialty">Specialty</Label>
-                <Input
-                  id="specialty"
-                  placeholder="e.g., Orthodontics, Endodontics"
-                  value={specialty}
-                  onChange={(e) => setSpecialty(e.target.value)}
+              <div>
+                <label className="block text-white/70 text-sm mb-1.5">Specialty</label>
+                <input
+                  type="text"
+                  value={form.specialty}
+                  onChange={e => setForm(f => ({ ...f, specialty: e.target.value }))}
+                  placeholder="e.g. Orthodontics"
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-teal-400/60 transition-colors"
                 />
               </div>
-
-              <Button type="submit" className="w-full" disabled={addDoctor.isPending}>
-                {addDoctor.isPending ? 'Adding Doctor...' : 'Add Doctor'}
-              </Button>
+              <button
+                type="submit"
+                disabled={addDoctor.isPending}
+                className="w-full py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-white font-semibold transition-colors disabled:opacity-50"
+              >
+                {addDoctor.isPending ? 'Adding...' : 'Add Doctor'}
+              </button>
             </form>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Current Doctors</CardTitle>
-            <CardDescription>Total: {doctors.length}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {doctors.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">No doctors added yet</p>
+          {/* Doctor List */}
+          <div className="glass-card rounded-2xl p-6">
+            <h2 className="text-white font-semibold text-lg mb-5">Current Doctors</h2>
+            {isLoading ? (
+              <p className="text-white/50 text-sm">Loading...</p>
+            ) : !doctors || doctors.length === 0 ? (
+              <p className="text-white/50 text-sm">No doctors added yet.</p>
             ) : (
-              <div className="space-y-4">
-                {doctors.map((doctor) => (
-                  <div
-                    key={doctor.id.toString()}
-                    className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                  >
-                    <h3 className="font-semibold text-lg">{doctor.name}</h3>
-                    <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
+              <div className="space-y-3">
+                {doctors.map(doc => (
+                  <div key={String(doc.id)} className="glass-card rounded-xl p-4">
+                    <p className="text-white font-medium">{doc.name}</p>
+                    <p className="text-teal-300 text-sm">{doc.specialty}</p>
                   </div>
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

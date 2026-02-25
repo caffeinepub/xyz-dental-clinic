@@ -1,116 +1,96 @@
 import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useAddReview } from '../../hooks/useQueries';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { ArrowLeft, Star } from 'lucide-react';
-import { Link } from '@tanstack/react-router';
 
 export default function ContentManager() {
+  const navigate = useNavigate();
   const addReview = useAddReview();
-  const [reviewerName, setReviewerName] = useState('');
-  const [reviewText, setReviewText] = useState('');
-  const [rating, setRating] = useState(5);
+  const [form, setForm] = useState({ reviewerName: '', text: '', rating: 5 });
 
-  const handleSubmitReview = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!reviewerName.trim() || !reviewText.trim()) {
+    if (!form.reviewerName.trim() || !form.text.trim()) {
       toast.error('Please fill in all fields');
       return;
     }
-
     try {
       await addReview.mutateAsync({
-        reviewerName: reviewerName.trim(),
-        text: reviewText.trim(),
-        rating: BigInt(rating),
-        photo: null,
-        beforeAfterImage: null,
+        reviewerName: form.reviewerName,
+        text: form.text,
+        rating: BigInt(form.rating),
       });
-      toast.success('Review added successfully!');
-      setReviewerName('');
-      setReviewText('');
-      setRating(5);
-    } catch (error) {
-      console.error('Failed to add review:', error);
-      toast.error('Failed to add review');
+      toast.success('Review submitted! It will appear after admin approval.');
+      setForm({ reviewerName: '', text: '', rating: 5 });
+    } catch {
+      toast.error('Failed to submit review');
     }
   };
 
   return (
-    <div className="container py-12">
-      <div className="mb-8">
-        <Link to="/admin/dashboard">
-          <Button variant="ghost" className="mb-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Button>
-        </Link>
-        <h1 className="text-4xl font-bold mb-2">Content Manager</h1>
-        <p className="text-muted-foreground">Manage reviews and testimonials</p>
-      </div>
+    <div className="min-h-screen p-6 md:p-10">
+      <div className="max-w-2xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <button onClick={() => navigate({ to: '/admin/dashboard' })} className="text-white/60 hover:text-white transition-colors">
+            ← Back
+          </button>
+          <h1 className="text-3xl font-bold text-white">Content Manager</h1>
+        </div>
 
-      <div className="max-w-2xl">
-        <Card>
-          <CardHeader>
-            <CardTitle>Add New Review</CardTitle>
-            <CardDescription>Add patient testimonials to showcase on the website</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmitReview} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="reviewerName">Patient Name</Label>
-                <Input
-                  id="reviewerName"
-                  placeholder="Enter patient name"
-                  value={reviewerName}
-                  onChange={(e) => setReviewerName(e.target.value)}
-                />
+        <div className="glass-card rounded-2xl p-8">
+          <h2 className="text-white font-semibold text-xl mb-2">Add Patient Review</h2>
+          <p className="text-white/50 text-sm mb-6">
+            ℹ️ Submitted reviews will be in <span className="text-yellow-300 font-medium">pending</span> state and require approval in the Review Approver before appearing publicly.
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-white/70 text-sm mb-1.5">Patient Name</label>
+              <input
+                type="text"
+                value={form.reviewerName}
+                onChange={e => setForm(f => ({ ...f, reviewerName: e.target.value }))}
+                placeholder="e.g. Priya Sharma"
+                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-teal-400/60 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/70 text-sm mb-1.5">Review Text</label>
+              <textarea
+                value={form.text}
+                onChange={e => setForm(f => ({ ...f, text: e.target.value }))}
+                placeholder="Write the patient's review..."
+                rows={4}
+                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-teal-400/60 transition-colors resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/70 text-sm mb-1.5">Rating</label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map(r => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, rating: r }))}
+                    className={`text-2xl transition-transform hover:scale-110 ${r <= form.rating ? 'text-yellow-400' : 'text-white/20'}`}
+                  >
+                    ★
+                  </button>
+                ))}
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="reviewText">Review Text</Label>
-                <Textarea
-                  id="reviewText"
-                  placeholder="Enter the review..."
-                  value={reviewText}
-                  onChange={(e) => setReviewText(e.target.value)}
-                  rows={5}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Rating</Label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setRating(star)}
-                      className="transition-transform hover:scale-110"
-                    >
-                      <Star
-                        className={`h-8 w-8 ${
-                          star <= rating
-                            ? 'fill-yellow-400 text-yellow-400'
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <Button type="submit" className="w-full" disabled={addReview.isPending}>
-                {addReview.isPending ? 'Adding Review...' : 'Add Review'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+            <button
+              type="submit"
+              disabled={addReview.isPending}
+              className="w-full py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-white font-semibold transition-colors disabled:opacity-50"
+            >
+              {addReview.isPending ? 'Submitting...' : 'Submit Review'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -1,22 +1,15 @@
 # Specification
 
 ## Summary
-**Goal:** Build a premium dental clinic website with smooth animations, interactive features, and an admin panel for managing appointments, content, and clinic status.
+**Goal:** Enhance the XYZ Dental Clinic admin panel with Service Manager and Review Approver features, and add several visual upgrades to the public site including glassmorphism cards, a scroll progress bar, floating dental elements, and a context-sensitive magnetic cursor.
 
 **Planned changes:**
-- Implement scroll-triggered animations (fade-in, slide-up) and parallax effects using Framer Motion
-- Add micro-interactions for buttons with hover glow and scale effects
-- Integrate Lottie animations for dental procedures synced with text
-- Create hero section with dental imagery and prominent "Book Appointment" CTA
-- Build interactive before/after slider for treatment comparisons
-- Create services grid with animated icons linking to detail pages
-- Build doctor profile section with photo and credentials
-- Add auto-sliding testimonial carousel with manual controls
-- Integrate WhatsApp chat button, Google Maps embed, and clickable phone number
-- Build backend for appointments, clinic status, content management, and doctor schedules
-- Create admin dashboard with clinic status toggle showing real-time banner on public site
-- Build admin interfaces for managing appointments, content uploads, and doctor availability
-- Implement Internet Identity authentication for admin panel access
-- Apply minimalist white, royal blue, and teal color scheme throughout
+- Add a "Service Manager" section to the admin panel allowing the admin to edit the name, description, and featured photo for each of the 5 premium services (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry); changes are persisted and reflected on public service cards and detail pages.
+- Add a "Review Approver" section to the admin panel where newly submitted reviews are held in a pending state and only go live on the public testimonial carousel after admin approval; admins can approve or reject each pending review.
+- Apply glassmorphism styling (backdrop-filter blur, semi-transparent background) to service cards, testimonial cards, the doctor profile card, and admin panel content cards so the animated mesh gradient background shows through.
+- Add a fixed 3–4px horizontal scroll-progress bar at the very top of the viewport that fills left-to-right as the user scrolls, using the site's teal/royal-blue accent color.
+- Add at least 4 floating semi-transparent dental element icons (tooth, dental mirror, toothbrush, plus/cross) positioned near page corners/edges with gentle float animations and scroll-based parallax offset.
+- Enhance the existing custom cursor so it switches to a dental-themed icon (tooth or plus SVG) when hovering over any service card, then reverts when moving off.
+- Serve all new floating dental element images as static assets in `frontend/public/assets/generated`.
 
-**User-visible outcome:** Users can explore a visually engaging dental clinic website with smooth animations, view services and doctors, book appointments, and see before/after results. Admins can manage appointments, update clinic status, upload content, and set doctor schedules through a secure dashboard.
+**User-visible outcome:** Admins can manage service content and moderate reviews via the admin panel. Public visitors see glassmorphism-styled cards, a scroll progress indicator, gently floating dental decorations, and a context-aware cursor that changes to a dental icon over service cards.

@@ -1,10 +1,10 @@
 import Iter "mo:core/Iter";
 import Map "mo:core/Map";
 import Array "mo:core/Array";
+import List "mo:core/List";
 import Set "mo:core/Set";
 import Time "mo:core/Time";
 import Order "mo:core/Order";
-import List "mo:core/List";
 import Text "mo:core/Text";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
@@ -12,13 +12,22 @@ import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   type AppointmentStatus = {
     #pending;
     #confirmed;
     #completed;
     #cancelled;
+  };
+
+  type Service = {
+    id : Text;
+    displayName : Text;
+    description : Text;
+    featuredPhoto : ?Storage.ExternalBlob;
   };
 
   type Appointment = {
@@ -43,6 +52,8 @@ actor {
     };
   };
 
+  public type ReviewState = { #pending; #approved; #rejected };
+
   type Review = {
     id : Nat;
     reviewerName : Text;
@@ -50,6 +61,7 @@ actor {
     rating : Nat;
     photo : ?Storage.ExternalBlob;
     beforeAfterImage : ?Storage.ExternalBlob;
+    state : ReviewState;
   };
 
   type DoctorAvailability = {
@@ -68,6 +80,14 @@ actor {
     name : Text;
   };
 
+  public type ReviewInput = {
+    reviewerName : Text;
+    text : Text;
+    rating : Nat;
+    photo : ?Storage.ExternalBlob;
+    beforeAfterImage : ?Storage.ExternalBlob;
+  };
+
   var nextAppointmentId = 1;
   var nextReviewId = 1;
   var nextDoctorId = 1;
@@ -76,6 +96,7 @@ actor {
   let reviews = Map.empty<Nat, Review>();
   let doctors = Map.empty<Nat, Doctor>();
   let userProfiles = Map.empty<Principal, UserProfile>();
+  let services = Map.empty<Text, Service>();
 
   let photoUrls = Set.empty<Text>();
   let beforeAfterUrls = Set.empty<Text>();
@@ -161,24 +182,76 @@ actor {
   };
 
   // Review Management
-  public shared ({ caller }) func addReview(reviewerName : Text, text : Text, rating : Nat, photo : ?Storage.ExternalBlob, beforeAfterImage : ?Storage.ExternalBlob) : async () {
+  public shared ({ caller }) func addReview(reviewInput : ReviewInput) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can add reviews");
     };
     let review : Review = {
       id = nextReviewId;
-      reviewerName;
-      text;
-      rating;
-      photo;
-      beforeAfterImage;
+      reviewerName = reviewInput.reviewerName;
+      text = reviewInput.text;
+      rating = reviewInput.rating;
+      photo = reviewInput.photo;
+      beforeAfterImage = reviewInput.beforeAfterImage;
+      state = #pending;
     };
     reviews.add(nextReviewId, review);
     nextReviewId += 1;
   };
 
-  public query ({ caller }) func getAllReviews() : async [Review] {
-    reviews.values().toArray();
+  public shared ({ caller }) func approveReview(reviewId : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can approve reviews");
+    };
+    switch (reviews.get(reviewId)) {
+      case (null) { Runtime.trap("Review not found") };
+      case (?review) {
+        let updatedReview = { review with state = #approved };
+        reviews.add(reviewId, updatedReview);
+      };
+    };
+  };
+
+  public shared ({ caller }) func rejectReview(reviewId : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can reject reviews");
+    };
+    switch (reviews.get(reviewId)) {
+      case (null) { Runtime.trap("Review not found") };
+      case (?review) {
+        let updatedReview = { review with state = #rejected };
+        reviews.add(reviewId, updatedReview);
+      };
+    };
+  };
+
+  // Admin-only: pending reviews must not be visible to the public
+  public query ({ caller }) func getPendingReviews() : async [Review] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view pending reviews");
+    };
+    let filtered = reviews.toArray().filter(
+      func((_, review)) {
+        review.state == #pending;
+      }
+    );
+    let reviewsList = List.fromArray<(Nat, Review)>(filtered);
+    reviewsList.map<(Nat, Review), Review>(
+      func((_, review)) { review }
+    ).toArray();
+  };
+
+  // Public: only approved reviews are visible to everyone
+  public query ({ caller }) func getApprovedReviews() : async [Review] {
+    let filtered = reviews.toArray().filter(
+      func((_, review)) {
+        review.state == #approved;
+      }
+    );
+    let reviewsList = List.fromArray<(Nat, Review)>(filtered);
+    reviewsList.map<(Nat, Review), Review>(
+      func((_, review)) { review }
+    ).toArray();
   };
 
   // Doctor Management
@@ -215,5 +288,27 @@ actor {
       Runtime.trap("Unauthorized: Only admins can add other admins");
     };
     AccessControl.assignRole(accessControlState, caller, adminPrincipal, #admin);
+  };
+
+  // Service Management
+  public shared ({ caller }) func addOrUpdateService(id : Text, displayName : Text, description : Text, featuredPhoto : ?Storage.ExternalBlob) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add or update services");
+    };
+    let service : Service = {
+      id;
+      displayName;
+      description;
+      featuredPhoto;
+    };
+    services.add(id, service);
+  };
+
+  public query ({ caller }) func getService(serviceId : Text) : async ?Service {
+    services.get(serviceId);
+  };
+
+  public query ({ caller }) func getAllServices() : async [Service] {
+    services.values().toArray();
   };
 };

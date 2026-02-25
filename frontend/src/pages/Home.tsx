@@ -1,43 +1,47 @@
-import ClinicStatusBanner from '../components/ClinicStatusBanner';
+import Header from '../components/Header';
 import HeroSection from '../components/HeroSection';
-import BeforeAfterSlider from '../components/BeforeAfterSlider';
 import ServicesGrid from '../components/ServicesGrid';
 import DoctorProfile from '../components/DoctorProfile';
 import TestimonialCarousel from '../components/TestimonialCarousel';
 import ContactSection from '../components/ContactSection';
+import Footer from '../components/Footer';
+import ClinicStatusBanner from '../components/ClinicStatusBanner';
+import FloatingDentalElements from '../components/FloatingDentalElements';
+import UserProfileSetup from '../components/UserProfileSetup';
+import { useGetCallerUserProfile } from '../hooks/useQueries';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
+
+function ScrambleHeading({ text, className }: { text: string; className?: string }) {
+  return <h2 className={className}>{text}</h2>;
+}
 
 export default function Home() {
-  return (
-    <>
-      <ClinicStatusBanner />
-      <HeroSection />
-      
-      <section className="py-20">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Real Results, Real Smiles</h2>
-            <p className="text-lg text-muted-foreground">See the transformations we've achieved</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-            <BeforeAfterSlider
-              beforeImage="/assets/generated/before-whitening.dim_800x600.png"
-              afterImage="/assets/generated/after-whitening.dim_800x600.png"
-              title="Teeth Whitening"
-            />
-            <BeforeAfterSlider
-              beforeImage="/assets/generated/before-braces.dim_800x600.png"
-              afterImage="/assets/generated/after-braces.dim_800x600.png"
-              title="Orthodontic Treatment"
-            />
-          </div>
-        </div>
-      </section>
+  const { identity } = useInternetIdentity();
+  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
+  const isAuthenticated = !!identity;
+  const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
 
-      <ServicesGrid />
-      <DoctorProfile />
-      <TestimonialCarousel />
-      <ContactSection />
-    </>
+  return (
+    <div className="min-h-screen relative">
+      <ClinicStatusBanner />
+      <Header />
+
+      {/* Floating dental elements layer */}
+      <div className="relative">
+        <FloatingDentalElements />
+        <HeroSection />
+      </div>
+
+      <main>
+        <ServicesGrid />
+        <DoctorProfile />
+        <TestimonialCarousel />
+        <ContactSection />
+      </main>
+
+      <Footer />
+
+      {showProfileSetup && <UserProfileSetup />}
+    </div>
   );
 }

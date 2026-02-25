@@ -42,8 +42,25 @@ export interface Review {
   'beforeAfterImage' : [] | [ExternalBlob],
   'text' : string,
   'reviewerName' : string,
+  'state' : ReviewState,
   'rating' : bigint,
   'photo' : [] | [ExternalBlob],
+}
+export interface ReviewInput {
+  'beforeAfterImage' : [] | [ExternalBlob],
+  'text' : string,
+  'reviewerName' : string,
+  'rating' : bigint,
+  'photo' : [] | [ExternalBlob],
+}
+export type ReviewState = { 'pending' : null } |
+  { 'approved' : null } |
+  { 'rejected' : null };
+export interface Service {
+  'id' : string,
+  'displayName' : string,
+  'featuredPhoto' : [] | [ExternalBlob],
+  'description' : string,
 }
 export type Time = bigint;
 export interface UserProfile { 'name' : string }
@@ -83,10 +100,12 @@ export interface _SERVICE {
     [string, string, Array<DoctorAvailability>],
     bigint
   >,
-  'addReview' : ActorMethod<
-    [string, string, bigint, [] | [ExternalBlob], [] | [ExternalBlob]],
+  'addOrUpdateService' : ActorMethod<
+    [string, string, string, [] | [ExternalBlob]],
     undefined
   >,
+  'addReview' : ActorMethod<[ReviewInput], undefined>,
+  'approveReview' : ActorMethod<[bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createAppointment' : ActorMethod<
     [string, string, Time, string],
@@ -94,7 +113,8 @@ export interface _SERVICE {
   >,
   'getAllAppointments' : ActorMethod<[], Array<Appointment>>,
   'getAllDoctors' : ActorMethod<[], Array<Doctor>>,
-  'getAllReviews' : ActorMethod<[], Array<Review>>,
+  'getAllServices' : ActorMethod<[], Array<Service>>,
+  'getApprovedReviews' : ActorMethod<[], Array<Review>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getClinicStatus' : ActorMethod<[], ClinicStatus>,
@@ -102,8 +122,11 @@ export interface _SERVICE {
     [bigint],
     [] | [Array<DoctorAvailability>]
   >,
+  'getPendingReviews' : ActorMethod<[], Array<Review>>,
+  'getService' : ActorMethod<[string], [] | [Service]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'rejectReview' : ActorMethod<[bigint], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setClinicStatus' : ActorMethod<[ClinicStatus], undefined>,
   'updateAppointmentStatus' : ActorMethod<

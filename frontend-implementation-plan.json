@@ -1,464 +1,253 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "XYZ Dental Clinic Premium Website with Animations and Admin Panel - Frontend Implementation",
+  "title": "Admin Panel Enhancements + Glassmorphism, Scroll Progress Bar, Floating Dental Elements & Magnetic Cursor",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Implement scroll-triggered reveal animations using Framer Motion for text and images throughout the website",
+      "id": "REQ-32",
+      "summary": "Add Service Manager section to admin panel for editing 5 premium services (Implants, Invisalign, Kids, Smile Makeover, Laser) including display name, description, and featured photo upload",
       "acceptanceCriteria": [
-        "Text elements fade in smoothly when scrolling into view",
-        "Images slide up with fade effect when entering viewport",
-        "Animations trigger once per element on first scroll"
+        "Admin panel has a 'Service Manager' tab/section listing all 5 premium services.",
+        "Each service entry has an editable name field, description/text area, and an image upload control.",
+        "Saving changes persists the updated text and image to the backend.",
+        "Updated service text and image appear on the public Services grid cards and corresponding detail pages without a code change."
       ],
       "file_operations": [
         {
-          "path": "frontend/package.json",
+          "path": "frontend/src/pages/admin/ServiceManager.tsx",
+          "operation": "create",
+          "description": "Create admin Service Manager page that lists all 5 premium services (dental-implants, invisalign, pediatric-dentistry, smile-makeover, laser-dentistry) with editable name, description, and photo upload controls. Use the blob-storage component to support image uploads as ExternalBlob instances. Call backend addOrUpdateService capability to persist changes. Display success/error toast notifications. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add framer-motion dependency for scroll-triggered animations"
-        },
-        {
-          "path": "frontend/src/hooks/useScrollReveal.ts",
-          "operation": "create",
-          "description": "Create custom hook for scroll-triggered reveal animations that detects when elements enter viewport and triggers fade-in and slide-up effects once per element"
-        },
-        {
-          "path": "frontend/src/components/AnimatedSection.tsx",
-          "operation": "create",
-          "description": "Create reusable wrapper component that applies scroll-triggered fade-in and slide-up animations to child elements using Framer Motion and the useScrollReveal hook"
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Add parallax scrolling effect to background images creating depth perception",
-      "acceptanceCriteria": [
-        "Background images move slower than foreground content",
-        "Parallax effect is smooth without janky performance",
-        "Effect works on hero section and key image sections"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useParallax.ts",
-          "operation": "create",
-          "description": "Create custom hook that tracks scroll position and calculates parallax offset for background images with configurable speed factor"
-        },
-        {
-          "path": "frontend/src/components/ParallaxSection.tsx",
-          "operation": "create",
-          "description": "Create reusable parallax container component that applies parallax effect to background images using the useParallax hook with smooth performance optimization"
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Create micro-interactions for buttons with hover effects including smooth glow and scale-up animations",
-      "acceptanceCriteria": [
-        "Buttons scale up slightly on hover (1.05x)",
-        "Glow effect appears smoothly on hover",
-        "Transitions are smooth and professional"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add global button hover animation styles including scale-up (1.05x) and glow effect with smooth transitions using Tailwind utilities"
-        },
-        {
-          "path": "frontend/src/components/AnimatedButton.tsx",
-          "operation": "create",
-          "description": "Create reusable button component with built-in hover micro-interactions including scale-up and glow effects using Framer Motion"
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Integrate Lottie animations for dental procedures that sync with accompanying text descriptions",
-      "acceptanceCriteria": [
-        "Lottie animations load and play for dental procedures",
-        "Animations sync with text scroll position or trigger",
-        "Animations are lightweight and don't impact performance"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/package.json",
-          "operation": "modify",
-          "description": "Add lottie-react dependency for Lottie animation playback"
-        },
-        {
-          "path": "frontend/src/components/LottieAnimation.tsx",
-          "operation": "create",
-          "description": "Create wrapper component for Lottie animations that plays dental procedure animations synced with scroll position or viewport entry trigger"
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Create hero section with high-quality image slider featuring dental work and prominent Book Appointment button",
-      "acceptanceCriteria": [
-        "Hero section displays full-width with professional dental imagery",
-        "Book Appointment button is prominent and easily clickable",
-        "Hero includes heading about perfect smiles",
-        "Responsive layout works on mobile and desktop"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/HeroSection.tsx",
-          "operation": "create",
-          "description": "Create hero section component with full-width layout displaying generated images from frontend/public/assets/generated/hero-bg.dim_1920x1080.png and frontend/public/assets/generated/smile-hero.dim_1200x800.png, featuring perfect smiles heading and prominent Book Appointment button with responsive design"
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Add HeroSection component to the top of the home page layout"
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Build interactive before/after slider component where users can drag to compare treatment results",
-      "acceptanceCriteria": [
-        "Slider handle can be dragged horizontally",
-        "Left side shows before image, right side shows after image",
-        "Smooth dragging experience without lag",
-        "Mobile touch support for dragging"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/BeforeAfterSlider.tsx",
-          "operation": "create",
-          "description": "Create interactive before/after comparison slider component with draggable handle, left showing before image and right showing after image, supporting both mouse and touch drag events with smooth performance"
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Add BeforeAfterSlider components to home page displaying treatment results using generated image pairs: before-whitening and after-whitening, before-braces and after-braces from frontend/public/assets/generated/"
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Create services grid displaying dental services with animated icons and links to detail pages",
-      "acceptanceCriteria": [
-        "Grid layout displays multiple services in organized manner",
-        "Each service has an animated icon",
-        "Clicking a service navigates to its detail page",
-        "Icons animate on hover or scroll into view"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/ServicesGrid.tsx",
-          "operation": "create",
-          "description": "Create services grid component displaying Root Canal, Braces, Whitening, and Implants services using generated icons from frontend/public/assets/generated/icon-root-canal.dim_256x256.png, icon-braces.dim_256x256.png, icon-whitening.dim_256x256.png, and icon-implants.dim_256x256.png with scroll-reveal animations and click navigation to detail pages"
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Add ServicesGrid component to home page layout"
-        },
-        {
-          "path": "frontend/src/pages/ServiceDetail.tsx",
-          "operation": "create",
-          "description": "Create service detail page component displaying full information about each dental service with routing parameter for service type"
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Add route for ServiceDetail page with dynamic service parameter, ensuring proper routing from services grid"
-        }
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "summary": "Build doctor profile section with photo, smooth entry animation, and credentials details",
-      "acceptanceCriteria": [
-        "Doctor photo displays prominently",
-        "Section animates smoothly when scrolling into view",
-        "Expertise and education information is clearly displayed",
-        "Professional and trustworthy layout"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/DoctorProfile.tsx",
-          "operation": "create",
-          "description": "Create doctor profile section component displaying doctor photo from frontend/public/assets/generated/doctor-profile.dim_600x800.png with scroll-triggered entry animation, expertise and education credentials in professional layout"
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Add DoctorProfile component to home page layout"
-        }
-      ]
-    },
-    {
-      "id": "REQ-9",
-      "summary": "Create auto-sliding testimonial carousel for patient reviews with manual navigation controls",
-      "acceptanceCriteria": [
-        "Testimonials auto-slide every few seconds",
-        "Users can manually navigate between reviews",
-        "Smooth transitions between testimonials",
-        "Displays patient name and review text clearly"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/TestimonialCarousel.tsx",
-          "operation": "create",
-          "description": "Create auto-sliding testimonial carousel component that fetches reviews from backend using getAllReviews, displays patient names and review text with smooth transitions, includes manual navigation controls, and auto-advances every few seconds"
-        },
-        {
-          "path": "frontend/src/hooks/useReviews.ts",
-          "operation": "create",
-          "description": "Create React Query hook for fetching reviews from backend getAllReviews method with proper caching and error handling"
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Add TestimonialCarousel component to home page layout"
-        }
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "summary": "Add live contact features including WhatsApp button, Google Maps embed, and clickable phone number",
-      "acceptanceCriteria": [
-        "WhatsApp button opens chat with clinic number",
-        "Google Maps embed shows clinic location",
-        "Phone number is clickable and initiates call on mobile",
-        "All contact options are easily accessible"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/ContactSection.tsx",
-          "operation": "create",
-          "description": "Create contact section component with WhatsApp chat button (using web.whatsapp.com link), embedded Google Maps iframe showing clinic location, and clickable phone number link, ensuring all contact options are accessible and functional on mobile and desktop"
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Add ContactSection component to home page layout"
-        }
-      ]
-    },
-    {
-      "id": "REQ-15",
-      "summary": "Build admin dashboard with clinic status toggle displaying real-time banner on public site when status is Emergency or Closed",
-      "acceptanceCriteria": [
-        "Dashboard has toggle switch for clinic status",
-        "Toggling status immediately updates backend",
-        "Public website displays banner when status is Closed or Emergency",
-        "Banner is prominent and clearly visible"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/ClinicStatusBanner.tsx",
-          "operation": "create",
-          "description": "Create prominent banner component that fetches clinic status from backend getClinicStatus and displays warning banner when status is Closed or Emergency, positioned at top of public pages with royal blue and teal styling"
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Add ClinicStatusBanner component at the top of home page layout before hero section"
-        },
-        {
-          "path": "frontend/src/hooks/useClinicStatus.ts",
-          "operation": "create",
-          "description": "Create React Query hook for fetching clinic status from backend getClinicStatus method with polling for real-time updates"
+          "description": "Add useUpdateService mutation hook that calls backend addOrUpdateService with service ID, displayName, description, and optional featuredPhoto (ExternalBlob or null). Invalidate 'allServices' and individual service query keys on success to refresh service data across the app."
         },
         {
           "path": "frontend/src/pages/admin/Dashboard.tsx",
-          "operation": "create",
-          "description": "Create admin dashboard page with clinic status toggle switch that calls backend setClinicStatus method, displaying current status and allowing admin to switch between Open, Closed, and Emergency modes. Use the authorization component to restrict access to admin users only. Verify the component's usage instructions before implementing."
+          "operation": "modify",
+          "description": "Add a navigation card for 'Service Manager' alongside existing cards (Appointments, Content Manager, Doctor Scheduler) that links to /admin/service-manager route."
         },
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Add route for admin Dashboard page under /admin/dashboard path with authorization guard ensuring only authenticated admin users can access"
+          "description": "Register /admin/service-manager route under AdminGuard that renders the ServiceManager component."
+        },
+        {
+          "path": "frontend/src/pages/ServicesGrid.tsx",
+          "operation": "modify",
+          "description": "Update ServicesGrid to fetch all services via a new useGetAllServices query hook instead of hardcoded data. Map service.featuredPhoto ExternalBlob to direct URL for card images. Ensure service.displayName and service.description are rendered from backend data."
+        },
+        {
+          "path": "frontend/src/pages/DentalImplantsDetail.tsx",
+          "operation": "modify",
+          "description": "Fetch service data for 'dental-implants' via useGetService query hook. Render service.displayName as page title, service.description in the content section, and service.featuredPhoto as the hero image. Keep existing benefits and process steps as static content."
+        },
+        {
+          "path": "frontend/src/pages/InvisalignDetail.tsx",
+          "operation": "modify",
+          "description": "Fetch service data for 'invisalign' via useGetService query hook. Render service.displayName as page title, service.description in the content section, and service.featuredPhoto as the hero image. Keep existing benefits and process steps as static content."
+        },
+        {
+          "path": "frontend/src/pages/PediatricDentistryDetail.tsx",
+          "operation": "modify",
+          "description": "Fetch service data for 'pediatric-dentistry' via useGetService query hook. Render service.displayName as page title, service.description in the content section, and service.featuredPhoto as the hero image. Keep existing benefits and process steps as static content."
+        },
+        {
+          "path": "frontend/src/pages/SmileMakeoverDetail.tsx",
+          "operation": "modify",
+          "description": "Fetch service data for 'smile-makeover' via useGetService query hook. Render service.displayName as page title, service.description in the content section, and service.featuredPhoto as the hero image. Keep existing benefits and process steps as static content."
+        },
+        {
+          "path": "frontend/src/pages/LaserDentistryDetail.tsx",
+          "operation": "modify",
+          "description": "Fetch service data for 'laser-dentistry' via useGetService query hook. Render service.displayName as page title, service.description in the content section, and service.featuredPhoto as the hero image. Keep existing benefits and process steps as static content."
         }
       ]
     },
     {
-      "id": "REQ-16",
-      "summary": "Create appointment manager interface in admin panel displaying all bookings with filtering and status updates",
+      "id": "REQ-33",
+      "summary": "Implement Review Approver workflow with pending state and admin approval/rejection actions in admin panel",
       "acceptanceCriteria": [
-        "All appointments display in organized table or list",
-        "Admin can filter appointments by date range and status",
-        "Admin can update appointment status",
-        "Display shows patient details and service requested"
+        "Newly submitted reviews have a 'pending' status and are not visible in the public testimonial carousel.",
+        "Admin panel shows a 'Review Approver' section listing all pending reviews with patient name, review text, star rating, and submission date.",
+        "Admin can click 'Approve' to make a review live or 'Reject' to discard it.",
+        "Only approved reviews appear in the public-facing auto-scrolling testimonial carousel.",
+        "Backend stores approval status per review and filters by status on public queries."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/admin/Appointments.tsx",
+          "path": "frontend/src/pages/admin/ReviewApprover.tsx",
           "operation": "create",
-          "description": "Create appointment manager page fetching appointments from backend getAllAppointments, displaying organized table with patient details and service type, including date and status filters, and allowing status updates via backend updateAppointmentStatus method. Use the authorization component to restrict access to admin users only. Verify the component's usage instructions before implementing."
+          "description": "Create admin Review Approver page that fetches pending reviews via useGetPendingReviews query hook. Display each review in a card with reviewerName, text, rating (stars), and photo if present. Provide 'Approve' and 'Reject' action buttons that call useApproveReview and useRejectReview mutation hooks. Show success/error toast notifications. Use the authorization component to ensure only admins can access this page."
         },
         {
-          "path": "frontend/src/hooks/useAppointments.ts",
-          "operation": "create",
-          "description": "Create React Query hooks for fetching appointments from backend getAllAppointments and updating appointment status via updateAppointmentStatus with proper cache invalidation"
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add useGetPendingReviews query hook that calls backend getPendingReviews capability. Add useApproveReview mutation hook that calls backend approveReview(reviewId). Add useRejectReview mutation hook that calls backend rejectReview(reviewId). Invalidate 'pendingReviews' and 'approvedReviews' query keys on mutation success to refresh review lists."
+        },
+        {
+          "path": "frontend/src/pages/admin/Dashboard.tsx",
+          "operation": "modify",
+          "description": "Add a navigation card for 'Review Approver' alongside existing cards that links to /admin/review-approver route."
         },
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Add route for admin Appointments page under /admin/appointments path with authorization guard"
-        }
-      ]
-    },
-    {
-      "id": "REQ-17",
-      "summary": "Build content management interface in admin panel for uploading photos, reviews, and before-after images",
-      "acceptanceCriteria": [
-        "Admin can upload new images through form interface",
-        "Admin can add reviews with patient name and text",
-        "Admin can create before-after pairs by uploading two images",
-        "Uploaded content immediately appears on public site"
-      ],
-      "file_operations": [
+          "description": "Register /admin/review-approver route under AdminGuard that renders the ReviewApprover component."
+        },
+        {
+          "path": "frontend/src/components/TestimonialCarousel.tsx",
+          "operation": "modify",
+          "description": "Update TestimonialCarousel to fetch approved reviews only via useGetApprovedReviews query hook (already exists). Ensure only reviews with state='approved' are displayed in the carousel."
+        },
         {
           "path": "frontend/src/pages/admin/ContentManager.tsx",
-          "operation": "create",
-          "description": "Create content management page with forms for adding reviews via backend addReview method, including fields for reviewer name, text, rating, and optional photo and before-after image uploads using ExternalBlob from blob-storage component. Use the authorization component to restrict access to admin users only. Use the blob-storage component to support image uploads. Verify both components' usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useContentManagement.ts",
-          "operation": "create",
-          "description": "Create React Query mutation hooks for adding reviews via backend addReview method with ExternalBlob handling for image uploads and proper cache invalidation"
-        },
-        {
-          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Add route for admin ContentManager page under /admin/content path with authorization guard"
+          "description": "Update ContentManager review submission form to clarify that newly submitted reviews will be in 'pending' state and require approval before appearing publicly. No backend changes needed as addReview already defaults to pending state."
         }
       ]
     },
     {
-      "id": "REQ-18",
-      "summary": "Create doctor availability scheduler interface in admin panel allowing modification of doctor schedules",
+      "id": "REQ-34",
+      "summary": "Apply glassmorphism design (frosted glass with backdrop-filter blur and semi-transparent background) to service cards, testimonial cards, doctor profile card, and admin panel content cards",
       "acceptanceCriteria": [
-        "Admin can view current doctor schedules",
-        "Admin can add new availability blocks with date and time",
-        "Admin can mark doctors as unavailable for specific dates",
-        "Changes save to backend immediately"
+        "Service grid cards use backdrop-filter blur with a semi-transparent background.",
+        "Testimonial carousel cards use the same glassmorphism treatment.",
+        "Doctor profile card uses glassmorphism styling.",
+        "Admin panel dashboard/content cards adopt glassmorphism.",
+        "The animated mesh gradient background is subtly visible through all glassmorphism cards.",
+        "Text and interactive elements remain fully legible on all glass cards."
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/pages/admin/DoctorScheduler.tsx",
-          "operation": "create",
-          "description": "Create doctor scheduler page fetching doctors from backend getAllDoctors and their availability via getDoctorAvailability, displaying current schedules with forms for adding/modifying availability blocks via backend addDoctor method, including date pickers and time range selectors. Use the authorization component to restrict access to admin users only. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useDoctors.ts",
-          "operation": "create",
-          "description": "Create React Query hooks for fetching doctors from backend getAllDoctors, getting availability via getDoctorAvailability, and managing doctor schedules with proper cache invalidation"
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Add route for admin DoctorScheduler page under /admin/doctors path with authorization guard"
-        }
-      ]
-    },
-    {
-      "id": "REQ-19",
-      "summary": "Implement authentication system restricting admin panel access to authorized users only",
-      "acceptanceCriteria": [
-        "Admin panel requires authentication to access",
-        "Unauthorized users cannot view or modify admin content",
-        "Authentication uses Internet Identity",
-        "Authenticated users can access all admin features"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/AdminGuard.tsx",
-          "operation": "create",
-          "description": "Create route guard component that checks user authentication and admin role via backend isCallerAdmin method, redirecting unauthorized users to login or access denied page. Use the authorization component to implement role-based access control. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/AccessDenied.tsx",
-          "operation": "create",
-          "description": "Create access denied page displaying message for unauthorized users attempting to access admin features"
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wrap all admin routes with AdminGuard component to enforce authentication and admin role checks, and add route for AccessDenied page"
-        },
-        {
-          "path": "frontend/src/components/LoginButton.tsx",
-          "operation": "create",
-          "description": "Create login/logout button component using Internet Identity from authorization component, handling authentication state and clearing cached data on logout. Use the authorization component for Internet Identity integration. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/UserProfileSetup.tsx",
-          "operation": "create",
-          "description": "Create user profile setup modal that appears on first login, prompting user for name and saving profile via backend saveCallerUserProfile method. Use the authorization component for profile management. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useUserProfile.ts",
-          "operation": "create",
-          "description": "Create React Query hook for fetching current user profile from backend getCallerUserProfile and saving profile via saveCallerUserProfile, implementing proper loading states to prevent profile setup modal flash as described in authorization component usage instructions. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Add LoginButton to main navigation and integrate UserProfileSetup modal that conditionally renders when authenticated user has no profile"
-        }
-      ]
-    },
-    {
-      "id": "REQ-20",
-      "summary": "Apply minimalist white, royal blue, and teal color palette throughout the website creating boutique high-end aesthetic",
-      "acceptanceCriteria": [
-        "Primary colors are white, royal blue, and teal",
-        "Color scheme is consistent across all pages",
-        "Design feels modern, clean, and professional",
-        "High contrast for readability"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/tailwind.config.js",
-          "operation": "modify",
-          "description": "Extend Tailwind theme with custom color palette defining royal blue and teal as primary colors, ensuring high contrast and boutique medical-professional aesthetic"
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add global CSS variables and base styles applying minimalist white, royal blue, and teal color scheme consistently across the website with modern, clean, professional styling"
-        }
-      ]
-    },
-    {
-      "id": "REQ-21",
-      "summary": "Render all generated images as static assets in frontend/public/assets/generated directory",
-      "acceptanceCriteria": [
-        "Generated images are stored in public/assets/generated",
-        "Images are referenced correctly in components",
-        "All images load properly on the website"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/HeroSection.tsx",
-          "operation": "modify",
-          "description": "Verify generated images hero-bg.dim_1920x1080.png and smile-hero.dim_1200x800.png are correctly referenced from frontend/public/assets/generated/ and load properly"
-        },
         {
           "path": "frontend/src/components/ServicesGrid.tsx",
           "operation": "modify",
-          "description": "Verify generated service icons icon-root-canal.dim_256x256.png, icon-braces.dim_256x256.png, icon-whitening.dim_256x256.png, and icon-implants.dim_256x256.png are correctly referenced from frontend/public/assets/generated/ and load properly"
+          "description": "Apply glassmorphism styling to all service cards: add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15) or rgba(20, 184, 166, 0.1), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow for depth. Ensure text contrast remains high and the animated mesh gradient is subtly visible through the cards."
+        },
+        {
+          "path": "frontend/src/components/TestimonialCarousel.tsx",
+          "operation": "modify",
+          "description": "Apply glassmorphism styling to testimonial cards: add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow. Ensure reviewer name, text, and star rating remain fully legible."
         },
         {
           "path": "frontend/src/components/DoctorProfile.tsx",
           "operation": "modify",
-          "description": "Verify generated doctor profile image doctor-profile.dim_600x800.png is correctly referenced from frontend/public/assets/generated/ and loads properly"
+          "description": "Apply glassmorphism styling to the doctor profile card container: add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow. Ensure bio, education, and awards text remain fully legible against the frosted glass background."
         },
         {
-          "path": "frontend/src/components/BeforeAfterSlider.tsx",
+          "path": "frontend/src/pages/admin/Dashboard.tsx",
           "operation": "modify",
-          "description": "Verify generated before-after image pairs before-whitening.dim_800x600.png, after-whitening.dim_800x600.png, before-braces.dim_800x600.png, and after-braces.dim_800x600.png are correctly referenced from frontend/public/assets/generated/ and load properly"
+          "description": "Apply glassmorphism styling to the navigation cards and clinic status section: add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow. Ensure card titles and icons remain legible."
         },
         {
-          "path": "frontend/src/components/ContactSection.tsx",
+          "path": "frontend/src/pages/admin/Appointments.tsx",
           "operation": "modify",
-          "description": "Verify generated clinic images clinic-exterior.dim_1200x800.png and waiting-room.dim_1200x800.png are correctly referenced from frontend/public/assets/generated/ and load properly if used in contact section"
+          "description": "Apply glassmorphism styling to the appointments table container and individual appointment cards (if applicable): add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow. Ensure table text and dropdown controls remain legible."
+        },
+        {
+          "path": "frontend/src/pages/admin/ContentManager.tsx",
+          "operation": "modify",
+          "description": "Apply glassmorphism styling to the review submission form container: add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow. Ensure form labels and input fields remain legible and functional."
+        },
+        {
+          "path": "frontend/src/pages/admin/DoctorScheduler.tsx",
+          "operation": "modify",
+          "description": "Apply glassmorphism styling to the doctor form and doctor list cards: add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow. Ensure form fields and doctor information remain legible."
+        }
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "summary": "Add scroll-progress indicator bar (thin horizontal bar at top of viewport) that fills left-to-right as user scrolls, using teal/royal-blue accent color",
+      "acceptanceCriteria": [
+        "A fixed bar is rendered at the very top of the viewport (z-index above header).",
+        "The bar width is proportional to scroll progress (0% at top, 100% at bottom of page).",
+        "The bar uses the site teal or royal-blue accent color.",
+        "The bar is 3–4px tall and spans full viewport width.",
+        "It is present on all public pages."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ScrollProgressBar.tsx",
+          "operation": "create",
+          "description": "Create ScrollProgressBar component that renders a fixed bar at the top of the viewport (position: fixed, top: 0, left: 0, z-index: 9999). Use a scroll event listener or IntersectionObserver to calculate scroll progress as (scrollY / (documentHeight - windowHeight)) * 100. Render a div with height 3-4px, width equal to scroll progress percentage, and background color using Tailwind teal (bg-teal-500) or royal-blue. Ensure the bar does not obstruct any clickable elements."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Import and render ScrollProgressBar component at the root level (before RouterProvider or as a sibling to CustomCursor) so it appears on all public pages."
+        }
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "summary": "Add floating dental element decorations (semi-transparent tooth, dental mirror, toothbrush, plus icons) with gentle float animation and parallax scroll offset in page corners",
+      "acceptanceCriteria": [
+        "At least 4 floating dental element icons are positioned near the corners/edges of the home page.",
+        "Each element has a gentle CSS float/bob animation (up-down or rotation).",
+        "Elements shift position slightly based on scroll position (parallax offset).",
+        "Elements are semi-transparent and do not overlap or obstruct text, CTAs, or interactive UI.",
+        "Images are served from frontend/public/assets/generated."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/FloatingDentalElements.tsx",
+          "operation": "create",
+          "description": "Create FloatingDentalElements component that renders 4 floating dental icons positioned absolutely in the corners/edges (top-left, top-right, bottom-left, bottom-right) using the generated images: frontend/public/assets/generated/tooth-float-icon.dim_96x96.png, frontend/public/assets/generated/dental-mirror-float-icon.dim_96x96.png, frontend/public/assets/generated/toothbrush-float-icon.dim_96x96.png, frontend/public/assets/generated/plus-float-icon.dim_96x96.png. Apply CSS animations (keyframes for gentle up-down float or rotation) and use a scroll event listener to apply subtle parallax transform offset (translateY based on scrollY). Set opacity to 0.6-0.7 for semi-transparency. Ensure elements have pointer-events: none to avoid obstructing interactive UI."
+        },
+        {
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Import and render FloatingDentalElements component at the top level of the Home page (before or after HeroSection) so the floating icons appear across the entire home page."
+        }
+      ]
+    },
+    {
+      "id": "REQ-37",
+      "summary": "Enhance CustomCursor to change to dental-themed icon (tooth or plus) when hovering over service cards, reverting to default cursor when not hovering",
+      "acceptanceCriteria": [
+        "Hovering over a service card switches the custom cursor SVG to a tooth or plus-sign dental icon.",
+        "Moving off the service card reverts the cursor to the default custom cursor (medical cross trail).",
+        "The transition between cursor states is smooth (no flicker).",
+        "The behavior works for all service cards including the 5 premium service cards.",
+        "The cursor does not obstruct or interfere with click targets on the cards."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/CustomCursor.tsx",
+          "operation": "modify",
+          "description": "Add a state variable to track the cursor icon type (default vs dental). Expose a method or context to set cursor state from external components. When cursor state is 'dental', render a tooth or plus SVG icon instead of the medical cross. Apply smooth transition for icon change. Ensure the cursor does not interfere with click events."
+        },
+        {
+          "path": "frontend/src/components/ServicesGrid.tsx",
+          "operation": "modify",
+          "description": "Add onMouseEnter and onMouseLeave event handlers to each service card that call the CustomCursor state setter to switch to 'dental' icon on hover and revert to 'default' on leave. Ensure the cursor change is smooth and does not obstruct card interaction."
+        },
+        {
+          "path": "frontend/src/context/CursorContext.tsx",
+          "operation": "create",
+          "description": "Create a React context (CursorContext) that provides cursor state (icon type) and a setter function (setCursorIcon). Wrap the app with CursorContextProvider in App.tsx. CustomCursor consumes this context to render the appropriate icon. ServicesGrid (and other components) use the context to trigger cursor icon changes."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wrap the app with CursorContextProvider so that CustomCursor and other components can access and control the cursor state via context."
+        }
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "summary": "Render floating dental element images as static assets in frontend/public/assets/generated",
+      "acceptanceCriteria": [
+        "All floating dental element PNG files are present in frontend/public/assets/generated.",
+        "The floating element components reference these static asset paths."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/FloatingDentalElements.tsx",
+          "operation": "modify",
+          "description": "Reference the generated floating dental element images using the exact workspace paths: frontend/public/assets/generated/tooth-float-icon.dim_96x96.png, frontend/public/assets/generated/dental-mirror-float-icon.dim_96x96.png, frontend/public/assets/generated/toothbrush-float-icon.dim_96x96.png, frontend/public/assets/generated/plus-float-icon.dim_96x96.png. Ensure the img src attributes use the correct relative paths (/assets/generated/<filename>)."
         }
       ]
     }

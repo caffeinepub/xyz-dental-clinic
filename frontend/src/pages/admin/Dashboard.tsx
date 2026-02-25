@@ -1,114 +1,84 @@
 import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useGetClinicStatus, useSetClinicStatus } from '../../hooks/useQueries';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ClinicStatus } from '../../backend';
 import { toast } from 'sonner';
-import { Building2, AlertTriangle, CheckCircle } from 'lucide-react';
-import { Link } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
+
+const navCards = [
+  { title: 'Appointments', desc: 'View and manage all patient bookings', icon: '📅', route: '/admin/appointments' },
+  { title: 'Content Manager', desc: 'Add and manage patient reviews', icon: '✍️', route: '/admin/content-manager' },
+  { title: 'Doctor Scheduler', desc: 'Manage doctors and availability', icon: '👨‍⚕️', route: '/admin/doctor-scheduler' },
+  { title: 'Service Manager', desc: 'Edit service details and photos', icon: '🦷', route: '/admin/service-manager' },
+  { title: 'Review Approver', desc: 'Approve or reject pending reviews', icon: '⭐', route: '/admin/review-approver' },
+];
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { data: clinicStatus } = useGetClinicStatus();
   const setClinicStatus = useSetClinicStatus();
 
-  const handleStatusChange = async (value: string) => {
+  const handleStatusChange = async (status: ClinicStatus) => {
     try {
-      await setClinicStatus.mutateAsync(value as any);
-      toast.success('Clinic status updated successfully');
-    } catch (error) {
-      console.error('Failed to update clinic status:', error);
+      await setClinicStatus.mutateAsync(status);
+      toast.success(`Clinic status updated to ${status}`);
+    } catch {
       toast.error('Failed to update clinic status');
     }
   };
 
   return (
-    <div className="container py-12">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Manage your clinic settings and content</p>
+    <div className="min-h-screen p-6 md:p-10">
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold text-white mb-1">Admin Dashboard</h1>
+          <p className="text-white/60">Manage your clinic from one place</p>
+        </div>
+
+        {/* Clinic Status */}
+        <div className="glass-card rounded-2xl p-6 mb-8">
+          <h2 className="text-white font-semibold text-lg mb-4">Clinic Status</h2>
+          <div className="flex flex-wrap gap-3">
+            {(['open', 'closed', 'emergency'] as ClinicStatus[]).map((s) => (
+              <button
+                key={s}
+                onClick={() => handleStatusChange(s)}
+                disabled={setClinicStatus.isPending}
+                className={`px-5 py-2 rounded-full font-medium text-sm transition-all border ${
+                  clinicStatus === s
+                    ? s === 'open'
+                      ? 'bg-teal-500 border-teal-400 text-white'
+                      : s === 'closed'
+                      ? 'bg-red-500 border-red-400 text-white'
+                      : 'bg-orange-500 border-orange-400 text-white'
+                    : 'bg-white/10 border-white/20 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                {s.charAt(0).toUpperCase() + s.slice(1)}
+              </button>
+            ))}
+          </div>
+          <p className="text-white/50 text-xs mt-3">
+            Current: <span className="text-teal-300 font-medium">{clinicStatus ?? '...'}</span>
+          </p>
+        </div>
+
+        {/* Navigation Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {navCards.map((card) => (
+            <button
+              key={card.title}
+              onClick={() => navigate({ to: card.route as any })}
+              className="glass-card rounded-2xl p-6 text-left hover:-translate-y-1 transition-all duration-200 hover:shadow-xl group"
+            >
+              <div className="text-3xl mb-3">{card.icon}</div>
+              <h3 className="text-white font-semibold text-lg mb-1 group-hover:text-teal-300 transition-colors">
+                {card.title}
+              </h3>
+              <p className="text-white/55 text-sm">{card.desc}</p>
+            </button>
+          ))}
+        </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <Link to="/admin/appointments">
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle>Appointments</CardTitle>
-              <CardDescription>View and manage patient appointments</CardDescription>
-            </CardHeader>
-          </Card>
-        </Link>
-
-        <Link to="/admin/content">
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle>Content Manager</CardTitle>
-              <CardDescription>Upload photos and manage reviews</CardDescription>
-            </CardHeader>
-          </Card>
-        </Link>
-
-        <Link to="/admin/doctors">
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle>Doctor Scheduler</CardTitle>
-              <CardDescription>Manage doctor availability</CardDescription>
-            </CardHeader>
-          </Card>
-        </Link>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5" />
-            Clinic Status
-          </CardTitle>
-          <CardDescription>
-            Control the clinic's operational status. Changes will be reflected immediately on the public website.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <RadioGroup
-            value={clinicStatus || 'open'}
-            onValueChange={handleStatusChange}
-            disabled={setClinicStatus.isPending}
-          >
-            <div className="flex items-center space-x-2 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-              <RadioGroupItem value="open" id="open" />
-              <Label htmlFor="open" className="flex items-center gap-2 cursor-pointer flex-1">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <div>
-                  <div className="font-semibold">Open</div>
-                  <div className="text-sm text-muted-foreground">Clinic is operating normally</div>
-                </div>
-              </Label>
-            </div>
-
-            <div className="flex items-center space-x-2 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-              <RadioGroupItem value="closed" id="closed" />
-              <Label htmlFor="closed" className="flex items-center gap-2 cursor-pointer flex-1">
-                <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                <div>
-                  <div className="font-semibold">Closed</div>
-                  <div className="text-sm text-muted-foreground">Clinic is temporarily closed</div>
-                </div>
-              </Label>
-            </div>
-
-            <div className="flex items-center space-x-2 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-              <RadioGroupItem value="emergency" id="emergency" />
-              <Label htmlFor="emergency" className="flex items-center gap-2 cursor-pointer flex-1">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
-                <div>
-                  <div className="font-semibold">Emergency</div>
-                  <div className="text-sm text-muted-foreground">Emergency situation - urgent calls only</div>
-                </div>
-              </Label>
-            </div>
-          </RadioGroup>
-        </CardContent>
-      </Card>
     </div>
   );
 }
