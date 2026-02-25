@@ -1,135 +1,126 @@
-import { useState, useRef, useCallback } from 'react';
-import { SiFacebook, SiInstagram, SiX } from 'react-icons/si';
-import { Heart } from 'lucide-react';
+import React, { useRef, useState } from 'react';
 import HiddenAdminLoginModal from './HiddenAdminLoginModal';
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear();
-  const appIdentifier = typeof window !== 'undefined' ? window.location.hostname : 'xyz-dental';
   const [adminModalOpen, setAdminModalOpen] = useState(false);
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleCopyrightClick = useCallback(() => {
+  const handleCopyrightClick = () => {
     clickCountRef.current += 1;
-
-    if (clickTimerRef.current) {
-      clearTimeout(clickTimerRef.current);
-    }
-
-    if (clickCountRef.current >= 3) {
-      clickCountRef.current = 0;
-      setAdminModalOpen(true);
-      return;
-    }
-
+    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
     clickTimerRef.current = setTimeout(() => {
       clickCountRef.current = 0;
     }, 600);
-  }, []);
+    if (clickCountRef.current >= 3) {
+      clickCountRef.current = 0;
+      setAdminModalOpen(true);
+    }
+  };
+
+  const year = new Date().getFullYear();
+  const appId = encodeURIComponent(
+    typeof window !== 'undefined' ? window.location.hostname : 'dr-smile-dental'
+  );
 
   return (
     <>
-      <footer className="border-t border-border/40 bg-muted/30">
-        <div className="container py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <footer className="bg-background border-t border-border/40 pt-12 pb-6 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
             {/* Brand */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold bg-gradient-to-r from-royal-blue to-teal bg-clip-text text-transparent">
-                XYZ Dental Clinic
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Premium dental care with cutting-edge technology and compassionate service.
+            <div className="col-span-1 md:col-span-2">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M12 2C9.5 2 7 4 7 7c0 1.5.5 3 1 4.5C8.5 13 9 15 9 17c0 2 1 4 3 4s3-2 3-4c0-2 .5-4 1-5.5.5-1.5 1-3 1-4.5C17 4 14.5 2 12 2z"
+                      fill="white"
+                    />
+                  </svg>
+                </div>
+                <span className="font-bold text-xl text-foreground">Dr. Smile Dental</span>
+              </div>
+              <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
+                Advanced dental care with a gentle touch. Your smile is our passion and our promise.
               </p>
             </div>
 
             {/* Quick Links */}
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Quick Links</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="/" className="hover:text-royal-blue transition-colors">
-                    Home
-                  </a>
-                </li>
-                <li>
-                  <a href="/services/root-canal" className="hover:text-royal-blue transition-colors">
-                    Services
-                  </a>
-                </li>
-                <li>
-                  <a href="#contact" className="hover:text-royal-blue transition-colors">
-                    Contact
-                  </a>
-                </li>
+            <div>
+              <h4 className="font-semibold text-foreground mb-3 text-sm uppercase tracking-wider">
+                Quick Links
+              </h4>
+              <ul className="space-y-2">
+                {['Home', 'Services', 'Doctor', 'Gallery', 'Reviews', 'Contact'].map((link) => (
+                  <li key={link}>
+                    <a
+                      href={`#${link.toLowerCase()}`}
+                      className="text-muted-foreground hover:text-primary text-sm transition-colors"
+                    >
+                      {link}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
 
             {/* Services */}
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Services</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>Root Canal Treatment</li>
-                <li>Braces & Orthodontics</li>
-                <li>Teeth Whitening</li>
-                <li>Dental Implants</li>
-                <li>Invisalign</li>
-                <li>Laser Dentistry</li>
+            <div>
+              <h4 className="font-semibold text-foreground mb-3 text-sm uppercase tracking-wider">
+                Services
+              </h4>
+              <ul className="space-y-2">
+                {[
+                  'Dental Implants',
+                  'Invisalign',
+                  'Kids Dentistry',
+                  'Smile Makeover',
+                  'Laser Dentistry',
+                ].map((s) => (
+                  <li key={s}>
+                    <span className="text-muted-foreground text-sm">{s}</span>
+                  </li>
+                ))}
               </ul>
-            </div>
-
-            {/* Contact & Social */}
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Connect With Us</h4>
-              <div className="flex space-x-4">
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-royal-blue transition-colors"
-                >
-                  <SiFacebook className="h-5 w-5" />
-                </a>
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-royal-blue transition-colors"
-                >
-                  <SiInstagram className="h-5 w-5" />
-                </a>
-                <a
-                  href="https://twitter.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-royal-blue transition-colors"
-                >
-                  <SiX className="h-5 w-5" />
-                </a>
-              </div>
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-border/40 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <div className="border-t border-border/40 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p
-              className="text-sm text-muted-foreground cursor-default select-none"
+              className="text-muted-foreground text-xs cursor-default select-none"
               onClick={handleCopyrightClick}
             >
-              © {currentYear} XYZ Dental Clinic. All rights reserved.
+              © {year} Dr. Smile Dental. All rights reserved.
             </p>
-            <p className="text-sm text-muted-foreground flex items-center gap-1">
-              Built with <Heart className="h-4 w-4 text-red-500 fill-red-500" /> using{' '}
+            <p className="text-muted-foreground text-xs">
+              Built with <span className="text-red-500">♥</span> using{' '}
               <a
-                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(appIdentifier)}`}
+                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${appId}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-royal-blue transition-colors font-medium"
+                className="text-primary hover:underline"
               >
                 caffeine.ai
               </a>
             </p>
           </div>
         </div>
+
+        {/* Invisible 1×1px trigger */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: 1,
+            height: 1,
+            opacity: 0,
+            cursor: 'default',
+          }}
+          onClick={() => setAdminModalOpen(true)}
+          aria-hidden="true"
+        />
       </footer>
 
       <HiddenAdminLoginModal open={adminModalOpen} onOpenChange={setAdminModalOpen} />

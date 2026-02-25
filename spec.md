@@ -1,15 +1,15 @@
 # Specification
 
 ## Summary
-**Goal:** Enhance the XYZ Dental Clinic admin panel with Service Manager and Review Approver features, and add several visual upgrades to the public site including glassmorphism cards, a scroll progress bar, floating dental elements, and a context-sensitive magnetic cursor.
+**Goal:** Enable frictionless, zero-login appointment booking so any anonymous visitor can book an appointment directly without any authentication step.
 
 **Planned changes:**
-- Add a "Service Manager" section to the admin panel allowing the admin to edit the name, description, and featured photo for each of the 5 premium services (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry); changes are persisted and reflected on public service cards and detail pages.
-- Add a "Review Approver" section to the admin panel where newly submitted reviews are held in a pending state and only go live on the public testimonial carousel after admin approval; admins can approve or reject each pending review.
-- Apply glassmorphism styling (backdrop-filter blur, semi-transparent background) to service cards, testimonial cards, the doctor profile card, and admin panel content cards so the animated mesh gradient background shows through.
-- Add a fixed 3–4px horizontal scroll-progress bar at the very top of the viewport that fills left-to-right as the user scrolls, using the site's teal/royal-blue accent color.
-- Add at least 4 floating semi-transparent dental element icons (tooth, dental mirror, toothbrush, plus/cross) positioned near page corners/edges with gentle float animations and scroll-based parallax offset.
-- Enhance the existing custom cursor so it switches to a dental-themed icon (tooth or plus SVG) when hovering over any service card, then reverts when moving off.
-- Serve all new floating dental element images as static assets in `frontend/public/assets/generated`.
+- Update the backend `bookAppointment` function to accept anonymous (unauthenticated) calls, storing submitted appointments in the existing data structure so they appear in the admin panel.
+- Replace the existing `BookAppointmentDialog` with a frictionless form containing exactly four fields: Patient Name, Phone Number, Service (dropdown), and Preferred Date.
+- On successful submission, display an inline "Thank You! Your appointment has been booked. We will contact you shortly." confirmation message inside the dialog — no redirect or login prompt.
+- Remove all authentication gates from every "Book Appointment" / "Book Now" button across all public-facing pages (Home, HeroSection, Header, and all service detail pages).
+- Use an anonymous actor for form submission — no Internet Identity, OTP, or sign-up required.
+- Add inline validation that disables submission and shows an error if Name or Phone Number is empty.
+- Keep the existing admin authentication system and admin-only data access fully intact.
 
-**User-visible outcome:** Admins can manage service content and moderate reviews via the admin panel. Public visitors see glassmorphism-styled cards, a scroll progress indicator, gently floating dental decorations, and a context-aware cursor that changes to a dental icon over service cards.
+**User-visible outcome:** Any visitor can click "Book Appointment" anywhere on the site, fill in four simple fields, and immediately see a thank-you confirmation — no login, no OTP, no account creation required. Submitted bookings appear in the admin panel automatically.

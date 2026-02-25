@@ -1,113 +1,148 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, CheckCircle, Smile } from 'lucide-react';
-import BookAppointmentDialog from '../components/BookAppointmentDialog';
-
-const benefits = [
-  'Child-friendly, anxiety-free environment',
-  'Gentle techniques designed for young patients',
-  'Preventive care to build healthy habits early',
-  'Fun, colorful treatment rooms kids love',
-  'Experienced pediatric dental specialists',
-  'Parent education and guidance included',
-];
-
-const process = [
-  'Warm welcome and fun introduction to the clinic',
-  'Gentle examination with child-friendly tools',
-  'Digital X-rays with minimal radiation',
-  'Cleaning and fluoride treatment',
-  'Sealants to protect growing teeth',
-  'Fun reward and take-home care kit',
-];
+import BackgroundParticles from '@/components/BackgroundParticles';
+import BookAppointmentDialog from '@/components/BookAppointmentDialog';
+import ZoomInImage from '@/components/ZoomInImage';
+import TypewriterText from '@/components/TypewriterText';
+import { useGetService } from '@/hooks/useQueries';
 
 export default function PediatricDentistryDetail() {
   const navigate = useNavigate();
+  const { data: service } = useGetService('pediatric-dentistry');
   const [bookingOpen, setBookingOpen] = useState(false);
 
+  const title = service?.displayName || 'Pediatric Dentistry';
+  const description =
+    service?.description ||
+    'Fun, fear-free dental care designed especially for children aged 1–16.';
+  const imageUrl =
+    service?.featuredPhoto?.getDirectURL() ||
+    '/assets/generated/pediatric-dentistry-icon.dim_600x400.png';
+
+  const benefits = [
+    'Child-friendly, anxiety-free environment',
+    'Gentle techniques designed for young patients',
+    'Preventive care to build healthy habits early',
+    'Fun, colorful treatment rooms kids love',
+    'Experienced pediatric dental specialists',
+    'Parent education and guidance included',
+  ];
+
+  const steps = [
+    { step: '01', title: 'Warm Welcome', desc: 'Fun introduction to the clinic with child-friendly tools.' },
+    { step: '02', title: 'Gentle Examination', desc: 'Thorough but gentle check-up using kid-safe instruments.' },
+    { step: '03', title: 'Digital X-Rays', desc: 'Low-radiation digital X-rays for accurate diagnosis.' },
+    { step: '04', title: 'Cleaning & Fluoride', desc: 'Professional cleaning and fluoride treatment.' },
+    { step: '05', title: 'Fun Reward', desc: 'Sticker, prize, and take-home care kit for every visit.' },
+  ];
+
   return (
-    <div className="min-h-screen">
-      <section className="py-12 bg-gradient-to-br from-teal/10 to-royal-blue/10 relative overflow-hidden">
-        {/* Floating bubbles background */}
-        {[...Array(10)].map((_, i) => (
-          <span
-            key={i}
-            className="bubble-particle-hero"
-            style={{
-              left: `${5 + i * 9}%`,
-              animationDelay: `${i * 0.5}s`,
-              width: `${12 + (i % 4) * 8}px`,
-              height: `${12 + (i % 4) * 8}px`,
-              bottom: 0,
-            }}
+    <div className="relative min-h-screen bg-background overflow-hidden">
+      <BackgroundParticles />
+
+      {/* Floating bubbles */}
+      {[...Array(8)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            width: `${12 + (i % 4) * 8}px`,
+            height: `${12 + (i % 4) * 8}px`,
+            left: `${5 + i * 12}%`,
+            bottom: 0,
+            background: 'rgba(20,184,166,0.15)',
+            animation: `bubbleRise ${3 + i * 0.5}s ease-in infinite`,
+            animationDelay: `${i * 0.4}s`,
+          }}
+        />
+      ))}
+
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <button
+          onClick={() => navigate({ to: '/' })}
+          className="text-muted-foreground hover:text-foreground transition-colors mb-8 flex items-center gap-2"
+        >
+          ← Back to Home
+        </button>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16 items-center">
+          <div>
+            <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
+              Kids Dentistry
+            </div>
+            <TypewriterText
+              text={title}
+              tag="h1"
+              className="text-4xl font-bold text-foreground mb-4"
+              speed={40}
+            />
+            <p className="text-muted-foreground text-lg leading-relaxed mb-6">{description}</p>
+            <button
+              onClick={() => setBookingOpen(true)}
+              className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+            >
+              Book Kids Appointment
+            </button>
+          </div>
+          <ZoomInImage src={imageUrl} alt={title} className="rounded-2xl shadow-xl" />
+        </div>
+
+        {/* Benefits */}
+        <div className="glass-card rounded-2xl p-8 mb-10 border border-border/40">
+          <TypewriterText
+            text="Why Kids Love Us"
+            tag="h2"
+            className="text-2xl font-bold text-foreground mb-6"
+            speed={35}
           />
-        ))}
-
-        <div className="container relative z-10">
-          <Button variant="ghost" onClick={() => navigate({ to: '/' })} className="mb-6">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Button>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-slide-in-left">
-              <div className="relative w-full max-w-sm mx-auto lg:mx-0 mb-6 overflow-hidden rounded-2xl shadow-2xl">
-                <img
-                  src="/assets/generated/pediatric-dentistry-icon.dim_600x400.png"
-                  alt="Pediatric Dentistry"
-                  className="w-full h-auto"
-                />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {benefits.map((b, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span className="text-primary mt-0.5">✓</span>
+                <span className="text-muted-foreground">{b}</span>
               </div>
-              <div className="flex items-center gap-2 mb-3">
-                <Smile className="h-6 w-6 text-teal" />
-                <span className="text-sm font-semibold text-teal uppercase tracking-wider">Kids Dentistry</span>
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Pediatric Dentistry</h1>
-              <p className="text-lg text-muted-foreground mb-6">
-                We make dental visits fun and stress-free for children! Our specially trained pediatric team
-                creates a warm, playful environment where kids actually look forward to their appointments.
-              </p>
-              <Button size="lg" className="animated-button" onClick={() => setBookingOpen(true)}>
-                <Calendar className="mr-2 h-5 w-5" />
-                Book Kids Appointment
-              </Button>
-            </div>
-
-            <div className="bg-white dark:bg-card rounded-2xl shadow-xl p-8 animate-slide-in-right">
-              <h2 className="text-2xl font-bold mb-6">Why Kids Love Us</h2>
-              <ul className="space-y-3">
-                {benefits.map((benefit, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="h-6 w-6 text-teal shrink-0 mt-0.5" />
-                    <span>{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            ))}
           </div>
         </div>
-      </section>
 
-      <section className="py-20">
-        <div className="container max-w-4xl">
-          <div className="animate-fade-in-up">
-            <h2 className="text-3xl font-bold mb-8 text-center">What to Expect</h2>
-            <div className="space-y-6">
-              {process.map((step, index) => (
-                <div key={index} className="flex gap-4">
-                  <div className="shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-teal to-royal-blue flex items-center justify-center text-white font-bold">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1 pt-1">
-                    <p className="text-lg">{step}</p>
-                  </div>
+        {/* Process */}
+        <div className="mb-10">
+          <TypewriterText
+            text="What to Expect"
+            tag="h2"
+            className="text-2xl font-bold text-foreground mb-6"
+            speed={35}
+          />
+          <div className="space-y-4">
+            {steps.map((s) => (
+              <div
+                key={s.step}
+                className="glass-card rounded-xl p-5 border border-border/40 flex gap-4 items-start"
+              >
+                <span className="text-primary font-bold text-lg shrink-0">{s.step}</span>
+                <div>
+                  <h3 className="font-semibold text-foreground">{s.title}</h3>
+                  <p className="text-muted-foreground text-sm mt-1">{s.desc}</p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
+
+        {/* CTA */}
+        <div className="text-center glass-card rounded-2xl p-8 border border-border/40">
+          <h2 className="text-2xl font-bold text-foreground mb-3">Make Dental Visits Fun! 🎉</h2>
+          <p className="text-muted-foreground mb-6">
+            Book your child's first appointment and start a lifetime of healthy smiles.
+          </p>
+          <button
+            onClick={() => setBookingOpen(true)}
+            className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+          >
+            Book Kids Appointment
+          </button>
+        </div>
+      </div>
 
       <BookAppointmentDialog open={bookingOpen} onOpenChange={setBookingOpen} />
     </div>

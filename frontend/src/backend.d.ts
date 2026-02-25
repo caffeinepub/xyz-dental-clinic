@@ -15,6 +15,12 @@ export class ExternalBlob {
     withUploadProgress(onProgress: (percentage: number) => void): ExternalBlob;
 }
 export type Time = bigint;
+export interface BeforeAfterPair {
+    id: bigint;
+    afterImage: ExternalBlob;
+    beforeImage: ExternalBlob;
+    description: string;
+}
 export interface Service {
     id: string;
     displayName: string;
@@ -82,13 +88,16 @@ export enum UserRole {
 }
 export interface backendInterface {
     addAdmin(adminPrincipal: Principal): Promise<void>;
+    addBeforeAfterPair(beforeImage: ExternalBlob, afterImage: ExternalBlob, description: string): Promise<bigint>;
     addDoctor(name: string, specialty: string, availability: Array<DoctorAvailability>): Promise<bigint>;
     addOrUpdateService(id: string, displayName: string, description: string, featuredPhoto: ExternalBlob | null): Promise<void>;
     addReview(reviewInput: ReviewInput): Promise<void>;
     approveReview(reviewId: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createAppointment(patientName: string, contactInfo: string, preferredDate: Time, serviceType: string): Promise<Appointment>;
+    bookAppointment(patientName: string, contactInfo: string, preferredDate: Time, serviceType: string): Promise<Appointment>;
+    deleteReview(reviewId: bigint): Promise<void>;
     getAllAppointments(): Promise<Array<Appointment>>;
+    getAllBeforeAfterPairs(): Promise<Array<BeforeAfterPair>>;
     getAllDoctors(): Promise<Array<Doctor>>;
     getAllServices(): Promise<Array<Service>>;
     getApprovedReviews(): Promise<Array<Review>>;
@@ -100,7 +109,6 @@ export interface backendInterface {
     getService(serviceId: string): Promise<Service | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
-    rejectReview(reviewId: bigint): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     setClinicStatus(status: ClinicStatus): Promise<void>;
     updateAppointmentStatus(appointmentId: bigint, newStatus: AppointmentStatus): Promise<void>;

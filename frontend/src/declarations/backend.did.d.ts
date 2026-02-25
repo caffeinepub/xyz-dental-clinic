@@ -23,6 +23,12 @@ export type AppointmentStatus = { 'cancelled' : null } |
   { 'pending' : null } |
   { 'completed' : null } |
   { 'confirmed' : null };
+export interface BeforeAfterPair {
+  'id' : bigint,
+  'afterImage' : ExternalBlob,
+  'beforeImage' : ExternalBlob,
+  'description' : string,
+}
 export type ClinicStatus = { 'closed' : null } |
   { 'emergency' : null } |
   { 'open' : null };
@@ -96,6 +102,10 @@ export interface _SERVICE {
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addAdmin' : ActorMethod<[Principal], undefined>,
+  'addBeforeAfterPair' : ActorMethod<
+    [ExternalBlob, ExternalBlob, string],
+    bigint
+  >,
   'addDoctor' : ActorMethod<
     [string, string, Array<DoctorAvailability>],
     bigint
@@ -107,11 +117,10 @@ export interface _SERVICE {
   'addReview' : ActorMethod<[ReviewInput], undefined>,
   'approveReview' : ActorMethod<[bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'createAppointment' : ActorMethod<
-    [string, string, Time, string],
-    Appointment
-  >,
+  'bookAppointment' : ActorMethod<[string, string, Time, string], Appointment>,
+  'deleteReview' : ActorMethod<[bigint], undefined>,
   'getAllAppointments' : ActorMethod<[], Array<Appointment>>,
+  'getAllBeforeAfterPairs' : ActorMethod<[], Array<BeforeAfterPair>>,
   'getAllDoctors' : ActorMethod<[], Array<Doctor>>,
   'getAllServices' : ActorMethod<[], Array<Service>>,
   'getApprovedReviews' : ActorMethod<[], Array<Review>>,
@@ -126,7 +135,6 @@ export interface _SERVICE {
   'getService' : ActorMethod<[string], [] | [Service]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'rejectReview' : ActorMethod<[bigint], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setClinicStatus' : ActorMethod<[ClinicStatus], undefined>,
   'updateAppointmentStatus' : ActorMethod<

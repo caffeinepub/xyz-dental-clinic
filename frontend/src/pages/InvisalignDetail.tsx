@@ -1,117 +1,149 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, CheckCircle, Sparkles } from 'lucide-react';
-import BookAppointmentDialog from '../components/BookAppointmentDialog';
-import BeforeAfterSlider from '../components/BeforeAfterSlider';
-
-const benefits = [
-  'Nearly invisible — no metal brackets or wires',
-  'Removable for eating, drinking, and brushing',
-  'Comfortable smooth plastic aligners',
-  'Fewer dental visits than traditional braces',
-  'Predictable results with 3D digital planning',
-  'Suitable for teens and adults',
-];
-
-const process = [
-  'Digital 3D scan of your teeth',
-  'Custom treatment plan with virtual preview',
-  'Series of custom-made clear aligners fabricated',
-  'Wear each aligner set for 1–2 weeks',
-  'Regular check-ins every 6–8 weeks',
-  'Retainer fitting after treatment completion',
-];
+import BackgroundParticles from '@/components/BackgroundParticles';
+import BookAppointmentDialog from '@/components/BookAppointmentDialog';
+import ZoomInImage from '@/components/ZoomInImage';
+import TypewriterText from '@/components/TypewriterText';
+import BeforeAfterSlider from '@/components/BeforeAfterSlider';
+import { useGetService } from '@/hooks/useQueries';
 
 export default function InvisalignDetail() {
   const navigate = useNavigate();
+  const { data: service } = useGetService('invisalign');
   const [bookingOpen, setBookingOpen] = useState(false);
 
+  const title = service?.displayName || 'Invisalign Clear Aligners';
+  const description =
+    service?.description || 'Straighten your teeth discreetly with custom clear aligners.';
+  const imageUrl =
+    service?.featuredPhoto?.getDirectURL() ||
+    '/assets/generated/invisalign-aligner.dim_600x400.png';
+
+  const benefits = [
+    'Nearly invisible aligners',
+    'Removable for eating and cleaning',
+    'Comfortable with no metal brackets',
+    'Fewer office visits required',
+    'Predictable results with 3D planning',
+    'Suitable for teens and adults',
+  ];
+
+  const steps = [
+    { step: '01', title: 'Digital Scan', desc: 'Precise 3D scan of your teeth for custom aligner fabrication.' },
+    { step: '02', title: 'Treatment Preview', desc: 'See your final smile before treatment even begins.' },
+    { step: '03', title: 'Aligner Delivery', desc: 'Receive your first set of custom clear aligners.' },
+    { step: '04', title: 'Progress Check-ins', desc: 'Regular visits every 6-8 weeks to monitor progress.' },
+    { step: '05', title: 'Retainer Fitting', desc: 'Custom retainer to maintain your beautiful new smile.' },
+  ];
+
   return (
-    <div className="min-h-screen">
-      <section className="py-12 bg-gradient-to-br from-royal-blue/10 to-teal/10">
-        <div className="container">
-          <Button variant="ghost" onClick={() => navigate({ to: '/' })} className="mb-6">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Button>
+    <div className="relative min-h-screen bg-background">
+      <BackgroundParticles />
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <button
+          onClick={() => navigate({ to: '/' })}
+          className="text-muted-foreground hover:text-foreground transition-colors mb-8 flex items-center gap-2"
+        >
+          ← Back to Home
+        </button>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-slide-in-left">
-              <div className="relative w-full max-w-sm mx-auto lg:mx-0 mb-6 overflow-hidden rounded-2xl shadow-2xl">
-                <img
-                  src="/assets/generated/invisalign-aligner.dim_600x400.png"
-                  alt="Invisalign Aligner"
-                  className="w-full h-auto"
-                />
-              </div>
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-6 w-6 text-teal" />
-                <span className="text-sm font-semibold text-teal uppercase tracking-wider">Premium Service</span>
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Invisalign Clear Aligners</h1>
-              <p className="text-lg text-muted-foreground mb-6">
-                Straighten your teeth discreetly with Invisalign — the world's most advanced clear aligner system.
-                See the transformation with our interactive before & after comparison below.
-              </p>
-              <Button size="lg" className="animated-button" onClick={() => setBookingOpen(true)}>
-                <Calendar className="mr-2 h-5 w-5" />
-                Book Free Consultation
-              </Button>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16 items-center">
+          <div>
+            <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
+              Clear Aligner Therapy
             </div>
-
-            <div className="bg-white dark:bg-card rounded-2xl shadow-xl p-8 animate-slide-in-right">
-              <h2 className="text-2xl font-bold mb-6">Why Invisalign?</h2>
-              <ul className="space-y-3">
-                {benefits.map((benefit, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="h-6 w-6 text-teal shrink-0 mt-0.5" />
-                    <span>{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Before/After Comparison */}
-      <section className="py-20">
-        <div className="container max-w-5xl">
-          <div className="text-center mb-12 animate-fade-in-up">
-            <h2 className="text-3xl font-bold mb-4">See the Transformation</h2>
-            <p className="text-muted-foreground">Drag the slider to compare before and after Invisalign treatment</p>
-          </div>
-          <div className="max-w-2xl mx-auto">
-            <BeforeAfterSlider
-              beforeImage="/assets/generated/invisalign-before.dim_800x500.png"
-              afterImage="/assets/generated/invisalign-after.dim_800x500.png"
-              title="Invisalign Transformation"
+            <TypewriterText
+              text={title}
+              tag="h1"
+              className="text-4xl font-bold text-foreground mb-4"
+              speed={40}
             />
+            <p className="text-muted-foreground text-lg leading-relaxed mb-6">{description}</p>
+            <button
+              onClick={() => setBookingOpen(true)}
+              className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+            >
+              Book Free Consultation
+            </button>
           </div>
+          <ZoomInImage src={imageUrl} alt={title} className="rounded-2xl shadow-xl" />
         </div>
-      </section>
 
-      {/* Process */}
-      <section className="py-20 bg-muted/30">
-        <div className="container max-w-4xl">
-          <div className="animate-fade-in-up">
-            <h2 className="text-3xl font-bold mb-8 text-center">Your Invisalign Journey</h2>
-            <div className="space-y-6">
-              {process.map((step, index) => (
-                <div key={index} className="flex gap-4">
-                  <div className="shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-royal-blue to-teal flex items-center justify-center text-white font-bold">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1 pt-1">
-                    <p className="text-lg">{step}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+        {/* Benefits */}
+        <div className="glass-card rounded-2xl p-8 mb-10 border border-border/40">
+          <TypewriterText
+            text="Why Choose Invisalign?"
+            tag="h2"
+            className="text-2xl font-bold text-foreground mb-6"
+            speed={35}
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {benefits.map((b, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span className="text-primary mt-0.5">✓</span>
+                <span className="text-muted-foreground">{b}</span>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
+
+        {/* Before/After Slider */}
+        <div className="mb-10">
+          <TypewriterText
+            text="Real Patient Results"
+            tag="h2"
+            className="text-2xl font-bold text-foreground mb-6"
+            speed={35}
+          />
+          <BeforeAfterSlider
+            staticPairs={[
+              {
+                beforeSrc: '/assets/generated/invisalign-before.dim_800x500.png',
+                afterSrc: '/assets/generated/invisalign-after.dim_800x500.png',
+                label: 'Invisalign Treatment',
+              },
+            ]}
+          />
+        </div>
+
+        {/* Process */}
+        <div className="mb-10">
+          <TypewriterText
+            text="Your Invisalign Journey"
+            tag="h2"
+            className="text-2xl font-bold text-foreground mb-6"
+            speed={35}
+          />
+          <div className="space-y-4">
+            {steps.map((s) => (
+              <div
+                key={s.step}
+                className="glass-card rounded-xl p-5 border border-border/40 flex gap-4 items-start"
+              >
+                <span className="text-primary font-bold text-lg shrink-0">{s.step}</span>
+                <div>
+                  <h3 className="font-semibold text-foreground">{s.title}</h3>
+                  <p className="text-muted-foreground text-sm mt-1">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="text-center glass-card rounded-2xl p-8 border border-border/40">
+          <h2 className="text-2xl font-bold text-foreground mb-3">Start Your Smile Journey</h2>
+          <p className="text-muted-foreground mb-6">
+            Get a free consultation and see your new smile before treatment begins.
+          </p>
+          <button
+            onClick={() => setBookingOpen(true)}
+            className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+          >
+            Book Free Consultation
+          </button>
+        </div>
+      </div>
 
       <BookAppointmentDialog open={bookingOpen} onOpenChange={setBookingOpen} />
     </div>

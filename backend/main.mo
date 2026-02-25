@@ -8,13 +8,12 @@ import Order "mo:core/Order";
 import Text "mo:core/Text";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
+
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import Migration "migration";
 
-(with migration = Migration.run)
 actor {
   type AppointmentStatus = {
     #pending;
@@ -64,6 +63,13 @@ actor {
     state : ReviewState;
   };
 
+  type BeforeAfterPair = {
+    id : Nat;
+    beforeImage : Storage.ExternalBlob;
+    afterImage : Storage.ExternalBlob;
+    description : Text;
+  };
+
   type DoctorAvailability = {
     doctorId : Nat;
     availableSlots : [Time.Time];
@@ -91,12 +97,14 @@ actor {
   var nextAppointmentId = 1;
   var nextReviewId = 1;
   var nextDoctorId = 1;
+  var nextBeforeAfterId = 1;
 
   let appointments = Map.empty<Nat, Appointment>();
   let reviews = Map.empty<Nat, Review>();
   let doctors = Map.empty<Nat, Doctor>();
   let userProfiles = Map.empty<Principal, UserProfile>();
   let services = Map.empty<Text, Service>();
+  let beforeAfterGallery = Map.empty<Nat, BeforeAfterPair>();
 
   let photoUrls = Set.empty<Text>();
   let beforeAfterUrls = Set.empty<Text>();
@@ -130,11 +138,13 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Appointment Management
-  public shared ({ caller }) func createAppointment(patientName : Text, contactInfo : Text, preferredDate : Time.Time, serviceType : Text) : async Appointment {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can create appointments");
-    };
+  // Unauthenticated appointment booking
+  public shared func bookAppointment(
+    patientName : Text,
+    contactInfo : Text,
+    preferredDate : Time.Time,
+    serviceType : Text,
+  ) : async Appointment {
     let newAppointment : Appointment = {
       id = nextAppointmentId;
       patientName;
@@ -212,15 +222,14 @@ actor {
     };
   };
 
-  public shared ({ caller }) func rejectReview(reviewId : Nat) : async () {
+  public shared ({ caller }) func deleteReview(reviewId : Nat) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can reject reviews");
+      Runtime.trap("Unauthorized: Only admins can delete reviews");
     };
     switch (reviews.get(reviewId)) {
       case (null) { Runtime.trap("Review not found") };
-      case (?review) {
-        let updatedReview = { review with state = #rejected };
-        reviews.add(reviewId, updatedReview);
+      case (_) {
+        reviews.remove(reviewId);
       };
     };
   };
@@ -310,5 +319,26 @@ actor {
 
   public query ({ caller }) func getAllServices() : async [Service] {
     services.values().toArray();
+  };
+
+  // Before/After Gallery Management
+  public shared ({ caller }) func addBeforeAfterPair(beforeImage : Storage.ExternalBlob, afterImage : Storage.ExternalBlob, description : Text) : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add before/after pairs");
+    };
+    let pair : BeforeAfterPair = {
+      id = nextBeforeAfterId;
+      beforeImage;
+      afterImage;
+      description;
+    };
+    beforeAfterGallery.add(nextBeforeAfterId, pair);
+    let currentId = nextBeforeAfterId;
+    nextBeforeAfterId += 1;
+    currentId;
+  };
+
+  public query ({ caller }) func getAllBeforeAfterPairs() : async [BeforeAfterPair] {
+    beforeAfterGallery.values().toArray();
   };
 };

@@ -1,169 +1,87 @@
 {
   "kind": "build_request",
-  "title": "Admin Panel Enhancements + Glassmorphism, Scroll Progress Bar, Floating Dental Elements & Magnetic Cursor",
+  "title": "Frictionless Zero-Login Appointment Booking",
   "projectName": "XYZ Dental Clinic",
-  "priority": "normal",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-32",
-      "text": "Add a 'Service Manager' section to the admin panel that allows the admin to edit the display name, description text, and upload/replace the featured photo for each of the 5 premium services: Dental Implants, Invisalign, Pediatric Dentistry (Kids), Smile Makeover, and Laser Dentistry. Changes must be persisted in the backend and reflected on the public-facing service cards and detail pages.",
-      "target": "both",
+      "id": "REQ-49",
+      "text": "Update the backend appointment booking function to accept anonymous (unauthenticated) calls. The `bookAppointment` function must not require a caller principal/identity check — any anonymous user must be able to submit a booking with Name, Phone Number, Service, and Date/Time fields. Store all submitted appointments in the existing appointments data structure so they appear in the admin panel.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Service Manager: 5 nayi services (Implants, Invisalign, Kids, Smile Makeover, Laser) ka text aur photo badalne ka option."
+          "Appointment book karte waqt user se koi identity, password, ya account creation nahi maangna hai.",
+          "Book Now click karte hi seedha Thank You message aaye aur data Admin Panel mein chala jaye. No OTP, No Login."
         ]
       },
       "acceptanceCriteria": [
-        "Admin panel has a 'Service Manager' tab/section listing all 5 premium services.",
-        "Each service entry has an editable name field, description/text area, and an image upload control.",
-        "Saving changes persists the updated text and image to the backend.",
-        "Updated service text and image appear on the public Services grid cards and corresponding detail pages without a code change."
+        "The bookAppointment backend function accepts calls from anonymous principals without throwing an authorization error.",
+        "Submitted appointments include Name, Phone Number, Service, and Date fields.",
+        "Appointments submitted anonymously appear in the admin Appointments panel with all submitted data visible.",
+        "No identity, principal check, or authentication is required to submit an appointment."
       ]
     },
     {
-      "id": "REQ-33",
-      "text": "Implement a Review Approver workflow: patient-submitted reviews must be held in a 'pending' state and only appear on the public website after an admin explicitly approves them in the admin panel. The admin panel must display all pending reviews with Approve and Reject actions.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Review Approver: Log jo reviews likhenge, wo pehle aapko admin panel mein dikhenge. Aap 'Approve' karoge tabhi website par live honge."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Newly submitted reviews have a 'pending' status and are not visible in the public testimonial carousel.",
-        "Admin panel shows a 'Review Approver' section listing all pending reviews with patient name, review text, star rating, and submission date.",
-        "Admin can click 'Approve' to make a review live or 'Reject' to discard it.",
-        "Only approved reviews appear in the public-facing auto-scrolling testimonial carousel.",
-        "Backend stores approval status per review and filters by status on public queries."
-      ]
-    },
-    {
-      "id": "REQ-34",
-      "text": "Apply a glassmorphism design treatment to all service cards, testimonial cards, doctor profile card, and admin panel content cards: use a frosted/blurred glass background (backdrop-filter: blur, semi-transparent white/teal background) so the animated mesh gradient background shows softly through the card surfaces.",
+      "id": "REQ-50",
+      "text": "Replace the existing BookAppointmentDialog component with a fully frictionless booking form. Remove any Internet Identity login requirement or auth-gated logic from the booking flow. The form must contain exactly four fields: Patient Name (text input), Phone Number (tel input), Service (dropdown select populated with available services), and Preferred Date (date picker). On successful submission, display an inline 'Thank You! Your appointment has been booked. We will contact you shortly.' confirmation message inside the dialog — no redirect, no login prompt. The 'Book Now' button must be immediately accessible without any authentication step.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Glassmorphism Design: Cards ko 'Dhundhla Kaanch' (Blurred Glass) jaisa look do taaki background ki animations piche se halki dikhti rahein."
+          "Sirf 3-4 simple fields honi chahiye: Name, Phone Number, Service Select, aur Date.",
+          "Book Now click karte hi seedha Thank You message aaye aur data Admin Panel mein chala jaye. No OTP, No Login.",
+          "User ko appointment book karte waqt kisi bhi tarah ka Login, Identity, ya Sign-up nahi mangna chahiye"
         ]
       },
       "acceptanceCriteria": [
-        "Service grid cards use backdrop-filter blur with a semi-transparent background.",
-        "Testimonial carousel cards use the same glassmorphism treatment.",
-        "Doctor profile card uses glassmorphism styling.",
-        "Admin panel dashboard/content cards adopt glassmorphism.",
-        "The animated mesh gradient background is subtly visible through all glassmorphism cards.",
-        "Text and interactive elements remain fully legible on all glass cards."
+        "The booking dialog/form renders immediately when the 'Book Appointment' button is clicked — no login or identity prompt appears.",
+        "The form contains exactly four fields: Patient Name, Phone Number, Service (dropdown), and Preferred Date.",
+        "Submitting the form with valid data calls the backend bookAppointment function using an anonymous actor (no Internet Identity required).",
+        "On successful submission, a 'Thank You' confirmation message is displayed inside the dialog.",
+        "No OTP, no sign-up, no Internet Identity login step is present anywhere in the booking flow.",
+        "The 'Book Appointment' CTA in the Hero section, Header, and service detail pages all open this frictionless form.",
+        "Form submission is disabled and shows inline validation if Name or Phone Number is empty."
       ]
     },
     {
-      "id": "REQ-35",
-      "text": "Add a scroll-progress indicator: a thin (3–4px) horizontal bar fixed at the very top of the viewport (above the sticky header) that fills from left to right as the user scrolls down the page, using the site's teal or royal-blue accent color, and resets to empty when the user returns to the top.",
+      "id": "REQ-51",
+      "text": "Audit all public-facing pages (Home, HeroSection, service detail pages: DentalImplantsDetail, InvisalignDetail, LaserDentistryDetail, PediatricDentistryDetail, SmileMakeoverDetail, ServiceDetail) and remove any logic that gates the 'Book Appointment' button or booking dialog behind an authentication check or login state. Every 'Book Appointment' / 'Book Now' button on the public site must open the frictionless booking form directly.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Scroll-Progress Bar: Screen ke upar ek patli line chale jo dikhaye user ne kitna scroll kiya hai."
+          "Booking process ekdum One-Click honi chahiye.",
+          "User ko appointment book karte waqt kisi bhi tarah ka Login, Identity, ya Sign-up nahi mangna chahiye"
         ]
       },
       "acceptanceCriteria": [
-        "A fixed bar is rendered at the very top of the viewport (z-index above header).",
-        "The bar width is proportional to scroll progress (0% at top, 100% at bottom of page).",
-        "The bar uses the site teal or royal-blue accent color.",
-        "The bar is 3–4px tall and spans full viewport width.",
-        "It is present on all public pages."
-      ]
-    },
-    {
-      "id": "REQ-36",
-      "text": "Add floating dental element decorations in the corners and edges of the page: small (64–96px) semi-transparent PNG images of dental icons (tooth, dental mirror, toothbrush, plus/cross) that gently float and apply a subtle parallax offset as the user scrolls, creating depth without obstructing any content.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Floating Elements: Website ke corners mein dental equipment ya healthy teeth ki small transparent images 'float' karti rahein (Parallax effect)."
-        ]
-      },
-      "acceptanceCriteria": [
-        "At least 4 floating dental element icons are positioned near the corners/edges of the home page.",
-        "Each element has a gentle CSS float/bob animation (up-down or rotation).",
-        "Elements shift position slightly based on scroll position (parallax offset).",
-        "Elements are semi-transparent and do not overlap or obstruct text, CTAs, or interactive UI.",
-        "Images are served from frontend/public/assets/generated."
-      ]
-    },
-    {
-      "id": "REQ-37",
-      "text": "Enhance the existing custom cursor so that when the mouse hovers over any service card in the Services section, the cursor icon changes to a dental-themed icon (tooth or medical plus/cross SVG). The cursor must revert to the standard custom cursor when moving off service cards. This is a magnetic/context-sensitive cursor enhancement on top of the existing CustomCursor component.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Magnetic Cursor: Mouse ka cursor dental icons (daant ya plus sign) mein badal jaye jab wo services par jaye."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Hovering over a service card switches the custom cursor SVG to a tooth or plus-sign dental icon.",
-        "Moving off the service card reverts the cursor to the default custom cursor (medical cross trail).",
-        "The transition between cursor states is smooth (no flicker).",
-        "The behavior works for all service cards including the 5 premium service cards.",
-        "The cursor does not obstruct or interfere with click targets on the cards."
-      ]
-    },
-    {
-      "id": "REQ-38",
-      "text": "Render all new floating dental element images as static assets in the frontend/public/assets/generated directory.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Website ke corners mein dental equipment ya healthy teeth ki small transparent images"
-        ]
-      },
-      "acceptanceCriteria": [
-        "All floating dental element PNG files are present in frontend/public/assets/generated.",
-        "The floating element components reference these static asset paths."
+        "No 'Book Appointment' button on any public page shows a login prompt or requires authentication.",
+        "All 'Book Appointment' / 'Book Now' buttons across HeroSection, Header, and all service detail pages open the frictionless BookAppointmentDialog directly.",
+        "Unauthenticated users can open and submit the booking form without being redirected or prompted to log in."
       ]
     }
   ],
   "constraints": [
-    "Do not break or modify the existing hidden admin triple-click footer login mechanism (credentials: 6352174912 / 63521).",
-    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "All Motoko logic must remain in the single backend/main.mo actor.",
-    "Floating elements and scroll progress bar must not obstruct any clickable elements or readable text.",
-    "Glassmorphism must preserve full text legibility on all cards."
+    "Do not remove or modify the existing admin authentication system — the hidden admin login and AdminGuard must remain intact.",
+    "The anonymous booking backend function must not expose or allow modification of any admin-only data.",
+    "Do not alter immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui."
   ],
   "nonGoals": [
-    "Adding OTP, CAPTCHA, or any additional security layer to the admin login flow.",
-    "Creating a separate admin login page (modal popup only).",
-    "Integrating any third-party authentication provider.",
-    "Adding real-time WebSocket or push notification features.",
-    "Changing the existing color palette (white, deep royal blue, teal).",
-    "Modifying the existing BeforeAfterSlider, TestimonialCarousel, or HeroSection core logic."
+    "Adding OTP verification or any phone number validation service.",
+    "Sending SMS or email confirmation to the patient.",
+    "Changing any admin panel authentication or access control.",
+    "Adding a patient account or profile system.",
+    "Modifying the review submission, before/after gallery, or any other backend functionality."
   ],
   "imageRequirements": {
-    "required": [
-      "Semi-transparent tooth icon illustration for floating dental element and magnetic cursor, white/teal tones on transparent background (tooth-float-icon.dim_96x96.png)",
-      "Semi-transparent dental mirror icon illustration for floating dental element, white/teal tones on transparent background (dental-mirror-float-icon.dim_96x96.png)",
-      "Semi-transparent toothbrush icon illustration for floating dental element, white/teal tones on transparent background (toothbrush-float-icon.dim_96x96.png)",
-      "Semi-transparent medical plus/cross icon illustration for floating dental element and magnetic cursor, teal/royal-blue tones on transparent background (plus-float-icon.dim_96x96.png)"
-    ],
+    "required": [],
     "edits": []
   }
 }

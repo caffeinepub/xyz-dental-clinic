@@ -1,253 +1,81 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Admin Panel Enhancements + Glassmorphism, Scroll Progress Bar, Floating Dental Elements & Magnetic Cursor",
+  "title": "Frictionless Zero-Login Appointment Booking",
   "requirements": [
     {
-      "id": "REQ-32",
-      "summary": "Add Service Manager section to admin panel for editing 5 premium services (Implants, Invisalign, Kids, Smile Makeover, Laser) including display name, description, and featured photo upload",
+      "id": "REQ-50",
+      "summary": "Replace BookAppointmentDialog with a fully frictionless booking form that requires no authentication and displays an inline confirmation message on success",
       "acceptanceCriteria": [
-        "Admin panel has a 'Service Manager' tab/section listing all 5 premium services.",
-        "Each service entry has an editable name field, description/text area, and an image upload control.",
-        "Saving changes persists the updated text and image to the backend.",
-        "Updated service text and image appear on the public Services grid cards and corresponding detail pages without a code change."
+        "The booking dialog/form renders immediately when the 'Book Appointment' button is clicked — no login or identity prompt appears.",
+        "The form contains exactly four fields: Patient Name, Phone Number, Service (dropdown), and Preferred Date.",
+        "Submitting the form with valid data calls the backend bookAppointment function using an anonymous actor (no Internet Identity required).",
+        "On successful submission, a 'Thank You' confirmation message is displayed inside the dialog.",
+        "No OTP, no sign-up, no Internet Identity login step is present anywhere in the booking flow.",
+        "The 'Book Appointment' CTA in the Hero section, Header, and service detail pages all open this frictionless form.",
+        "Form submission is disabled and shows inline validation if Name or Phone Number is empty."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/admin/ServiceManager.tsx",
-          "operation": "create",
-          "description": "Create admin Service Manager page that lists all 5 premium services (dental-implants, invisalign, pediatric-dentistry, smile-makeover, laser-dentistry) with editable name, description, and photo upload controls. Use the blob-storage component to support image uploads as ExternalBlob instances. Call backend addOrUpdateService capability to persist changes. Display success/error toast notifications. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/components/BookAppointmentDialog.tsx",
+          "operation": "modify",
+          "description": "Remove all authentication checks and Internet Identity dependencies from the booking dialog. Replace the existing authenticated booking flow with a fully anonymous form containing exactly four fields: Patient Name (text input), Phone Number (tel input), Service (dropdown select populated from backend via useGetAllServices), and Preferred Date (date picker). Update the useBookAppointment mutation hook call to use an anonymous actor instead of an authenticated one. On successful form submission, display an inline 'Thank You! Your appointment has been booked. We will contact you shortly.' confirmation message inside the dialog without redirecting or closing the modal. Add client-side validation to disable the submit button when Name or Phone Number is empty, showing inline validation messages. Remove any conditional rendering that gates the form behind isAuthenticated checks."
         },
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add useUpdateService mutation hook that calls backend addOrUpdateService with service ID, displayName, description, and optional featuredPhoto (ExternalBlob or null). Invalidate 'allServices' and individual service query keys on success to refresh service data across the app."
+          "description": "Update the useBookAppointment mutation hook to create and use an anonymous actor (via createActor with AnonymousIdentity) instead of requiring the authenticated actor from useActor. Ensure the mutation calls backend.bookAppointment with the four required parameters: patientName, contactInfo, preferredDate, and serviceType. Remove any authentication or identity requirements from this mutation hook so it works for unauthenticated users."
+        }
+      ]
+    },
+    {
+      "id": "REQ-51",
+      "summary": "Remove all authentication gates from 'Book Appointment' buttons across all public-facing pages so the frictionless booking form opens immediately for any user",
+      "acceptanceCriteria": [
+        "No 'Book Appointment' button on any public page shows a login prompt or requires authentication.",
+        "All 'Book Appointment' / 'Book Now' buttons across HeroSection, Header, and all service detail pages open the frictionless BookAppointmentDialog directly.",
+        "Unauthenticated users can open and submit the booking form without being redirected or prompted to log in."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/HeroSection.tsx",
+          "operation": "modify",
+          "description": "Remove any conditional logic that gates the 'Book Appointment' button behind authentication checks. Ensure the button always renders and directly opens the BookAppointmentDialog component when clicked, regardless of user authentication status."
         },
         {
-          "path": "frontend/src/pages/admin/Dashboard.tsx",
+          "path": "frontend/src/components/Header.tsx",
           "operation": "modify",
-          "description": "Add a navigation card for 'Service Manager' alongside existing cards (Appointments, Content Manager, Doctor Scheduler) that links to /admin/service-manager route."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Register /admin/service-manager route under AdminGuard that renders the ServiceManager component."
-        },
-        {
-          "path": "frontend/src/pages/ServicesGrid.tsx",
-          "operation": "modify",
-          "description": "Update ServicesGrid to fetch all services via a new useGetAllServices query hook instead of hardcoded data. Map service.featuredPhoto ExternalBlob to direct URL for card images. Ensure service.displayName and service.description are rendered from backend data."
+          "description": "Remove any authentication gates or conditional rendering around the 'Book Appointment' button in the header navigation. Ensure the button is always visible and directly opens the BookAppointmentDialog when clicked, without checking isAuthenticated or prompting for login."
         },
         {
           "path": "frontend/src/pages/DentalImplantsDetail.tsx",
           "operation": "modify",
-          "description": "Fetch service data for 'dental-implants' via useGetService query hook. Render service.displayName as page title, service.description in the content section, and service.featuredPhoto as the hero image. Keep existing benefits and process steps as static content."
+          "description": "Remove any authentication checks or login prompts from the 'Book Appointment' / 'Book Now' buttons on the Dental Implants detail page. Ensure all booking buttons directly open the frictionless BookAppointmentDialog without requiring user authentication."
         },
         {
           "path": "frontend/src/pages/InvisalignDetail.tsx",
           "operation": "modify",
-          "description": "Fetch service data for 'invisalign' via useGetService query hook. Render service.displayName as page title, service.description in the content section, and service.featuredPhoto as the hero image. Keep existing benefits and process steps as static content."
-        },
-        {
-          "path": "frontend/src/pages/PediatricDentistryDetail.tsx",
-          "operation": "modify",
-          "description": "Fetch service data for 'pediatric-dentistry' via useGetService query hook. Render service.displayName as page title, service.description in the content section, and service.featuredPhoto as the hero image. Keep existing benefits and process steps as static content."
-        },
-        {
-          "path": "frontend/src/pages/SmileMakeoverDetail.tsx",
-          "operation": "modify",
-          "description": "Fetch service data for 'smile-makeover' via useGetService query hook. Render service.displayName as page title, service.description in the content section, and service.featuredPhoto as the hero image. Keep existing benefits and process steps as static content."
+          "description": "Remove any authentication gates from the 'Book Appointment' / 'Book Now' buttons on the Invisalign detail page. Ensure the buttons directly open the frictionless BookAppointmentDialog for all users, authenticated or not."
         },
         {
           "path": "frontend/src/pages/LaserDentistryDetail.tsx",
           "operation": "modify",
-          "description": "Fetch service data for 'laser-dentistry' via useGetService query hook. Render service.displayName as page title, service.description in the content section, and service.featuredPhoto as the hero image. Keep existing benefits and process steps as static content."
-        }
-      ]
-    },
-    {
-      "id": "REQ-33",
-      "summary": "Implement Review Approver workflow with pending state and admin approval/rejection actions in admin panel",
-      "acceptanceCriteria": [
-        "Newly submitted reviews have a 'pending' status and are not visible in the public testimonial carousel.",
-        "Admin panel shows a 'Review Approver' section listing all pending reviews with patient name, review text, star rating, and submission date.",
-        "Admin can click 'Approve' to make a review live or 'Reject' to discard it.",
-        "Only approved reviews appear in the public-facing auto-scrolling testimonial carousel.",
-        "Backend stores approval status per review and filters by status on public queries."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/admin/ReviewApprover.tsx",
-          "operation": "create",
-          "description": "Create admin Review Approver page that fetches pending reviews via useGetPendingReviews query hook. Display each review in a card with reviewerName, text, rating (stars), and photo if present. Provide 'Approve' and 'Reject' action buttons that call useApproveReview and useRejectReview mutation hooks. Show success/error toast notifications. Use the authorization component to ensure only admins can access this page."
+          "description": "Remove any authentication checks from the 'Book Appointment' / 'Book Now' buttons on the Laser Dentistry detail page. Ensure the booking dialog opens immediately when clicked, without requiring login or identity verification."
         },
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/pages/PediatricDentistryDetail.tsx",
           "operation": "modify",
-          "description": "Add useGetPendingReviews query hook that calls backend getPendingReviews capability. Add useApproveReview mutation hook that calls backend approveReview(reviewId). Add useRejectReview mutation hook that calls backend rejectReview(reviewId). Invalidate 'pendingReviews' and 'approvedReviews' query keys on mutation success to refresh review lists."
+          "description": "Remove any authentication gates from the 'Book Appointment' / 'Book Now' buttons on the Pediatric Dentistry detail page. Ensure the frictionless BookAppointmentDialog opens directly when the button is clicked, regardless of authentication status."
         },
         {
-          "path": "frontend/src/pages/admin/Dashboard.tsx",
+          "path": "frontend/src/pages/SmileMakeoverDetail.tsx",
           "operation": "modify",
-          "description": "Add a navigation card for 'Review Approver' alongside existing cards that links to /admin/review-approver route."
+          "description": "Remove any authentication checks from the 'Book Appointment' / 'Book Now' buttons on the Smile Makeover detail page. Ensure all booking buttons open the frictionless BookAppointmentDialog immediately without requiring user login."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/pages/ServiceDetail.tsx",
           "operation": "modify",
-          "description": "Register /admin/review-approver route under AdminGuard that renders the ReviewApprover component."
-        },
-        {
-          "path": "frontend/src/components/TestimonialCarousel.tsx",
-          "operation": "modify",
-          "description": "Update TestimonialCarousel to fetch approved reviews only via useGetApprovedReviews query hook (already exists). Ensure only reviews with state='approved' are displayed in the carousel."
-        },
-        {
-          "path": "frontend/src/pages/admin/ContentManager.tsx",
-          "operation": "modify",
-          "description": "Update ContentManager review submission form to clarify that newly submitted reviews will be in 'pending' state and require approval before appearing publicly. No backend changes needed as addReview already defaults to pending state."
-        }
-      ]
-    },
-    {
-      "id": "REQ-34",
-      "summary": "Apply glassmorphism design (frosted glass with backdrop-filter blur and semi-transparent background) to service cards, testimonial cards, doctor profile card, and admin panel content cards",
-      "acceptanceCriteria": [
-        "Service grid cards use backdrop-filter blur with a semi-transparent background.",
-        "Testimonial carousel cards use the same glassmorphism treatment.",
-        "Doctor profile card uses glassmorphism styling.",
-        "Admin panel dashboard/content cards adopt glassmorphism.",
-        "The animated mesh gradient background is subtly visible through all glassmorphism cards.",
-        "Text and interactive elements remain fully legible on all glass cards."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/ServicesGrid.tsx",
-          "operation": "modify",
-          "description": "Apply glassmorphism styling to all service cards: add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15) or rgba(20, 184, 166, 0.1), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow for depth. Ensure text contrast remains high and the animated mesh gradient is subtly visible through the cards."
-        },
-        {
-          "path": "frontend/src/components/TestimonialCarousel.tsx",
-          "operation": "modify",
-          "description": "Apply glassmorphism styling to testimonial cards: add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow. Ensure reviewer name, text, and star rating remain fully legible."
-        },
-        {
-          "path": "frontend/src/components/DoctorProfile.tsx",
-          "operation": "modify",
-          "description": "Apply glassmorphism styling to the doctor profile card container: add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow. Ensure bio, education, and awards text remain fully legible against the frosted glass background."
-        },
-        {
-          "path": "frontend/src/pages/admin/Dashboard.tsx",
-          "operation": "modify",
-          "description": "Apply glassmorphism styling to the navigation cards and clinic status section: add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow. Ensure card titles and icons remain legible."
-        },
-        {
-          "path": "frontend/src/pages/admin/Appointments.tsx",
-          "operation": "modify",
-          "description": "Apply glassmorphism styling to the appointments table container and individual appointment cards (if applicable): add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow. Ensure table text and dropdown controls remain legible."
-        },
-        {
-          "path": "frontend/src/pages/admin/ContentManager.tsx",
-          "operation": "modify",
-          "description": "Apply glassmorphism styling to the review submission form container: add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow. Ensure form labels and input fields remain legible and functional."
-        },
-        {
-          "path": "frontend/src/pages/admin/DoctorScheduler.tsx",
-          "operation": "modify",
-          "description": "Apply glassmorphism styling to the doctor form and doctor list cards: add backdrop-filter: blur(10px), background: rgba(255, 255, 255, 0.15), border: 1px solid rgba(255, 255, 255, 0.2), and box-shadow. Ensure form fields and doctor information remain legible."
-        }
-      ]
-    },
-    {
-      "id": "REQ-35",
-      "summary": "Add scroll-progress indicator bar (thin horizontal bar at top of viewport) that fills left-to-right as user scrolls, using teal/royal-blue accent color",
-      "acceptanceCriteria": [
-        "A fixed bar is rendered at the very top of the viewport (z-index above header).",
-        "The bar width is proportional to scroll progress (0% at top, 100% at bottom of page).",
-        "The bar uses the site teal or royal-blue accent color.",
-        "The bar is 3–4px tall and spans full viewport width.",
-        "It is present on all public pages."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/ScrollProgressBar.tsx",
-          "operation": "create",
-          "description": "Create ScrollProgressBar component that renders a fixed bar at the top of the viewport (position: fixed, top: 0, left: 0, z-index: 9999). Use a scroll event listener or IntersectionObserver to calculate scroll progress as (scrollY / (documentHeight - windowHeight)) * 100. Render a div with height 3-4px, width equal to scroll progress percentage, and background color using Tailwind teal (bg-teal-500) or royal-blue. Ensure the bar does not obstruct any clickable elements."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Import and render ScrollProgressBar component at the root level (before RouterProvider or as a sibling to CustomCursor) so it appears on all public pages."
-        }
-      ]
-    },
-    {
-      "id": "REQ-36",
-      "summary": "Add floating dental element decorations (semi-transparent tooth, dental mirror, toothbrush, plus icons) with gentle float animation and parallax scroll offset in page corners",
-      "acceptanceCriteria": [
-        "At least 4 floating dental element icons are positioned near the corners/edges of the home page.",
-        "Each element has a gentle CSS float/bob animation (up-down or rotation).",
-        "Elements shift position slightly based on scroll position (parallax offset).",
-        "Elements are semi-transparent and do not overlap or obstruct text, CTAs, or interactive UI.",
-        "Images are served from frontend/public/assets/generated."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/FloatingDentalElements.tsx",
-          "operation": "create",
-          "description": "Create FloatingDentalElements component that renders 4 floating dental icons positioned absolutely in the corners/edges (top-left, top-right, bottom-left, bottom-right) using the generated images: frontend/public/assets/generated/tooth-float-icon.dim_96x96.png, frontend/public/assets/generated/dental-mirror-float-icon.dim_96x96.png, frontend/public/assets/generated/toothbrush-float-icon.dim_96x96.png, frontend/public/assets/generated/plus-float-icon.dim_96x96.png. Apply CSS animations (keyframes for gentle up-down float or rotation) and use a scroll event listener to apply subtle parallax transform offset (translateY based on scrollY). Set opacity to 0.6-0.7 for semi-transparency. Ensure elements have pointer-events: none to avoid obstructing interactive UI."
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Import and render FloatingDentalElements component at the top level of the Home page (before or after HeroSection) so the floating icons appear across the entire home page."
-        }
-      ]
-    },
-    {
-      "id": "REQ-37",
-      "summary": "Enhance CustomCursor to change to dental-themed icon (tooth or plus) when hovering over service cards, reverting to default cursor when not hovering",
-      "acceptanceCriteria": [
-        "Hovering over a service card switches the custom cursor SVG to a tooth or plus-sign dental icon.",
-        "Moving off the service card reverts the cursor to the default custom cursor (medical cross trail).",
-        "The transition between cursor states is smooth (no flicker).",
-        "The behavior works for all service cards including the 5 premium service cards.",
-        "The cursor does not obstruct or interfere with click targets on the cards."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/CustomCursor.tsx",
-          "operation": "modify",
-          "description": "Add a state variable to track the cursor icon type (default vs dental). Expose a method or context to set cursor state from external components. When cursor state is 'dental', render a tooth or plus SVG icon instead of the medical cross. Apply smooth transition for icon change. Ensure the cursor does not interfere with click events."
-        },
-        {
-          "path": "frontend/src/components/ServicesGrid.tsx",
-          "operation": "modify",
-          "description": "Add onMouseEnter and onMouseLeave event handlers to each service card that call the CustomCursor state setter to switch to 'dental' icon on hover and revert to 'default' on leave. Ensure the cursor change is smooth and does not obstruct card interaction."
-        },
-        {
-          "path": "frontend/src/context/CursorContext.tsx",
-          "operation": "create",
-          "description": "Create a React context (CursorContext) that provides cursor state (icon type) and a setter function (setCursorIcon). Wrap the app with CursorContextProvider in App.tsx. CustomCursor consumes this context to render the appropriate icon. ServicesGrid (and other components) use the context to trigger cursor icon changes."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wrap the app with CursorContextProvider so that CustomCursor and other components can access and control the cursor state via context."
-        }
-      ]
-    },
-    {
-      "id": "REQ-38",
-      "summary": "Render floating dental element images as static assets in frontend/public/assets/generated",
-      "acceptanceCriteria": [
-        "All floating dental element PNG files are present in frontend/public/assets/generated.",
-        "The floating element components reference these static asset paths."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/FloatingDentalElements.tsx",
-          "operation": "modify",
-          "description": "Reference the generated floating dental element images using the exact workspace paths: frontend/public/assets/generated/tooth-float-icon.dim_96x96.png, frontend/public/assets/generated/dental-mirror-float-icon.dim_96x96.png, frontend/public/assets/generated/toothbrush-float-icon.dim_96x96.png, frontend/public/assets/generated/plus-float-icon.dim_96x96.png. Ensure the img src attributes use the correct relative paths (/assets/generated/<filename>)."
+          "description": "Remove any authentication gates from the 'Book Appointment' / 'Book Now' buttons on the generic ServiceDetail page. Ensure the booking dialog opens directly when clicked, without checking authentication status or prompting for login."
         }
       ]
     }

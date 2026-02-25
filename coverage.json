@@ -1,171 +1,70 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-25T20:49:47.412Z",
+  "generatedAt": "2026-02-25T21:24:03.490Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 7,
-    "implemented": 7,
+    "total": 3,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-32",
-        "summary": "Add a 'Service Manager' section to the admin panel that allows the admin to edit the display name, description text, and upload/replace the featured photo for each of the 5 premium services: Dental Implants, Invisalign, Pediatric Dentistry (Kids), Smile Makeover, and Laser Dentistry. Changes must be persisted in the backend and reflected on the public-facing service cards and detail pages.",
+        "id": "REQ-49",
+        "summary": "Update the backend appointment booking function to accept anonymous (unauthenticated) calls. The `bookAppointment` function must not require a caller principal/identity check — any anonymous user must be able to submit a booking with Name, Phone Number, Service, and Date/Time fields. Store all submitted appointments in the existing appointments data structure so they appear in the admin panel.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-50",
+        "summary": "Replace the existing BookAppointmentDialog component with a fully frictionless booking form. Remove any Internet Identity login requirement or auth-gated logic from the booking flow. The form must contain exactly four fields: Patient Name (text input), Phone Number (tel input), Service (dropdown select populated with available services), and Preferred Date (date picker). On successful submission, display an inline 'Thank You! Your appointment has been booked. We will contact you shortly.' confirmation message inside the dialog — no redirect, no login prompt. The 'Book Now' button must be immediately accessible without any authentication step.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/admin/ServiceManager.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/admin/Dashboard.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/pages/ServicesGrid.tsx",
+          "frontend/src/components/BookAppointmentDialog.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/BookAppointmentDialog.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-51",
+        "summary": "Audit all public-facing pages (Home, HeroSection, service detail pages: DentalImplantsDetail, InvisalignDetail, LaserDentistryDetail, PediatricDentistryDetail, SmileMakeoverDetail, ServiceDetail) and remove any logic that gates the 'Book Appointment' button or booking dialog behind an authentication check or login state. Every 'Book Appointment' / 'Book Now' button on the public site must open the frictionless booking form directly.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/HeroSection.tsx",
+          "frontend/src/components/Header.tsx",
           "frontend/src/pages/DentalImplantsDetail.tsx",
           "frontend/src/pages/InvisalignDetail.tsx",
+          "frontend/src/pages/LaserDentistryDetail.tsx",
           "frontend/src/pages/PediatricDentistryDetail.tsx",
           "frontend/src/pages/SmileMakeoverDetail.tsx",
-          "frontend/src/pages/LaserDentistryDetail.tsx"
+          "frontend/src/pages/ServiceDetail.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/admin/ServiceManager.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/admin/Dashboard.tsx",
-          "frontend/src/App.tsx"
-        ]
-      },
-      {
-        "id": "REQ-33",
-        "summary": "Implement a Review Approver workflow: patient-submitted reviews must be held in a 'pending' state and only appear on the public website after an admin explicitly approves them in the admin panel. The admin panel must display all pending reviews with Approve and Reject actions.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/admin/ReviewApprover.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/admin/Dashboard.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/TestimonialCarousel.tsx",
-          "frontend/src/pages/admin/ContentManager.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/admin/ReviewApprover.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/admin/Dashboard.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/TestimonialCarousel.tsx",
-          "frontend/src/pages/admin/ContentManager.tsx"
-        ]
-      },
-      {
-        "id": "REQ-34",
-        "summary": "Apply a glassmorphism design treatment to all service cards, testimonial cards, doctor profile card, and admin panel content cards: use a frosted/blurred glass background (backdrop-filter: blur, semi-transparent white/teal background) so the animated mesh gradient background shows softly through the card surfaces.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/ServicesGrid.tsx",
-          "frontend/src/components/TestimonialCarousel.tsx",
-          "frontend/src/components/DoctorProfile.tsx",
-          "frontend/src/pages/admin/Dashboard.tsx",
-          "frontend/src/pages/admin/Appointments.tsx",
-          "frontend/src/pages/admin/ContentManager.tsx",
-          "frontend/src/pages/admin/DoctorScheduler.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/ServicesGrid.tsx",
-          "frontend/src/components/TestimonialCarousel.tsx",
-          "frontend/src/components/DoctorProfile.tsx",
-          "frontend/src/pages/admin/Dashboard.tsx",
-          "frontend/src/pages/admin/Appointments.tsx",
-          "frontend/src/pages/admin/ContentManager.tsx",
-          "frontend/src/pages/admin/DoctorScheduler.tsx"
-        ]
-      },
-      {
-        "id": "REQ-35",
-        "summary": "Add a scroll-progress indicator: a thin (3–4px) horizontal bar fixed at the very top of the viewport (above the sticky header) that fills from left to right as the user scrolls down the page, using the site's teal or royal-blue accent color, and resets to empty when the user returns to the top.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/ScrollProgressBar.tsx",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/ScrollProgressBar.tsx",
-          "frontend/src/App.tsx"
-        ]
-      },
-      {
-        "id": "REQ-36",
-        "summary": "Add floating dental element decorations in the corners and edges of the page: small (64–96px) semi-transparent PNG images of dental icons (tooth, dental mirror, toothbrush, plus/cross) that gently float and apply a subtle parallax offset as the user scrolls, creating depth without obstructing any content.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/FloatingDentalElements.tsx",
-          "frontend/src/pages/Home.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/FloatingDentalElements.tsx",
-          "frontend/src/pages/Home.tsx"
-        ]
-      },
-      {
-        "id": "REQ-37",
-        "summary": "Enhance the existing custom cursor so that when the mouse hovers over any service card in the Services section, the cursor icon changes to a dental-themed icon (tooth or medical plus/cross SVG). The cursor must revert to the standard custom cursor when moving off service cards. This is a magnetic/context-sensitive cursor enhancement on top of the existing CustomCursor component.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/CustomCursor.tsx",
-          "frontend/src/components/ServicesGrid.tsx",
-          "frontend/src/context/CursorContext.tsx",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/CustomCursor.tsx",
-          "frontend/src/components/ServicesGrid.tsx",
-          "frontend/src/context/CursorContext.tsx",
-          "frontend/src/App.tsx"
-        ]
-      },
-      {
-        "id": "REQ-38",
-        "summary": "Render all new floating dental element images as static assets in the frontend/public/assets/generated directory.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/FloatingDentalElements.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/FloatingDentalElements.tsx"
+          "frontend/src/components/Header.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
     "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
+    "build-template/README.md",
+    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/public/assets/generated/dental-mirror-float-icon.dim_96x96.png",
-    "frontend/public/assets/generated/plus-float-icon.dim_96x96.png",
-    "frontend/public/assets/generated/tooth-float-icon.dim_96x96.png",
-    "frontend/public/assets/generated/toothbrush-float-icon.dim_96x96.png",
-    "frontend/src/App.tsx",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
-    "frontend/src/components/CustomCursor.tsx",
-    "frontend/src/components/DoctorProfile.tsx",
-    "frontend/src/components/FloatingDentalElements.tsx",
-    "frontend/src/components/ScrollProgressBar.tsx",
-    "frontend/src/components/ServicesGrid.tsx",
-    "frontend/src/components/TestimonialCarousel.tsx",
-    "frontend/src/context/CursorContext.tsx",
+    "frontend/src/components/BookAppointmentDialog.tsx",
+    "frontend/src/components/Header.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/index.css",
-    "frontend/src/pages/Home.tsx",
-    "frontend/src/pages/admin/Appointments.tsx",
-    "frontend/src/pages/admin/ContentManager.tsx",
-    "frontend/src/pages/admin/Dashboard.tsx",
-    "frontend/src/pages/admin/DoctorScheduler.tsx",
-    "frontend/src/pages/admin/ReviewApprover.tsx",
-    "frontend/src/pages/admin/ServiceManager.tsx",
-    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

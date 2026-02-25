@@ -1,127 +1,155 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, CheckCircle, Star } from 'lucide-react';
-import BookAppointmentDialog from '../components/BookAppointmentDialog';
-import BeforeAfterSlider from '../components/BeforeAfterSlider';
-
-const benefits = [
-  'Complete smile transformation in one treatment plan',
-  'Combines whitening, veneers, implants, and more',
-  'Fully customized to your facial features',
-  'Digital smile preview before treatment begins',
-  'Long-lasting, natural-looking results',
-  'Boosts confidence and quality of life',
-];
-
-const process = [
-  'Comprehensive smile analysis and consultation',
-  'Digital smile design and preview',
-  'Personalized multi-treatment plan creation',
-  'Preparatory treatments (cleaning, extractions if needed)',
-  'Core cosmetic procedures (veneers, whitening, implants)',
-  'Final polishing, adjustments, and maintenance plan',
-];
+import BackgroundParticles from '@/components/BackgroundParticles';
+import BookAppointmentDialog from '@/components/BookAppointmentDialog';
+import ZoomInImage from '@/components/ZoomInImage';
+import TypewriterText from '@/components/TypewriterText';
+import BeforeAfterSlider from '@/components/BeforeAfterSlider';
+import { useGetService } from '@/hooks/useQueries';
 
 export default function SmileMakeoverDetail() {
   const navigate = useNavigate();
+  const { data: service } = useGetService('smile-makeover');
   const [bookingOpen, setBookingOpen] = useState(false);
 
+  const title = service?.displayName || 'Smile Makeover';
+  const description =
+    service?.description ||
+    'Complete smile transformation combining the best of cosmetic dentistry.';
+  const imageUrl =
+    service?.featuredPhoto?.getDirectURL() ||
+    '/assets/generated/smile-makeover-banner.dim_1200x500.png';
+
+  const benefits = [
+    'Complete smile transformation in one plan',
+    'Combines whitening, veneers, implants, and more',
+    'Fully customized to your facial features',
+    'Digital smile preview before treatment begins',
+    'Long-lasting, natural-looking results',
+    'Boosts confidence and quality of life',
+  ];
+
+  const steps = [
+    { step: '01', title: 'Smile Analysis', desc: 'Comprehensive consultation and digital smile assessment.' },
+    { step: '02', title: 'Digital Design', desc: 'Preview your new smile with advanced digital design tools.' },
+    { step: '03', title: 'Treatment Plan', desc: 'Personalized multi-treatment plan tailored to your goals.' },
+    { step: '04', title: 'Core Procedures', desc: 'Veneers, whitening, implants, or other chosen treatments.' },
+    { step: '05', title: 'Final Polish', desc: 'Adjustments, polishing, and long-term maintenance plan.' },
+  ];
+
   return (
-    <div className="min-h-screen">
-      {/* Hero */}
-      <section className="py-12 bg-gradient-to-br from-royal-blue/10 to-teal/10">
-        <div className="container">
-          <Button variant="ghost" onClick={() => navigate({ to: '/' })} className="mb-6">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Button>
+    <div className="relative min-h-screen bg-background">
+      <BackgroundParticles />
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <button
+          onClick={() => navigate({ to: '/' })}
+          className="text-muted-foreground hover:text-foreground transition-colors mb-8 flex items-center gap-2"
+        >
+          ← Back to Home
+        </button>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-slide-in-left">
-              <div className="relative w-full max-w-lg mx-auto lg:mx-0 mb-6 overflow-hidden rounded-2xl shadow-2xl">
-                <img
-                  src="/assets/generated/smile-makeover-banner.dim_1200x500.png"
-                  alt="Smile Makeover"
-                  className="w-full h-auto"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-royal-blue/40 to-transparent" />
-                <div className="absolute bottom-4 left-4 text-white font-bold text-xl drop-shadow">
-                  Your Dream Smile Awaits
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16 items-center">
+          <div>
+            <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
+              Premium Transformation
+            </div>
+            <TypewriterText
+              text={title}
+              tag="h1"
+              className="text-4xl font-bold text-foreground mb-4"
+              speed={40}
+            />
+            <p className="text-muted-foreground text-lg leading-relaxed mb-6">{description}</p>
+            <button
+              onClick={() => setBookingOpen(true)}
+              className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+            >
+              Start Your Transformation
+            </button>
+          </div>
+          <ZoomInImage src={imageUrl} alt={title} className="rounded-2xl shadow-xl" />
+        </div>
+
+        {/* Benefits */}
+        <div className="glass-card rounded-2xl p-8 mb-10 border border-border/40">
+          <TypewriterText
+            text="What's Included"
+            tag="h2"
+            className="text-2xl font-bold text-foreground mb-6"
+            speed={35}
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {benefits.map((b, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span className="text-primary mt-0.5">✓</span>
+                <span className="text-muted-foreground">{b}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Before/After Gallery */}
+        <div className="mb-10">
+          <TypewriterText
+            text="Real Patient Transformations"
+            tag="h2"
+            className="text-2xl font-bold text-foreground mb-6"
+            speed={35}
+          />
+          <BeforeAfterSlider
+            staticPairs={[
+              {
+                beforeSrc: '/assets/generated/smile-before-1.dim_800x500.png',
+                afterSrc: '/assets/generated/smile-after-1.dim_800x500.png',
+                label: 'Smile Makeover Case 1',
+              },
+              {
+                beforeSrc: '/assets/generated/before-whitening.dim_800x600.png',
+                afterSrc: '/assets/generated/after-whitening.dim_800x600.png',
+                label: 'Smile Makeover Case 2',
+              },
+            ]}
+          />
+        </div>
+
+        {/* Process */}
+        <div className="mb-10">
+          <TypewriterText
+            text="Your Makeover Journey"
+            tag="h2"
+            className="text-2xl font-bold text-foreground mb-6"
+            speed={35}
+          />
+          <div className="space-y-4">
+            {steps.map((s) => (
+              <div
+                key={s.step}
+                className="glass-card rounded-xl p-5 border border-border/40 flex gap-4 items-start"
+              >
+                <span className="text-primary font-bold text-lg shrink-0">{s.step}</span>
+                <div>
+                  <h3 className="font-semibold text-foreground">{s.title}</h3>
+                  <p className="text-muted-foreground text-sm mt-1">{s.desc}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 mb-3">
-                <Star className="h-6 w-6 text-yellow-500 fill-yellow-500" />
-                <span className="text-sm font-semibold text-teal uppercase tracking-wider">Premium Transformation</span>
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Smile Makeover</h1>
-              <p className="text-lg text-muted-foreground mb-6">
-                A complete smile transformation combining the best of cosmetic dentistry. See real patient
-                results in our before & after gallery below.
-              </p>
-              <Button size="lg" className="animated-button" onClick={() => setBookingOpen(true)}>
-                <Calendar className="mr-2 h-5 w-5" />
-                Start Your Transformation
-              </Button>
-            </div>
-
-            <div className="bg-white dark:bg-card rounded-2xl shadow-xl p-8 animate-slide-in-right">
-              <h2 className="text-2xl font-bold mb-6">What's Included</h2>
-              <ul className="space-y-3">
-                {benefits.map((benefit, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="h-6 w-6 text-teal shrink-0 mt-0.5" />
-                    <span>{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            ))}
           </div>
         </div>
-      </section>
 
-      {/* Before/After Gallery */}
-      <section className="py-20">
-        <div className="container max-w-6xl">
-          <div className="text-center mb-12 animate-fade-in-up">
-            <h2 className="text-3xl font-bold mb-4">Real Patient Transformations</h2>
-            <p className="text-muted-foreground">Drag the sliders to see the incredible before & after results</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <BeforeAfterSlider
-              beforeImage="/assets/generated/smile-before-1.dim_800x500.png"
-              afterImage="/assets/generated/smile-after-1.dim_800x500.png"
-              title="Smile Makeover Case 1"
-            />
-            <BeforeAfterSlider
-              beforeImage="/assets/generated/before-whitening.dim_800x600.png"
-              afterImage="/assets/generated/after-whitening.dim_800x600.png"
-              title="Smile Makeover Case 2"
-            />
-          </div>
+        {/* CTA */}
+        <div className="text-center glass-card rounded-2xl p-8 border border-border/40">
+          <h2 className="text-2xl font-bold text-foreground mb-3">Your Dream Smile Awaits</h2>
+          <p className="text-muted-foreground mb-6">
+            Book a consultation and see your transformation before it begins.
+          </p>
+          <button
+            onClick={() => setBookingOpen(true)}
+            className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+          >
+            Book Consultation
+          </button>
         </div>
-      </section>
-
-      {/* Process */}
-      <section className="py-20 bg-muted/30">
-        <div className="container max-w-4xl">
-          <div className="animate-fade-in-up">
-            <h2 className="text-3xl font-bold mb-8 text-center">Your Makeover Journey</h2>
-            <div className="space-y-6">
-              {process.map((step, index) => (
-                <div key={index} className="flex gap-4">
-                  <div className="shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-royal-blue to-teal flex items-center justify-center text-white font-bold">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1 pt-1">
-                    <p className="text-lg">{step}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
 
       <BookAppointmentDialog open={bookingOpen} onOpenChange={setBookingOpen} />
     </div>

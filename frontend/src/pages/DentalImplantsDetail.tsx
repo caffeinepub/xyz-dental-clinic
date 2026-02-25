@@ -1,107 +1,130 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, CheckCircle, Zap } from 'lucide-react';
-import BookAppointmentDialog from '../components/BookAppointmentDialog';
-
-const benefits = [
-  'Permanent, lifetime tooth replacement',
-  'Looks, feels, and functions like natural teeth',
-  'Prevents jawbone loss and facial sagging',
-  'No damage to adjacent healthy teeth',
-  'Improved speech, chewing, and confidence',
-  '3D-guided precision placement for best outcomes',
-];
-
-const process = [
-  'Comprehensive 3D CT scan and digital planning',
-  'Bone density assessment and treatment design',
-  'Implant post placement under local anesthesia',
-  'Osseointegration healing period (3–6 months)',
-  'Custom abutment and crown fabrication',
-  'Final crown placement and bite adjustment',
-];
+import BackgroundParticles from '@/components/BackgroundParticles';
+import BookAppointmentDialog from '@/components/BookAppointmentDialog';
+import ZoomInImage from '@/components/ZoomInImage';
+import TypewriterText from '@/components/TypewriterText';
+import { useGetService } from '@/hooks/useQueries';
 
 export default function DentalImplantsDetail() {
   const navigate = useNavigate();
+  const { data: service } = useGetService('dental-implants');
   const [bookingOpen, setBookingOpen] = useState(false);
 
+  const title = service?.displayName || 'Advanced Dental Implants';
+  const description =
+    service?.description ||
+    'Permanent, natural-looking tooth replacement with titanium implants.';
+  const imageUrl =
+    service?.featuredPhoto?.getDirectURL() ||
+    '/assets/generated/dental-implant-diagram.dim_600x400.png';
+
+  const benefits = [
+    'Permanent solution lasting 20+ years',
+    'Natural look and feel',
+    'Preserves jawbone density',
+    'No adhesives or removal needed',
+    'Improves speech and chewing',
+    'Easy maintenance like natural teeth',
+  ];
+
+  const steps = [
+    { step: '01', title: 'Consultation & 3D Scan', desc: 'Comprehensive examination with digital X-rays and 3D imaging.' },
+    { step: '02', title: 'Treatment Planning', desc: 'Custom implant placement plan using advanced software.' },
+    { step: '03', title: 'Implant Placement', desc: 'Titanium post surgically placed under local anesthesia.' },
+    { step: '04', title: 'Healing Period', desc: '3-6 months for osseointegration with the jawbone.' },
+    { step: '05', title: 'Crown Placement', desc: 'Custom ceramic crown attached for a perfect smile.' },
+  ];
+
   return (
-    <div className="min-h-screen">
-      <section className="py-12 bg-gradient-to-br from-royal-blue/10 to-teal/10 relative overflow-hidden">
-        {/* Animated implant drop visual */}
-        <div className="absolute right-8 top-8 opacity-10 pointer-events-none hidden lg:block">
-          <div className="implant-drop-anim w-32 h-32 bg-gradient-to-b from-royal-blue to-teal rounded-full" />
+    <div className="relative min-h-screen bg-background">
+      <BackgroundParticles />
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Back */}
+        <button
+          onClick={() => navigate({ to: '/' })}
+          className="text-muted-foreground hover:text-foreground transition-colors mb-8 flex items-center gap-2"
+        >
+          ← Back to Home
+        </button>
+
+        {/* Hero */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16 items-center">
+          <div>
+            <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
+              Premium Treatment
+            </div>
+            <TypewriterText
+              text={title}
+              tag="h1"
+              className="text-4xl font-bold text-foreground mb-4"
+              speed={40}
+            />
+            <p className="text-muted-foreground text-lg leading-relaxed mb-6">{description}</p>
+            <button
+              onClick={() => setBookingOpen(true)}
+              className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+            >
+              Book Consultation
+            </button>
+          </div>
+          <ZoomInImage src={imageUrl} alt={title} className="rounded-2xl shadow-xl" />
         </div>
 
-        <div className="container">
-          <Button variant="ghost" onClick={() => navigate({ to: '/' })} className="mb-6">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </Button>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-slide-in-left">
-              <div className="relative w-full max-w-sm mx-auto lg:mx-0 mb-6 overflow-hidden rounded-2xl shadow-2xl">
-                <img
-                  src="/assets/generated/dental-implant-diagram.dim_600x400.png"
-                  alt="Dental Implant Diagram"
-                  className="w-full h-auto"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-royal-blue/30 to-transparent" />
-                <div className="absolute bottom-4 left-4 text-white font-bold text-lg drop-shadow">
-                  3D Guided Precision
-                </div>
+        {/* Benefits */}
+        <div className="glass-card rounded-2xl p-8 mb-10 border border-border/40">
+          <TypewriterText
+            text="Why Choose Dental Implants?"
+            tag="h2"
+            className="text-2xl font-bold text-foreground mb-6"
+            speed={35}
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {benefits.map((b, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span className="text-primary mt-0.5">✓</span>
+                <span className="text-muted-foreground">{b}</span>
               </div>
-              <div className="flex items-center gap-2 mb-3">
-                <Zap className="h-6 w-6 text-teal" />
-                <span className="text-sm font-semibold text-teal uppercase tracking-wider">Premium Service</span>
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Advanced Dental Implants</h1>
-              <p className="text-lg text-muted-foreground mb-6">
-                Experience the gold standard in tooth replacement. Our 3D-guided implant technology ensures
-                perfect placement, faster healing, and results that last a lifetime.
-              </p>
-              <Button size="lg" className="animated-button" onClick={() => setBookingOpen(true)}>
-                <Calendar className="mr-2 h-5 w-5" />
-                Book Consultation
-              </Button>
-            </div>
-
-            <div className="bg-white dark:bg-card rounded-2xl shadow-xl p-8 animate-slide-in-right">
-              <h2 className="text-2xl font-bold mb-6">Why Choose Our Implants?</h2>
-              <ul className="space-y-3">
-                {benefits.map((benefit, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="h-6 w-6 text-teal shrink-0 mt-0.5" />
-                    <span>{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            ))}
           </div>
         </div>
-      </section>
 
-      <section className="py-20">
-        <div className="container max-w-4xl">
-          <div className="animate-fade-in-up">
-            <h2 className="text-3xl font-bold mb-8 text-center">Treatment Process</h2>
-            <div className="space-y-6">
-              {process.map((step, index) => (
-                <div key={index} className="flex gap-4">
-                  <div className="shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-royal-blue to-teal flex items-center justify-center text-white font-bold">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1 pt-1">
-                    <p className="text-lg">{step}</p>
-                  </div>
+        {/* Process */}
+        <div className="mb-10">
+          <TypewriterText
+            text="The Implant Process"
+            tag="h2"
+            className="text-2xl font-bold text-foreground mb-6"
+            speed={35}
+          />
+          <div className="space-y-4">
+            {steps.map((s) => (
+              <div
+                key={s.step}
+                className="glass-card rounded-xl p-5 border border-border/40 flex gap-4 items-start"
+              >
+                <span className="text-primary font-bold text-lg shrink-0">{s.step}</span>
+                <div>
+                  <h3 className="font-semibold text-foreground">{s.title}</h3>
+                  <p className="text-muted-foreground text-sm mt-1">{s.desc}</p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
+
+        {/* CTA */}
+        <div className="text-center glass-card rounded-2xl p-8 border border-border/40">
+          <h2 className="text-2xl font-bold text-foreground mb-3">Ready to Restore Your Smile?</h2>
+          <p className="text-muted-foreground mb-6">Book a free consultation today and take the first step.</p>
+          <button
+            onClick={() => setBookingOpen(true)}
+            className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+          >
+            Book Free Consultation
+          </button>
+        </div>
+      </div>
 
       <BookAppointmentDialog open={bookingOpen} onOpenChange={setBookingOpen} />
     </div>

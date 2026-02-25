@@ -19,12 +19,12 @@ export const _CaffeineStorageRefillResult = IDL.Record({
   'success' : IDL.Opt(IDL.Bool),
   'topped_up_amount' : IDL.Opt(IDL.Nat),
 });
+export const ExternalBlob = IDL.Vec(IDL.Nat8);
 export const Time = IDL.Int;
 export const DoctorAvailability = IDL.Record({
   'doctorId' : IDL.Nat,
   'availableSlots' : IDL.Vec(Time),
 });
-export const ExternalBlob = IDL.Vec(IDL.Nat8);
 export const ReviewInput = IDL.Record({
   'beforeAfterImage' : IDL.Opt(ExternalBlob),
   'text' : IDL.Text,
@@ -51,6 +51,12 @@ export const Appointment = IDL.Record({
   'contactInfo' : IDL.Text,
   'preferredDate' : Time,
   'patientName' : IDL.Text,
+});
+export const BeforeAfterPair = IDL.Record({
+  'id' : IDL.Nat,
+  'afterImage' : ExternalBlob,
+  'beforeImage' : ExternalBlob,
+  'description' : IDL.Text,
 });
 export const Doctor = IDL.Record({
   'id' : IDL.Nat,
@@ -114,6 +120,11 @@ export const idlService = IDL.Service({
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addAdmin' : IDL.Func([IDL.Principal], [], []),
+  'addBeforeAfterPair' : IDL.Func(
+      [ExternalBlob, ExternalBlob, IDL.Text],
+      [IDL.Nat],
+      [],
+    ),
   'addDoctor' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Vec(DoctorAvailability)],
       [IDL.Nat],
@@ -127,12 +138,18 @@ export const idlService = IDL.Service({
   'addReview' : IDL.Func([ReviewInput], [], []),
   'approveReview' : IDL.Func([IDL.Nat], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'createAppointment' : IDL.Func(
+  'bookAppointment' : IDL.Func(
       [IDL.Text, IDL.Text, Time, IDL.Text],
       [Appointment],
       [],
     ),
+  'deleteReview' : IDL.Func([IDL.Nat], [], []),
   'getAllAppointments' : IDL.Func([], [IDL.Vec(Appointment)], ['query']),
+  'getAllBeforeAfterPairs' : IDL.Func(
+      [],
+      [IDL.Vec(BeforeAfterPair)],
+      ['query'],
+    ),
   'getAllDoctors' : IDL.Func([], [IDL.Vec(Doctor)], ['query']),
   'getAllServices' : IDL.Func([], [IDL.Vec(Service)], ['query']),
   'getApprovedReviews' : IDL.Func([], [IDL.Vec(Review)], ['query']),
@@ -152,7 +169,6 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-  'rejectReview' : IDL.Func([IDL.Nat], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'setClinicStatus' : IDL.Func([ClinicStatus], [], []),
   'updateAppointmentStatus' : IDL.Func([IDL.Nat, AppointmentStatus], [], []),
@@ -172,12 +188,12 @@ export const idlFactory = ({ IDL }) => {
     'success' : IDL.Opt(IDL.Bool),
     'topped_up_amount' : IDL.Opt(IDL.Nat),
   });
+  const ExternalBlob = IDL.Vec(IDL.Nat8);
   const Time = IDL.Int;
   const DoctorAvailability = IDL.Record({
     'doctorId' : IDL.Nat,
     'availableSlots' : IDL.Vec(Time),
   });
-  const ExternalBlob = IDL.Vec(IDL.Nat8);
   const ReviewInput = IDL.Record({
     'beforeAfterImage' : IDL.Opt(ExternalBlob),
     'text' : IDL.Text,
@@ -204,6 +220,12 @@ export const idlFactory = ({ IDL }) => {
     'contactInfo' : IDL.Text,
     'preferredDate' : Time,
     'patientName' : IDL.Text,
+  });
+  const BeforeAfterPair = IDL.Record({
+    'id' : IDL.Nat,
+    'afterImage' : ExternalBlob,
+    'beforeImage' : ExternalBlob,
+    'description' : IDL.Text,
   });
   const Doctor = IDL.Record({
     'id' : IDL.Nat,
@@ -267,6 +289,11 @@ export const idlFactory = ({ IDL }) => {
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addAdmin' : IDL.Func([IDL.Principal], [], []),
+    'addBeforeAfterPair' : IDL.Func(
+        [ExternalBlob, ExternalBlob, IDL.Text],
+        [IDL.Nat],
+        [],
+      ),
     'addDoctor' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Vec(DoctorAvailability)],
         [IDL.Nat],
@@ -280,12 +307,18 @@ export const idlFactory = ({ IDL }) => {
     'addReview' : IDL.Func([ReviewInput], [], []),
     'approveReview' : IDL.Func([IDL.Nat], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'createAppointment' : IDL.Func(
+    'bookAppointment' : IDL.Func(
         [IDL.Text, IDL.Text, Time, IDL.Text],
         [Appointment],
         [],
       ),
+    'deleteReview' : IDL.Func([IDL.Nat], [], []),
     'getAllAppointments' : IDL.Func([], [IDL.Vec(Appointment)], ['query']),
+    'getAllBeforeAfterPairs' : IDL.Func(
+        [],
+        [IDL.Vec(BeforeAfterPair)],
+        ['query'],
+      ),
     'getAllDoctors' : IDL.Func([], [IDL.Vec(Doctor)], ['query']),
     'getAllServices' : IDL.Func([], [IDL.Vec(Service)], ['query']),
     'getApprovedReviews' : IDL.Func([], [IDL.Vec(Review)], ['query']),
@@ -305,7 +338,6 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-    'rejectReview' : IDL.Func([IDL.Nat], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'setClinicStatus' : IDL.Func([ClinicStatus], [], []),
     'updateAppointmentStatus' : IDL.Func([IDL.Nat, AppointmentStatus], [], []),

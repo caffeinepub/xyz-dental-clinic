@@ -2,13 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-service-manager-section-to-the-admin-panel-that-allows-the-admin-to-edit-the-display-name-description-text-and-upload-replace-the-featured-photo-for-each-of-the-5-premium-services-dental-implants-invisalign-pediatric-dentistry-kids-smile-makeover-and-laser-dentistry-changes-must-be-persisted-in-the-backend-and-reflected-on-the-public-facing-service-cards-and-detail-pages",
-      "featureTitle": "Add a 'Service Manager' section to the admin panel that allows the admin to edit the display name, description text, and upload/replace the featured photo for each of the 5 premium services: Dental Implants, Invisalign, Pediatric Dentistry (Kids), Smile Makeover, and Laser Dentistry. Changes must be persisted in the backend and reflected on the public-facing service cards and detail pages.",
+      "featureId": "feature-replace-the-existing-bookappointmentdialog-component-with-a-fully-frictionless-booking-form-remove-any-internet-identity-login-requirement-or-auth-gated-logic-from-the-booking-flow-the-form-must-contain-exactly-four-fields-patient-name-text-input-phone-number-tel-input-service-dropdown-select-populated-with-available-services-and-preferred-date-date-picker-on-successful-submission-display-an-inline-thank-you-your-appointment-has-been-booked-we-will-contact-you-shortly-confirmation-message-inside-the-dialog-no-redirect-no-login-prompt-the-book-now-button-must-be-immediately-accessible-without-any-authentication-step",
+      "featureTitle": "Replace the existing BookAppointmentDialog component with a fully frictionless booking form. Remove any Internet Identity login requirement or auth-gated logic from the booking flow. The form must contain exactly four fields: Patient Name (text input), Phone Number (tel input), Service (dropdown select populated with available services), and Preferred Date (date picker). On successful submission, display an inline 'Thank You! Your appointment has been booked. We will contact you shortly.' confirmation message inside the dialog — no redirect, no login prompt. The 'Book Now' button must be immediately accessible without any authentication step.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/admin/Dashboard.tsx",
-        "frontend/src/pages/admin/ServiceManager.tsx"
+        "frontend/src/components/BookAppointmentDialog.tsx",
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -20,20 +18,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-32"
+        "REQ-50"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-a-review-approver-workflow-patient-submitted-reviews-must-be-held-in-a-pending-state-and-only-appear-on-the-public-website-after-an-admin-explicitly-approves-them-in-the-admin-panel-the-admin-panel-must-display-all-pending-reviews-with-approve-and-reject-actions",
-      "featureTitle": "Implement a Review Approver workflow: patient-submitted reviews must be held in a 'pending' state and only appear on the public website after an admin explicitly approves them in the admin panel. The admin panel must display all pending reviews with Approve and Reject actions.",
+      "featureId": "feature-audit-all-public-facing-pages-home-herosection-service-detail-pages-dentalimplantsdetail-invisaligndetail-laserdentistrydetail-pediatricdentistrydetail-smilemakeoverdetail-servicedetail-and-remove-any-logic-that-gates-the-book-appointment-button-or-booking-dialog-behind-an-authentication-check-or-login-state-every-book-appointment-book-now-button-on-the-public-site-must-open-the-frictionless-booking-form-directly",
+      "featureTitle": "Audit all public-facing pages (Home, HeroSection, service detail pages: DentalImplantsDetail, InvisalignDetail, LaserDentistryDetail, PediatricDentistryDetail, SmileMakeoverDetail, ServiceDetail) and remove any logic that gates the 'Book Appointment' button or booking dialog behind an authentication check or login state. Every 'Book Appointment' / 'Book Now' button on the public site must open the frictionless booking form directly.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/TestimonialCarousel.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/admin/ContentManager.tsx",
-        "frontend/src/pages/admin/Dashboard.tsx",
-        "frontend/src/pages/admin/ReviewApprover.tsx"
+        "frontend/src/components/Header.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -45,118 +38,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-33"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-apply-a-glassmorphism-design-treatment-to-all-service-cards-testimonial-cards-doctor-profile-card-and-admin-panel-content-cards-use-a-frosted-blurred-glass-background-backdrop-filter-blur-semi-transparent-white-teal-background-so-the-animated-mesh-gradient-background-shows-softly-through-the-card-surfaces",
-      "featureTitle": "Apply a glassmorphism design treatment to all service cards, testimonial cards, doctor profile card, and admin panel content cards: use a frosted/blurred glass background (backdrop-filter: blur, semi-transparent white/teal background) so the animated mesh gradient background shows softly through the card surfaces.",
-      "files": [
-        "frontend/src/components/DoctorProfile.tsx",
-        "frontend/src/components/ServicesGrid.tsx",
-        "frontend/src/components/TestimonialCarousel.tsx",
-        "frontend/src/pages/admin/Appointments.tsx",
-        "frontend/src/pages/admin/ContentManager.tsx",
-        "frontend/src/pages/admin/Dashboard.tsx",
-        "frontend/src/pages/admin/DoctorScheduler.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-34"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-scroll-progress-indicator-a-thin-3-4px-horizontal-bar-fixed-at-the-very-top-of-the-viewport-above-the-sticky-header-that-fills-from-left-to-right-as-the-user-scrolls-down-the-page-using-the-site-s-teal-or-royal-blue-accent-color-and-resets-to-empty-when-the-user-returns-to-the-top",
-      "featureTitle": "Add a scroll-progress indicator: a thin (3–4px) horizontal bar fixed at the very top of the viewport (above the sticky header) that fills from left to right as the user scrolls down the page, using the site's teal or royal-blue accent color, and resets to empty when the user returns to the top.",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/ScrollProgressBar.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-35"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-floating-dental-element-decorations-in-the-corners-and-edges-of-the-page-small-64-96px-semi-transparent-png-images-of-dental-icons-tooth-dental-mirror-toothbrush-plus-cross-that-gently-float-and-apply-a-subtle-parallax-offset-as-the-user-scrolls-creating-depth-without-obstructing-any-content",
-      "featureTitle": "Add floating dental element decorations in the corners and edges of the page: small (64–96px) semi-transparent PNG images of dental icons (tooth, dental mirror, toothbrush, plus/cross) that gently float and apply a subtle parallax offset as the user scrolls, creating depth without obstructing any content.",
-      "files": [
-        "frontend/src/components/FloatingDentalElements.tsx",
-        "frontend/src/pages/Home.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-36"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-enhance-the-existing-custom-cursor-so-that-when-the-mouse-hovers-over-any-service-card-in-the-services-section-the-cursor-icon-changes-to-a-dental-themed-icon-tooth-or-medical-plus-cross-svg-the-cursor-must-revert-to-the-standard-custom-cursor-when-moving-off-service-cards-this-is-a-magnetic-context-sensitive-cursor-enhancement-on-top-of-the-existing-customcursor-component",
-      "featureTitle": "Enhance the existing custom cursor so that when the mouse hovers over any service card in the Services section, the cursor icon changes to a dental-themed icon (tooth or medical plus/cross SVG). The cursor must revert to the standard custom cursor when moving off service cards. This is a magnetic/context-sensitive cursor enhancement on top of the existing CustomCursor component.",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/CustomCursor.tsx",
-        "frontend/src/components/ServicesGrid.tsx",
-        "frontend/src/context/CursorContext.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-37"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-render-all-new-floating-dental-element-images-as-static-assets-in-the-frontend-public-assets-generated-directory",
-      "featureTitle": "Render all new floating dental element images as static assets in the frontend/public/assets/generated directory.",
-      "files": [
-        "frontend/src/components/FloatingDentalElements.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-38"
+        "REQ-51"
       ],
       "confidence": "high"
     }
