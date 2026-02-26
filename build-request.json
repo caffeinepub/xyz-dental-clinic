@@ -1,203 +1,42 @@
 {
   "kind": "build_request",
-  "title": "Replace hidden admin trigger with visible footer tooth logo, consolidate admin dashboard, and confirm all UX/animation features",
-  "projectName": "XYZ Dental Clinic",
-  "priority": "high",
+  "title": "Style 'Book Appointment' submit button with bright teal/blue color",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-62",
-      "text": "Replace the current invisible bottom-right corner double-click admin trigger with a small, elegant tooth SVG logo placed visibly in the Footer component (at the very bottom of the page). A single click on this tooth logo must open the existing HiddenAdminLoginModal. The tooth icon should be styled as a small (28–36px), semi-transparent but visible dental tooth icon using the site's teal/royal-blue accent colors. Remove the existing HiddenAdminTrigger invisible hit-box component from App.tsx and Footer. Credentials remain: username '6352174912', password '63521'.",
+      "id": "REQ-71",
+      "text": "In the BookAppointmentDialog component, style the submit 'Book Appointment' / 'Book Now' button with a bright teal or royal-blue background color (e.g., the site's teal accent — #0D9488 or equivalent OKLCH token) so it stands out prominently against the white form background. The button must have white text, a smooth hover state (slightly darker shade or glow), and a CSS transition of ~200–300ms. All other form elements remain white/light as-is.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-last"
+          "msg-4"
         ],
         "quotes": [
-          "Website ke ekdum Footer (Sabse niche) mein ek chhota sa, elegant Tooth Logo (Dant ka logo) rakho.",
-          "Is logo par click karte hi ek simple Username/Password login popup khulna chahiye."
+          "Form ko white karne ke baad, \"Book Appointment\" ka button Bright Teal ya Blue rakhiyega, taaki pure safed form mein wo alag se chamke aur log uspar click karein."
         ]
       },
       "acceptanceCriteria": [
-        "A small tooth icon is visible at the bottom of the Footer on all pages.",
-        "Single-clicking the tooth icon opens the HiddenAdminLoginModal.",
-        "The modal accepts username '6352174912' and password '63521' and navigates to the admin dashboard on success.",
-        "The old invisible 50×50px bottom-right corner trigger (HiddenAdminTrigger component) is removed from App.tsx and no longer present in the DOM.",
-        "No other hidden admin triggers (triple-click footer copyright, 1×1px dot, logo long-press) exist anywhere in the site."
-      ]
-    },
-    {
-      "id": "REQ-63",
-      "text": "Ensure the Admin Dashboard page consolidates and displays all three required admin capabilities in a single accessible view: (1) Appointments table with columns Patient Name, Phone Number, Service, and Date/Time with auto-refresh polling via React Query (refetchInterval ≤ 10 seconds); (2) Clinic Status toggle (Open / Closed / Emergency) that controls the public-facing ClinicStatusBanner and the closed modal popup; (3) Service Manager CMS section allowing the admin to edit display name, description text, and upload/replace the featured photo for each of the 5 premium services (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry). All changes must persist in the backend and be reflected immediately on public-facing pages.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "Appointments: Saari bookings ki list (Name, Number, Service, Date).",
-          "Clinic ON/OFF: Ek toggle button jo website par 'Open' ya 'Closed' ka status change kare.",
-          "CMS: 5 Services (Implants, Invisalign, Kids, Smile Makeover, Laser) ka text aur photo badalne ka option."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin Dashboard page shows all booked appointments in a table with Patient Name, Phone Number, Service, and Date/Time columns.",
-        "Appointments table auto-refreshes without page reload using React Query polling.",
-        "Clinic Status toggle (Open/Closed/Emergency) is present on the dashboard and updates the public-facing banner/modal in real time.",
-        "Service Manager CMS section is present on the dashboard (or accessible via a tab/link within the admin panel) with editable name, description, and photo upload for all 5 premium services.",
-        "Changes to service data persist in the backend and are reflected on the public service cards and detail pages."
-      ]
-    },
-    {
-      "id": "REQ-64",
-      "text": "Audit and confirm that the BookAppointmentDialog is fully frictionless — no Internet Identity login prompt, no auth check, no disabled state tied to authentication. The form must contain at minimum: Patient Name (text input) and Phone Number (tel input). Service (dropdown) and Preferred Date (date picker) fields may remain if already present. On successful submission, display an inline confirmation: 'Thank You! Your appointment has been booked. We will contact you shortly.' inside the dialog with no redirect. Every 'Book Appointment' / 'Book Now' button across all public pages (Home, HeroSection, DentalImplantsDetail, InvisalignDetail, LaserDentistryDetail, PediatricDentistryDetail, SmileMakeoverDetail, ServiceDetail) must open this form immediately without any authentication step.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "No Identity/Login for Patients: Appointment book karte waqt user se koi account ya identity nahi mangni. Sirf form bharo aur 'Book' karo."
-        ]
-      },
-      "acceptanceCriteria": [
-        "BookAppointmentDialog opens directly without any login prompt on all public pages.",
-        "Form contains Patient Name and Phone Number fields as required minimum.",
-        "No auth-gated logic, disabled state, or Internet Identity prompt exists anywhere in the booking flow.",
-        "On form submission, inline confirmation message appears inside the dialog.",
-        "All 'Book Appointment' / 'Book Now' buttons on Home, HeroSection, and all 5 service detail pages open the frictionless dialog directly."
-      ]
-    },
-    {
-      "id": "REQ-65",
-      "text": "Confirm the 'XYZ Dental Clinic' brand name in the Header triggers window.location.reload() on click. Ensure no router navigation occurs on the brand name element. The visual styling of the brand name must remain unchanged (no underline on hover added by this change).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "Header Action: Clinic Name (XYZ) par click karte hi puri screen Refresh honi chahiye."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Clicking the 'XYZ Dental Clinic' brand name in the Header causes a full page reload.",
-        "No router Link or navigation event fires on brand name click.",
-        "Brand name visual appearance (color, font, weight) is unchanged."
-      ]
-    },
-    {
-      "id": "REQ-66",
-      "text": "Confirm that the custom cursor follower (circle, trail, 'View' text expansion) is fully removed from the site. CustomCursor component must be disabled or empty, CursorContext must not inject any cursor overrides, and no CSS rule sets cursor: none on body or html. The browser's native OS cursor must be active across the entire site.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "No Cursor Circle: Mouse ke saath ghumne wale circle ko hata do, normal cursor hi rakho."
-        ]
-      },
-      "acceptanceCriteria": [
-        "No cursor circle, trail, or 'View' text element appears anywhere on the site.",
-        "Body and html elements do not have cursor: none applied.",
-        "The browser's default system cursor is visible and functional across all pages."
-      ]
-    },
-    {
-      "id": "REQ-67",
-      "text": "Confirm and enforce the animated mesh gradient background throughout the entire site (all public and admin pages). The gradient must shift subtly between very light white, pale silver, and soft blue shades over a 15–20 second continuous CSS animation loop. This must be applied at the root layout level (App.tsx or index.css body/html) so it appears behind all page content.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "Soft Animated Background: Pure background mein ek halka sa Moving Gradient (Light Blue/Silver) rakho jo user ko premium feel de."
-        ]
-      },
-      "acceptanceCriteria": [
-        "A slow-moving mesh gradient background is visible on all pages (home, detail pages, and admin pages).",
-        "The gradient cycles through light white, pale silver, and soft blue shades continuously.",
-        "The animation loop duration is between 15 and 20 seconds.",
-        "The background does not obscure any text or interactive elements."
-      ]
-    },
-    {
-      "id": "REQ-68",
-      "text": "Confirm and enforce scroll-triggered reveal animations site-wide: text sections (headings and paragraphs) must fade in and slide up when they enter the viewport; images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use IntersectionObserver (via existing useScrollReveal hook or equivalent) to trigger each element's animation once per page load. Apply to all major sections: ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider gallery, ContactSection, and service detail page sections.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "Scroll-Triggered Reveals: Text aur images screen par tab aayein jab user scroll kare (Fade-in aur Slide-up effects)."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Text content in all major sections fades in and slides up as the section enters the viewport.",
-        "Images in all major sections animate from scale(0.85)/opacity-0 to full size/opacity-1 on scroll entry.",
-        "Each element's animation triggers only once per page load via IntersectionObserver.",
-        "Animations are present on ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider, ContactSection, and service detail page sections."
-      ]
-    },
-    {
-      "id": "REQ-69",
-      "text": "Confirm the interactive Before/After drag slider (BeforeAfterSlider component) is prominently displayed in a dedicated 'Results Gallery' section on the Home page. The slider must support mouse drag and touch drag to reveal before (left) and after (right) dental treatment images. Use backend-stored before/after pairs if available, otherwise fall back to static example pairs. The slider section must be visible without scrolling too far and be clearly labeled.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "Interactive Before/After Slider: Gallery mein ek drag karne wala slider jisme treatment ke results dikhe (Left: Before | Right: After)."
-        ]
-      },
-      "acceptanceCriteria": [
-        "A Before/After slider is present and visible in a results/gallery section on the Home page.",
-        "Users can click-drag and touch-drag the divider handle to reveal before and after images.",
-        "The slider uses backend data if available, or falls back to static dental treatment image pairs.",
-        "The section is labeled (e.g., 'Treatment Results' or 'Before & After')."
-      ]
-    },
-    {
-      "id": "REQ-70",
-      "text": "Confirm and enforce the soft glow hover effect on all 5 premium service cards (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry) in the ServicesGrid. On mouse hover, each card must lift slightly (translateY(-6px) to -8px) and emit a gentle box-shadow glow using the site's teal or royal-blue accent color. The lift and glow must transition smoothly in and out with a CSS transition of approximately 300ms. This effect must coexist with each card's existing specific animation (3D rotation, scan line, etc.).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "Service Hover Effects: Jab mouse 5 services par jaye, toh wo cards thoda 'Lift' (Upar uthe) aur halka sa 'Glow' karein."
-        ]
-      },
-      "acceptanceCriteria": [
-        "All 5 premium service cards lift upward (translateY negative) on hover.",
-        "All 5 premium service cards emit a teal or royal-blue box-shadow glow on hover.",
-        "Hover transition is smooth (~300ms) both on enter and exit.",
-        "Existing card-specific animations (3D rotation on Dental Implants, scan line on Laser Dentistry, etc.) remain functional alongside the glow/lift effect."
+        "The submit button inside BookAppointmentDialog has a bright teal or royal-blue background (not white, not grey).",
+        "Button text is white and clearly readable against the teal/blue background.",
+        "On hover, the button transitions to a slightly darker teal/blue shade or emits a subtle glow, with a CSS transition of approximately 200–300ms.",
+        "The rest of the form (inputs, labels, dialog background) remains white/light.",
+        "The button styling is consistent across all viewports (desktop and mobile).",
+        "No other UI elements are changed by this update."
       ]
     }
   ],
   "constraints": [
-    "Credentials for admin login must remain: username '6352174912', password '63521'.",
-    "Do not add any visible admin link, button, or label anywhere on the public-facing site other than the small tooth logo in the Footer.",
-    "The HiddenAdminLoginModal component must be reused as-is for the tooth logo trigger.",
-    "Do not modify any files listed in frontend.immutablePaths.",
-    "All booking form submissions must work for anonymous (unauthenticated) users."
+    "Do not change any form fields, layout, or submission logic in BookAppointmentDialog.",
+    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
+    "Use existing teal/royal-blue design tokens from tailwind.config.js or index.css — do not introduce new arbitrary color values."
   ],
   "nonGoals": [
-    "Adding any new backend data models beyond what is already implemented.",
-    "Implementing OTP, SMS verification, or email confirmation for appointments.",
-    "Adding new service types beyond the existing 5 premium services.",
-    "Changing the overall color palette or typography system.",
-    "Adding any social media login or third-party authentication."
+    "Changing any other buttons on the site outside the BookAppointmentDialog submit button.",
+    "Modifying form fields, validation logic, or submission behaviour.",
+    "Altering the white form background or dialog styling beyond the button."
   ],
   "imageRequirements": {
-    "required": [
-      "Small elegant tooth icon in teal and white colors, minimal clean line-art style, suitable for use as a footer clickable logo (tooth-logo-footer.dim_48x48.png)"
-    ],
+    "required": [],
     "edits": []
   }
 }

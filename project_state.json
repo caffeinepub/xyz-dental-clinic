@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 15,
+  "projectStateVersion": 17,
   "summary": "Premium dental clinic website with smooth GSAP animations, before/after sliders, patient reviews, hidden admin panel (small elegant tooth logo in footer, single-click triggers login), 5 premium services (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry), animated mesh gradient background (soft blue & silver), glassmorphism card design on scroll, scroll-progress bar, floating dental element parallax corners, interactive service card glow effects, NO custom cursor follower (removed), clinic name in header triggers page reload on click, and frictionless appointment booking (Name + Phone only, no login)",
   "architectural_notes": [
     "Color palette: Minimalist White, Deep Royal Blue, and Teal for boutique high-end feel",
@@ -15,7 +15,6 @@
   ],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Small elegant tooth icon in teal and white colors, minimal clean line-art style, suitable for use as a footer clickable logo (tooth-logo-footer.dim_48x48.png)",
   "existing_features": [
     {
       "id": "feature-create-micro-interactions-for-buttons-with-hover-effects-including-smooth-glow-and-scale-up-animations",
@@ -504,6 +503,14 @@
         "REQ-70"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-in-the-bookappointmentdialog-component-style-the-submit-book-appointment-book-now-button-with-a-bright-teal-or-royal-blue-background-color-e-g-the-site-s-teal-accent-0d9488-or-equivalent-oklch-token-so-it-stands-out-prominently-against-the-white-form-background-the-button-must-have-white-text-a-smooth-hover-state-slightly-darker-shade-or-glow-and-a-css-transition-of-200-300ms-all-other-form-elements-remain-white-light-as-is",
+      "title": "In the BookAppointmentDialog component, style the submit 'Book Appointment' / 'Book Now' button with a bright teal or royal-blue background color (e.g., the site's teal accent — #0D9488 or equivalent OKLCH token) so it stands out prominently against the white form background. The button must have white text, a smooth hover state (slightly darker shade or glow), and a CSS transition of ~200–300ms. All other form elements remain white/light as-is.",
+      "reqIds": [
+        "REQ-71"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -804,6 +811,12 @@
     {
       "id": "AR-59",
       "summary": "Replace the hidden bottom-right corner invisible hit-box admin trigger with a small elegant tooth logo placed visibly in the footer (bottom of website). Single click on this tooth logo opens the Username/Password login popup. Credentials: username 6352174912, password 63521.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-60",
+      "summary": "Style the 'Book Appointment' button in the booking form with a bright teal or blue color so it stands out prominently against the white form background.",
       "reqIds": [],
       "status": "pending"
     }

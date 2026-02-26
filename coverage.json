@@ -1,204 +1,35 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T20:52:46.089Z",
+  "generatedAt": "2026-02-26T21:02:02.323Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 9,
-    "implemented": 9,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-62",
-        "summary": "Replace the current invisible bottom-right corner double-click admin trigger with a small, elegant tooth SVG logo placed visibly in the Footer component (at the very bottom of the page). A single click on this tooth logo must open the existing HiddenAdminLoginModal. The tooth icon should be styled as a small (28–36px), semi-transparent but visible dental tooth icon using the site's teal/royal-blue accent colors. Remove the existing HiddenAdminTrigger invisible hit-box component from App.tsx and Footer. Credentials remain: username '6352174912', password '63521'.",
+        "id": "REQ-71",
+        "summary": "In the BookAppointmentDialog component, style the submit 'Book Appointment' / 'Book Now' button with a bright teal or royal-blue background color (e.g., the site's teal accent — #0D9488 or equivalent OKLCH token) so it stands out prominently against the white form background. The button must have white text, a smooth hover state (slightly darker shade or glow), and a CSS transition of ~200–300ms. All other form elements remain white/light as-is.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/Footer.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/HiddenAdminTrigger.tsx"
+          "frontend/src/components/BookAppointmentDialog.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/Footer.tsx",
-          "frontend/src/App.tsx"
-        ]
-      },
-      {
-        "id": "REQ-63",
-        "summary": "Ensure the Admin Dashboard page consolidates and displays all three required admin capabilities in a single accessible view: (1) Appointments table with columns Patient Name, Phone Number, Service, and Date/Time with auto-refresh polling via React Query (refetchInterval ≤ 10 seconds); (2) Clinic Status toggle (Open / Closed / Emergency) that controls the public-facing ClinicStatusBanner and the closed modal popup; (3) Service Manager CMS section allowing the admin to edit display name, description text, and upload/replace the featured photo for each of the 5 premium services (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry). All changes must persist in the backend and be reflected immediately on public-facing pages.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/admin/Dashboard.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/admin/ServiceManager.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/admin/Dashboard.tsx",
-          "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-64",
-        "summary": "Audit and confirm that the BookAppointmentDialog is fully frictionless — no Internet Identity login prompt, no auth check, no disabled state tied to authentication. The form must contain at minimum: Patient Name (text input) and Phone Number (tel input). Service (dropdown) and Preferred Date (date picker) fields may remain if already present. On successful submission, display an inline confirmation: 'Thank You! Your appointment has been booked. We will contact you shortly.' inside the dialog with no redirect. Every 'Book Appointment' / 'Book Now' button across all public pages (Home, HeroSection, DentalImplantsDetail, InvisalignDetail, LaserDentistryDetail, PediatricDentistryDetail, SmileMakeoverDetail, ServiceDetail) must open this form immediately without any authentication step.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/BookAppointmentDialog.tsx",
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/pages/DentalImplantsDetail.tsx",
-          "frontend/src/pages/InvisalignDetail.tsx",
-          "frontend/src/pages/LaserDentistryDetail.tsx",
-          "frontend/src/pages/PediatricDentistryDetail.tsx",
-          "frontend/src/pages/SmileMakeoverDetail.tsx",
-          "frontend/src/components/HeroSection.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/BookAppointmentDialog.tsx",
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/pages/DentalImplantsDetail.tsx",
-          "frontend/src/pages/InvisalignDetail.tsx",
-          "frontend/src/pages/LaserDentistryDetail.tsx",
-          "frontend/src/pages/PediatricDentistryDetail.tsx",
-          "frontend/src/pages/SmileMakeoverDetail.tsx",
-          "frontend/src/components/HeroSection.tsx"
-        ]
-      },
-      {
-        "id": "REQ-65",
-        "summary": "Confirm the 'XYZ Dental Clinic' brand name in the Header triggers window.location.reload() on click. Ensure no router navigation occurs on the brand name element. The visual styling of the brand name must remain unchanged (no underline on hover added by this change).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Header.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Header.tsx"
-        ]
-      },
-      {
-        "id": "REQ-66",
-        "summary": "Confirm that the custom cursor follower (circle, trail, 'View' text expansion) is fully removed from the site. CustomCursor component must be disabled or empty, CursorContext must not inject any cursor overrides, and no CSS rule sets cursor: none on body or html. The browser's native OS cursor must be active across the entire site.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/CustomCursor.tsx",
-          "frontend/src/context/CursorContext.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/index.css"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/CustomCursor.tsx",
-          "frontend/src/context/CursorContext.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/index.css"
-        ]
-      },
-      {
-        "id": "REQ-67",
-        "summary": "Confirm and enforce the animated mesh gradient background throughout the entire site (all public and admin pages). The gradient must shift subtly between very light white, pale silver, and soft blue shades over a 15–20 second continuous CSS animation loop. This must be applied at the root layout level (App.tsx or index.css body/html) so it appears behind all page content.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/App.tsx"
-        ]
-      },
-      {
-        "id": "REQ-68",
-        "summary": "Confirm and enforce scroll-triggered reveal animations site-wide: text sections (headings and paragraphs) must fade in and slide up when they enter the viewport; images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use IntersectionObserver (via existing useScrollReveal hook or equivalent) to trigger each element's animation once per page load. Apply to all major sections: ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider gallery, ContactSection, and service detail page sections.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useScrollReveal.ts",
-          "frontend/src/components/ServicesGrid.tsx",
-          "frontend/src/components/DoctorProfile.tsx",
-          "frontend/src/components/TestimonialCarousel.tsx",
-          "frontend/src/components/BeforeAfterSlider.tsx",
-          "frontend/src/components/ContactSection.tsx",
-          "frontend/src/pages/DentalImplantsDetail.tsx",
-          "frontend/src/pages/InvisalignDetail.tsx",
-          "frontend/src/pages/LaserDentistryDetail.tsx",
-          "frontend/src/pages/PediatricDentistryDetail.tsx",
-          "frontend/src/pages/SmileMakeoverDetail.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useScrollReveal.ts",
-          "frontend/src/components/ServicesGrid.tsx",
-          "frontend/src/components/DoctorProfile.tsx",
-          "frontend/src/components/TestimonialCarousel.tsx",
-          "frontend/src/components/BeforeAfterSlider.tsx",
-          "frontend/src/components/ContactSection.tsx",
-          "frontend/src/pages/DentalImplantsDetail.tsx",
-          "frontend/src/pages/InvisalignDetail.tsx",
-          "frontend/src/pages/LaserDentistryDetail.tsx",
-          "frontend/src/pages/PediatricDentistryDetail.tsx",
-          "frontend/src/pages/SmileMakeoverDetail.tsx"
-        ]
-      },
-      {
-        "id": "REQ-69",
-        "summary": "Confirm the interactive Before/After drag slider (BeforeAfterSlider component) is prominently displayed in a dedicated 'Results Gallery' section on the Home page. The slider must support mouse drag and touch drag to reveal before (left) and after (right) dental treatment images. Use backend-stored before/after pairs if available, otherwise fall back to static example pairs. The slider section must be visible without scrolling too far and be clearly labeled.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/components/BeforeAfterSlider.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/components/BeforeAfterSlider.tsx"
-        ]
-      },
-      {
-        "id": "REQ-70",
-        "summary": "Confirm and enforce the soft glow hover effect on all 5 premium service cards (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry) in the ServicesGrid. On mouse hover, each card must lift slightly (translateY(-6px) to -8px) and emit a gentle box-shadow glow using the site's teal or royal-blue accent color. The lift and glow must transition smoothly in and out with a CSS transition of approximately 300ms. This effect must coexist with each card's existing specific animation (3D rotation, scan line, etc.).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/ServicesGrid.tsx",
-          "frontend/tailwind.config.js"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/ServicesGrid.tsx",
-          "frontend/tailwind.config.js"
+          "frontend/src/components/BookAppointmentDialog.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/public/assets/generated/tooth-logo-footer.dim_48x48.png",
-    "frontend/src/App.tsx",
-    "frontend/src/components/AdminGuard.tsx",
-    "frontend/src/components/BeforeAfterSlider.tsx",
     "frontend/src/components/BookAppointmentDialog.tsx",
-    "frontend/src/components/ContactSection.tsx",
-    "frontend/src/components/CustomCursor.tsx",
-    "frontend/src/components/DoctorProfile.tsx",
-    "frontend/src/components/Footer.tsx",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/components/HeroSection.tsx",
-    "frontend/src/components/HiddenAdminLoginModal.tsx",
-    "frontend/src/components/ServicesGrid.tsx",
-    "frontend/src/components/TestimonialCarousel.tsx",
-    "frontend/src/context/CursorContext.tsx",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/hooks/useScrollReveal.ts",
     "frontend/src/index.css",
-    "frontend/src/pages/DentalImplantsDetail.tsx",
-    "frontend/src/pages/Home.tsx",
-    "frontend/src/pages/InvisalignDetail.tsx",
-    "frontend/src/pages/LaserDentistryDetail.tsx",
-    "frontend/src/pages/PediatricDentistryDetail.tsx",
-    "frontend/src/pages/ServiceDetail.tsx",
-    "frontend/src/pages/SmileMakeoverDetail.tsx",
-    "frontend/src/pages/admin/BeforeAfterManager.tsx",
-    "frontend/src/pages/admin/ContentManager.tsx",
-    "frontend/src/pages/admin/Dashboard.tsx",
-    "frontend/src/pages/admin/DoctorScheduler.tsx",
-    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
