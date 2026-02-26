@@ -1,107 +1,105 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useRef, useState, useEffect, useCallback } from 'react';
+import { useGetAllBeforeAfterPairs } from '@/hooks/useQueries';
 
-interface ImagePair {
-  before: string;
-  after: string;
-  label?: string;
+interface StaticPair {
+  beforeImage: string;
+  afterImage: string;
+  description: string;
 }
 
 interface BeforeAfterSliderProps {
-  staticPairs?: ImagePair[];
+  staticPairs?: StaticPair[];
 }
 
-const DEFAULT_PAIRS: ImagePair[] = [
+const DEFAULT_PAIRS: StaticPair[] = [
   {
-    before: '/assets/generated/before-braces.dim_800x600.png',
-    after: '/assets/generated/after-braces.dim_800x600.png',
-    label: 'Orthodontic Treatment',
+    beforeImage: '/assets/generated/before-braces.dim_800x600.png',
+    afterImage: '/assets/generated/after-braces.dim_800x600.png',
+    description: 'Braces Treatment',
   },
   {
-    before: '/assets/generated/before-whitening.dim_800x600.png',
-    after: '/assets/generated/after-whitening.dim_800x600.png',
-    label: 'Teeth Whitening',
-  },
-  {
-    before: '/assets/generated/smile-before-1.dim_800x500.png',
-    after: '/assets/generated/smile-after-1.dim_800x500.png',
-    label: 'Smile Makeover',
+    beforeImage: '/assets/generated/before-whitening.dim_800x600.png',
+    afterImage: '/assets/generated/after-whitening.dim_800x600.png',
+    description: 'Teeth Whitening',
   },
 ];
 
-function SingleSlider({ pair }: { pair: ImagePair }) {
+function SingleSlider({
+  beforeSrc,
+  afterSrc,
+  description,
+}: {
+  beforeSrc: string;
+  afterSrc: string;
+  description: string;
+}) {
   const [sliderPos, setSliderPos] = useState(50);
+  const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
 
-  const updateSlider = useCallback((clientX: number) => {
-    if (!containerRef.current) return;
+  const getPos = useCallback((clientX: number) => {
+    if (!containerRef.current) return 50;
     const rect = containerRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    setSliderPos((x / rect.width) * 100);
+    const x = clientX - rect.left;
+    return Math.min(100, Math.max(0, (x / rect.width) * 100));
   }, []);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    isDragging.current = true;
-    updateSlider(e.clientX);
+  const onMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    isDragging.current = true;
-    updateSlider(e.touches[0].clientX);
+  const onTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
   };
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging.current) updateSlider(e.clientX);
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      setSliderPos(getPos(e.clientX));
     };
-    const handleMouseUp = () => { isDragging.current = false; };
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isDragging.current) updateSlider(e.touches[0].clientX);
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isDragging) return;
+      setSliderPos(getPos(e.touches[0].clientX));
     };
-    const handleTouchEnd = () => { isDragging.current = false; };
+    const onUp = () => setIsDragging(false);
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
-    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onUp);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onUp);
     };
-  }, [updateSlider]);
+  }, [isDragging, getPos]);
 
   return (
-    <div className="space-y-3">
-      {pair.label && (
-        <p className="text-center text-slate-600 font-medium text-sm">{pair.label}</p>
-      )}
+    <div className="rounded-xl overflow-hidden shadow-lg">
       <div
         ref={containerRef}
-        className="relative overflow-hidden rounded-xl cursor-ew-resize select-none"
-        style={{ aspectRatio: '4/3' }}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
+        className="relative select-none"
+        style={{ aspectRatio: '4/3', cursor: isDragging ? 'ew-resize' : 'col-resize' }}
       >
-        {/* After image (full) */}
+        {/* After image (full width, behind) */}
         <img
-          src={pair.after}
-          alt="After treatment"
+          src={afterSrc}
+          alt="After"
           className="absolute inset-0 w-full h-full object-cover"
           draggable={false}
         />
 
-        {/* Before image (clipped) */}
+        {/* Before image (clipped to left side) */}
         <div
           className="absolute inset-0 overflow-hidden"
           style={{ width: `${sliderPos}%` }}
         >
           <img
-            src={pair.before}
-            alt="Before treatment"
+            src={beforeSrc}
+            alt="Before"
             className="absolute inset-0 w-full h-full object-cover"
             style={{ width: `${10000 / sliderPos}%`, maxWidth: 'none' }}
             draggable={false}
@@ -110,78 +108,71 @@ function SingleSlider({ pair }: { pair: ImagePair }) {
 
         {/* Divider line */}
         <div
-          className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg z-10"
+          className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg"
           style={{ left: `${sliderPos}%`, transform: 'translateX(-50%)' }}
+        />
+
+        {/* Handle */}
+        <div
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white shadow-xl flex items-center justify-center z-10 border-2 border-teal-500"
+          style={{ left: `${sliderPos}%` }}
+          onMouseDown={onMouseDown}
+          onTouchStart={onTouchStart}
         >
-          {/* Handle */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center border-2 border-teal-400">
-            <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l-3 3 3 3M16 9l3 3-3 3" />
-            </svg>
-          </div>
+          <svg
+            className="w-5 h-5 text-teal-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 9l-4 3 4 3M16 9l4 3-4 3"
+            />
+          </svg>
         </div>
 
         {/* Labels */}
-        <div className="absolute bottom-3 left-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full z-20">
-          Before
+        <div className="absolute top-3 left-3 bg-black/60 text-white text-xs font-semibold px-2 py-1 rounded">
+          BEFORE
         </div>
-        <div className="absolute bottom-3 right-3 bg-teal-600/80 text-white text-xs px-2 py-1 rounded-full z-20">
-          After
+        <div className="absolute top-3 right-3 bg-teal-600/90 text-white text-xs font-semibold px-2 py-1 rounded">
+          AFTER
         </div>
+      </div>
+      <div className="bg-white px-4 py-2 text-center text-sm font-medium text-gray-700">
+        {description}
       </div>
     </div>
   );
 }
 
 export default function BeforeAfterSlider({ staticPairs }: BeforeAfterSliderProps) {
-  const pairs = staticPairs && staticPairs.length > 0 ? staticPairs : DEFAULT_PAIRS;
-  const [activeIndex, setActiveIndex] = useState(0);
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  const { data: backendPairs } = useGetAllBeforeAfterPairs();
+
+  const pairs: StaticPair[] =
+    backendPairs && backendPairs.length > 0
+      ? backendPairs.map((p) => ({
+          beforeImage: p.beforeImage.getDirectURL(),
+          afterImage: p.afterImage.getDirectURL(),
+          description: p.description,
+        }))
+      : staticPairs && staticPairs.length > 0
+      ? staticPairs
+      : DEFAULT_PAIRS;
 
   return (
-    <section className="py-20 px-4 bg-gradient-to-b from-slate-50 to-white">
-      <div className="max-w-4xl mx-auto">
-        <div
-          ref={ref}
-          className={`transition-all duration-700 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
-        >
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-bold text-slate-800 font-playfair mb-4">
-              Before &amp; After Results
-            </h2>
-            <p className="text-slate-500 text-lg">
-              Drag the slider to see the transformation
-            </p>
-          </div>
-
-          {/* Pair selector tabs */}
-          {pairs.length > 1 && (
-            <div className="flex justify-center gap-2 mb-6">
-              {pairs.map((pair, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveIndex(i)}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                    activeIndex === i
-                      ? 'bg-teal-600 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  {pair.label || `Case ${i + 1}`}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <SingleSlider pair={pairs[activeIndex]} />
-
-          <p className="text-center text-slate-400 text-xs mt-4">
-            ← Drag to compare →
-          </p>
-        </div>
-      </div>
-    </section>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {pairs.map((pair, i) => (
+        <SingleSlider
+          key={i}
+          beforeSrc={pair.beforeImage}
+          afterSrc={pair.afterImage}
+          description={pair.description}
+        />
+      ))}
+    </div>
   );
 }

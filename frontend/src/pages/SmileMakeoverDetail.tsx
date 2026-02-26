@@ -33,14 +33,14 @@ function RevealImage({ src, alt, className = '' }: { src: string; alt: string; c
 
 const smilePairs = [
   {
-    before: '/assets/generated/smile-before-1.dim_800x500.png',
-    after: '/assets/generated/smile-after-1.dim_800x500.png',
-    label: 'Smile Transformation',
+    beforeImage: '/assets/generated/smile-before-1.dim_800x500.png',
+    afterImage: '/assets/generated/smile-after-1.dim_800x500.png',
+    description: 'Smile Transformation',
   },
   {
-    before: '/assets/generated/before-whitening.dim_800x600.png',
-    after: '/assets/generated/after-whitening.dim_800x600.png',
-    label: 'Whitening Results',
+    beforeImage: '/assets/generated/before-whitening.dim_800x600.png',
+    afterImage: '/assets/generated/after-whitening.dim_800x600.png',
+    description: 'Whitening Results',
   },
 ];
 
@@ -91,7 +91,7 @@ export default function SmileMakeoverDetail() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {treatments.map((treatment, i) => (
               <RevealSection key={i}>
-                <div className="glass-card rounded-xl p-4 flex items-center gap-3">
+                <div className="glass rounded-xl p-4 flex items-center gap-3">
                   <span className="text-pink-500 text-xl">✨</span>
                   <span className="text-slate-700 font-medium">{treatment}</span>
                 </div>
@@ -102,7 +102,15 @@ export default function SmileMakeoverDetail() {
       </section>
 
       {/* Before/After */}
-      <BeforeAfterSlider staticPairs={smilePairs} />
+      <section className="py-16 px-4">
+        <div className="max-w-5xl mx-auto">
+          <RevealSection className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-slate-800 font-playfair">Before &amp; After</h2>
+            <p className="text-slate-500 mt-2">Drag the slider to see the transformation</p>
+          </RevealSection>
+          <BeforeAfterSlider staticPairs={smilePairs} />
+        </div>
+      </section>
 
       {/* CTA */}
       <section className="py-20 px-4 bg-pink-700 text-white text-center">

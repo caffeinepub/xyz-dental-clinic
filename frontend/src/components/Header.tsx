@@ -1,93 +1,124 @@
 import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
 import BookAppointmentDialog from './BookAppointmentDialog';
 
 export default function Header() {
-  const navigate = useNavigate();
   const [bookingOpen, setBookingOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const handleBrandClick = () => {
+    window.location.reload();
+  };
+
   const navLinks = [
-    { label: 'Home', path: '/' },
-    { label: 'Services', path: '/#services' },
-    { label: 'About', path: '/#about' },
-    { label: 'Contact', path: '/#contact' },
+    { label: 'Services', href: '#services' },
+    { label: 'Doctor', href: '#doctor' },
+    { label: 'Reviews', href: '#reviews' },
+    { label: 'Gallery', href: '#gallery' },
+    { label: 'Contact', href: '#contact' },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Brand Name - clicking causes full page reload */}
-        <button
-          onClick={() => window.location.reload()}
-          className="text-xl font-bold text-teal-700 font-playfair hover:text-teal-600 transition-colors focus:outline-none cursor-pointer"
-          style={{ background: 'none', border: 'none', padding: 0 }}
-        >
-          XYZ Dental Clinic
-        </button>
-
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => (
-            <a
-              key={link.path}
-              href={link.path}
-              className="text-slate-600 hover:text-teal-600 transition-colors text-sm font-medium"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
-
-        {/* Book Appointment Button */}
-        <div className="hidden md:block">
+    <>
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+          {/* Brand - click to reload */}
           <button
-            onClick={() => setBookingOpen(true)}
-            className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-full text-sm font-semibold transition-colors shadow-md"
+            onClick={handleBrandClick}
+            className="flex items-center gap-2 focus:outline-none group"
+            aria-label="XYZ Dental Clinic - Click to refresh"
           >
-            Book Appointment
+            <img
+              src="/assets/generated/tooth-logo-footer.dim_48x48.png"
+              alt="Logo"
+              className="w-8 h-8 object-contain"
+            />
+            <span className="font-bold text-lg text-gray-900 group-hover:text-teal-600 transition-colors">
+              XYZ Dental Clinic
+            </span>
           </button>
+
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-6">
+            {navLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="text-sm font-medium text-gray-600 hover:text-teal-600 transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+
+          {/* Book Appointment Button */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setBookingOpen(true)}
+              className="book-appointment-btn hidden md:block"
+              style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}
+            >
+              Book Appointment
+            </button>
+
+            {/* Mobile menu toggle */}
+            <button
+              className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                {mobileMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
 
-        {/* Mobile Menu Toggle */}
-        <button
-          className="md:hidden text-slate-600 hover:text-teal-600 transition-colors"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {mobileMenuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-slate-200 px-4 py-4 space-y-3">
-          {navLinks.map((link) => (
-            <a
-              key={link.path}
-              href={link.path}
-              className="block text-slate-600 hover:text-teal-600 transition-colors text-sm font-medium py-1"
-              onClick={() => setMobileMenuOpen(false)}
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-gray-100 px-4 py-3 space-y-2">
+            {navLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="block py-2 text-sm font-medium text-gray-700 hover:text-teal-600 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </a>
+            ))}
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setBookingOpen(true);
+              }}
+              className="book-appointment-btn w-full mt-2"
             >
-              {link.label}
-            </a>
-          ))}
-          <button
-            onClick={() => { setBookingOpen(true); setMobileMenuOpen(false); }}
-            className="w-full bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-full text-sm font-semibold transition-colors"
-          >
-            Book Appointment
-          </button>
-        </div>
-      )}
+              Book Appointment
+            </button>
+          </div>
+        )}
+      </header>
 
       <BookAppointmentDialog open={bookingOpen} onOpenChange={setBookingOpen} />
-    </header>
+    </>
   );
 }

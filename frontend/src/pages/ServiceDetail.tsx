@@ -6,14 +6,21 @@ import { useGetService } from '../hooks/useQueries';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
 export default function ServiceDetail() {
-  const { serviceId } = useParams({ from: '/services/$serviceId' });
+  // Use the full nested route path matching the router tree: /layout/services/$serviceId
+  const { serviceId } = useParams({ from: '/layout/services/$serviceId' });
   const navigate = useNavigate();
   const [bookingOpen, setBookingOpen] = useState(false);
   const { data: service, isLoading } = useGetService(serviceId);
   const { ref, isVisible } = useScrollReveal<HTMLElement>(0.05);
 
-  const displayName = service?.displayName || serviceId.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-  const description = service?.description || 'Professional dental care tailored to your needs.';
+  const displayName =
+    service?.displayName ||
+    serviceId
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  const description =
+    service?.description || 'Professional dental care tailored to your needs.';
 
   return (
     <div className="min-h-screen">
@@ -36,7 +43,7 @@ export default function ServiceDetail() {
               <div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
-            <div className="glass-card rounded-3xl p-8 md:p-12">
+            <div className="glass rounded-3xl p-8 md:p-12">
               {service?.featuredPhoto && (
                 <div className="rounded-2xl overflow-hidden mb-8 shadow-lg">
                   <img
@@ -47,11 +54,18 @@ export default function ServiceDetail() {
                 </div>
               )}
 
-              <h1 className="text-4xl font-playfair font-bold text-teal-700 mb-4">{displayName}</h1>
+              <h1 className="text-4xl font-playfair font-bold text-teal-700 mb-4">
+                {displayName}
+              </h1>
               <p className="text-slate-600 text-lg leading-relaxed mb-8">{description}</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                {['Expert Care', 'Modern Equipment', 'Comfortable Experience', 'Affordable Pricing'].map((feature) => (
+                {[
+                  'Expert Care',
+                  'Modern Equipment',
+                  'Comfortable Experience',
+                  'Affordable Pricing',
+                ].map((feature) => (
                   <div key={feature} className="flex items-center gap-3">
                     <CheckCircle size={18} className="text-teal-500 flex-shrink-0" />
                     <span className="text-slate-700">{feature}</span>
@@ -61,7 +75,7 @@ export default function ServiceDetail() {
 
               <button
                 onClick={() => setBookingOpen(true)}
-                className="px-8 py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-full shadow-lg transition-all hover:scale-105"
+                className="book-appointment-btn"
               >
                 Book Appointment
               </button>

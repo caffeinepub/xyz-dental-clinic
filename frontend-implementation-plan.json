@@ -1,24 +1,222 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Style 'Book Appointment' submit button with bright teal/blue color",
+  "title": "Fix booking form design, confirm existing features, and enforce site-wide polish",
   "requirements": [
     {
-      "id": "REQ-71",
-      "summary": "Style the submit button in BookAppointmentDialog with a bright teal or royal-blue background (#0D9488 or equivalent OKLCH token) so it stands out prominently against the white form. The button must have white text, a smooth hover state (slightly darker shade or glow), and a CSS transition of ~200–300ms.",
+      "id": "REQ-72",
+      "summary": "Apply solid white background with drop shadow to BookAppointmentDialog container",
       "acceptanceCriteria": [
-        "The submit button inside BookAppointmentDialog has a bright teal or royal-blue background (not white, not grey).",
-        "Button text is white and clearly readable against the teal/blue background.",
-        "On hover, the button transitions to a slightly darker teal/blue shade or emits a subtle glow, with a CSS transition of approximately 200–300ms.",
-        "The rest of the form (inputs, labels, dialog background) remains white/light.",
-        "The button styling is consistent across all viewports (desktop and mobile).",
-        "No other UI elements are changed by this update."
+        "BookAppointmentDialog container has a pure white (#FFFFFF) background color.",
+        "A soft drop shadow is visible around the dialog container.",
+        "The dialog does not appear transparent or show the gradient through it.",
+        "The dialog visually looks elevated and separate from the page background."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/BookAppointmentDialog.tsx",
           "operation": "modify",
-          "description": "Update the submit button styling to use a bright teal background color (using existing design tokens from tailwind.config.js such as bg-teal-500 or the site's #0D9488 teal accent). Apply white text color (text-white), add a hover state with a slightly darker teal shade (e.g., hover:bg-teal-600) or a subtle glow effect, and include a CSS transition property (transition-colors duration-200 or duration-300). Ensure all other form elements (inputs, labels, dialog background) remain unchanged with their existing white/light styling."
+          "description": "Remove any transparency or backdrop-filter from the dialog container. Apply a solid white (#FFFFFF) background to the dialog content wrapper. Add a soft drop shadow (e.g., box-shadow: 0 8px 32px rgba(0,0,0,0.12)) to the dialog container so it appears lifted and distinct from the animated mesh gradient background behind it."
+        }
+      ]
+    },
+    {
+      "id": "REQ-73",
+      "summary": "Style all input fields in BookAppointmentDialog with light grey borders and teal focus glow",
+      "acceptanceCriteria": [
+        "All input fields in the booking dialog have a light grey border in their default state.",
+        "Clicking or tabbing into any input field changes the border color to teal (#0D9488) and adds a teal glow shadow.",
+        "The focus transition is smooth (~200ms).",
+        "The glow disappears when the field loses focus."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/BookAppointmentDialog.tsx",
+          "operation": "modify",
+          "description": "Apply light grey border (#D1D5DB) to all input fields (Patient Name, Phone Number, Service dropdown, Preferred Date) in their default state. Add focus styles with teal border-color (#0D9488) and a teal box-shadow glow effect. Use a CSS transition of ~200ms for smooth focus state changes."
+        }
+      ]
+    },
+    {
+      "id": "REQ-74",
+      "summary": "Ensure all text inside BookAppointmentDialog uses high-contrast dark colors",
+      "acceptanceCriteria": [
+        "All labels inside BookAppointmentDialog use a dark color (#111827 or equivalent).",
+        "Input placeholder text and entered values are clearly visible with high contrast.",
+        "No form text is rendered in a light grey or low-opacity style that could be hard to read on white."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/BookAppointmentDialog.tsx",
+          "operation": "modify",
+          "description": "Update all text inside the form (labels, placeholder text, input values, helper text) to use a high-contrast dark color (#111827 or #1F2937) against the white form background. Remove any light, muted, or low-opacity text styles applied to form labels or content to ensure maximum readability."
+        }
+      ]
+    },
+    {
+      "id": "REQ-75",
+      "summary": "Confirm and enforce visible tooth icon in Footer that opens HiddenAdminLoginModal with correct credentials",
+      "acceptanceCriteria": [
+        "A small tooth SVG icon (28–36px) is visible at the bottom of the Footer.",
+        "The icon uses teal or royal-blue accent color and is semi-transparent.",
+        "Single-clicking the icon opens the HiddenAdminLoginModal.",
+        "Entering username '6352174912' and password '63521' successfully navigates to the admin dashboard.",
+        "No other visible admin link or button exists on the public site."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Footer.tsx",
+          "operation": "modify",
+          "description": "Verify that a small (28–36px) tooth SVG icon using the generated tooth-logo-footer asset (frontend/public/assets/generated/tooth-logo-footer.dim_48x48.png) is visible at the very bottom of the footer with teal/royal-blue accent colors and semi-transparent opacity. Ensure single-clicking this icon opens the HiddenAdminLoginModal. Remove any other visible admin entry points from the footer."
+        },
+        {
+          "path": "frontend/src/components/HiddenAdminLoginModal.tsx",
+          "operation": "modify",
+          "description": "Confirm that the modal validates credentials (username '6352174912', password '63521') and navigates to the admin dashboard on successful authentication. Ensure proper error handling for incorrect credentials."
+        }
+      ]
+    },
+    {
+      "id": "REQ-76",
+      "summary": "Confirm brand name click in Header triggers full page reload",
+      "acceptanceCriteria": [
+        "Clicking 'XYZ Dental Clinic' in the header triggers a full page reload.",
+        "No router navigation (e.g., navigate('/')) occurs on the brand name click.",
+        "The brand name appearance (font, color, size) is unchanged."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Verify that clicking the 'XYZ Dental Clinic' brand name in the header calls window.location.reload() to trigger a full page refresh. Ensure no router navigation (e.g., navigate('/')) occurs on the brand name click. Maintain existing visual styling of the brand name."
+        }
+      ]
+    },
+    {
+      "id": "REQ-77",
+      "summary": "Confirm CustomCursor component is disabled and native OS cursor is active site-wide",
+      "acceptanceCriteria": [
+        "No custom cursor circle, trail, or follower element is rendered anywhere on the page.",
+        "The browser's native OS cursor is visible and fully functional across the entire site.",
+        "No CSS rule sets cursor: none on body, html, or any global selector.",
+        "CustomCursor component is either empty or not rendered."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/CustomCursor.tsx",
+          "operation": "modify",
+          "description": "Verify that the CustomCursor component renders nothing (returns null or an empty fragment). Ensure the component does not apply any cursor override logic."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Remove any cursor: none CSS rules from body, html, or any global selector. Ensure the browser's native OS cursor is active and visible throughout the entire site."
+        }
+      ]
+    },
+    {
+      "id": "REQ-78",
+      "summary": "Confirm and enforce scroll-triggered reveal animations site-wide for all major sections",
+      "acceptanceCriteria": [
+        "ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider gallery, and ContactSection all fade in and slide up on scroll entry.",
+        "Each animation triggers once per page load via IntersectionObserver.",
+        "Service detail page sections also have the same scroll-reveal animation.",
+        "Sections that have already entered the viewport do not re-animate on scroll back."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ServicesGrid.tsx",
+          "operation": "modify",
+          "description": "Verify that the ServicesGrid component uses the useScrollReveal hook to fade in and slide up (translateY from ~30px to 0, opacity 0 to 1) when it scrolls into the viewport. Ensure the animation triggers once per page load using IntersectionObserver."
+        },
+        {
+          "path": "frontend/src/components/DoctorProfile.tsx",
+          "operation": "modify",
+          "description": "Verify that the DoctorProfile component uses the useScrollReveal hook to fade in and slide up when it scrolls into the viewport. Ensure the animation triggers once per page load."
+        },
+        {
+          "path": "frontend/src/components/TestimonialCarousel.tsx",
+          "operation": "modify",
+          "description": "Verify that the TestimonialCarousel component uses the useScrollReveal hook to fade in and slide up when it scrolls into the viewport. Ensure the animation triggers once per page load."
+        },
+        {
+          "path": "frontend/src/components/BeforeAfterSlider.tsx",
+          "operation": "modify",
+          "description": "Verify that the BeforeAfterSlider component uses the useScrollReveal hook to fade in and slide up when it scrolls into the viewport. Ensure the animation triggers once per page load."
+        },
+        {
+          "path": "frontend/src/components/ContactSection.tsx",
+          "operation": "modify",
+          "description": "Verify that the ContactSection component uses the useScrollReveal hook to fade in and slide up when it scrolls into the viewport. Ensure the animation triggers once per page load."
+        },
+        {
+          "path": "frontend/src/pages/DentalImplantsDetail.tsx",
+          "operation": "modify",
+          "description": "Verify that all major sections on the Dental Implants detail page use the useScrollReveal hook for scroll-triggered fade-in and slide-up animations."
+        },
+        {
+          "path": "frontend/src/pages/InvisalignDetail.tsx",
+          "operation": "modify",
+          "description": "Verify that all major sections on the Invisalign detail page use the useScrollReveal hook for scroll-triggered fade-in and slide-up animations."
+        },
+        {
+          "path": "frontend/src/pages/LaserDentistryDetail.tsx",
+          "operation": "modify",
+          "description": "Verify that all major sections on the Laser Dentistry detail page use the useScrollReveal hook for scroll-triggered fade-in and slide-up animations."
+        },
+        {
+          "path": "frontend/src/pages/PediatricDentistryDetail.tsx",
+          "operation": "modify",
+          "description": "Verify that all major sections on the Pediatric Dentistry detail page use the useScrollReveal hook for scroll-triggered fade-in and slide-up animations."
+        },
+        {
+          "path": "frontend/src/pages/SmileMakeoverDetail.tsx",
+          "operation": "modify",
+          "description": "Verify that all major sections on the Smile Makeover detail page use the useScrollReveal hook for scroll-triggered fade-in and slide-up animations."
+        }
+      ]
+    },
+    {
+      "id": "REQ-79",
+      "summary": "Confirm and enforce animated mesh gradient background site-wide",
+      "acceptanceCriteria": [
+        "An animated mesh gradient is visible behind all page content on every public and admin page.",
+        "The gradient cycles between very light white, pale silver, and soft blue shades.",
+        "The animation loop is 15–20 seconds and runs continuously.",
+        "The background animation is applied at the root layout level and does not need to be added per-component."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Verify that the animated mesh gradient background is applied at the root level (body or html) using CSS keyframes animation. The gradient must subtly shift between very light shades of white, pale silver, and soft blue over a 15–20 second continuous loop. Ensure the animation is visible behind all page content on every public and admin page. The background should use a gradient pattern that cycles continuously without interruption."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Verify that the root App component or layout wrapper does not override or block the animated mesh gradient background defined in index.css. Ensure the background is visible throughout the entire application including all routes."
+        }
+      ]
+    },
+    {
+      "id": "REQ-80",
+      "summary": "Confirm interactive Before/After drag slider is prominently displayed on Home page",
+      "acceptanceCriteria": [
+        "A 'Results Gallery' or equivalently labeled section appears on the Home page featuring the BeforeAfterSlider.",
+        "Users can click and drag (or touch drag on mobile) the divider handle to reveal before/left and after/right images.",
+        "The slider uses backend-stored before/after pairs if available, or falls back to static dental treatment image pairs.",
+        "The section is clearly labeled and visible without excessive scrolling."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Verify that the BeforeAfterSlider component is prominently displayed in a dedicated 'Results Gallery' or equivalently labeled section on the Home page. Ensure the section is clearly visible and positioned appropriately within the page flow. The slider should use backend-stored before/after pairs via the getAllBeforeAfterPairs query hook, falling back to static image pairs if no backend data is available."
+        },
+        {
+          "path": "frontend/src/components/BeforeAfterSlider.tsx",
+          "operation": "modify",
+          "description": "Verify that the BeforeAfterSlider component supports both mouse drag and touch drag to reveal before (left) and after (right) dental treatment images. Ensure the slider is using the generated before/after image assets: frontend/public/assets/generated/before-braces.dim_800x600.png, frontend/public/assets/generated/after-braces.dim_800x600.png, frontend/public/assets/generated/before-whitening.dim_800x600.png, frontend/public/assets/generated/after-whitening.dim_800x600.png as fallback static pairs if backend data is unavailable."
         }
       ]
     }

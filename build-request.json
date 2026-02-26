@@ -1,39 +1,194 @@
 {
   "kind": "build_request",
-  "title": "Style 'Book Appointment' submit button with bright teal/blue color",
+  "title": "Fix booking form design, confirm existing features, and enforce site-wide polish",
+  "projectName": "XYZ Dental Clinic",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-71",
-      "text": "In the BookAppointmentDialog component, style the submit 'Book Appointment' / 'Book Now' button with a bright teal or royal-blue background color (e.g., the site's teal accent — #0D9488 or equivalent OKLCH token) so it stands out prominently against the white form background. The button must have white text, a smooth hover state (slightly darker shade or glow), and a CSS transition of ~200–300ms. All other form elements remain white/light as-is.",
+      "id": "REQ-72",
+      "text": "In BookAppointmentDialog, apply a solid pure white (#FFFFFF) background to the entire form/dialog container with a soft drop shadow (e.g., box-shadow: 0 8px 32px rgba(0,0,0,0.12)) so the form appears lifted and distinct from the animated mesh gradient background behind it. Remove any transparency or backdrop-filter on the dialog container itself.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-3"
         ],
         "quotes": [
-          "Form ko white karne ke baad, \"Book Appointment\" ka button Bright Teal ya Blue rakhiyega, taaki pure safed form mein wo alag se chamke aur log uspar click karein."
+          "Solid White Background: Appointment booking form ka section ab transparent nahi hoga. Use Pure White (#FFFFFF) background do, jisme halki si Soft Shadow (Drop Shadow) ho taaki wo background se alag aur utha hua dikhe."
         ]
       },
       "acceptanceCriteria": [
-        "The submit button inside BookAppointmentDialog has a bright teal or royal-blue background (not white, not grey).",
-        "Button text is white and clearly readable against the teal/blue background.",
-        "On hover, the button transitions to a slightly darker teal/blue shade or emits a subtle glow, with a CSS transition of approximately 200–300ms.",
-        "The rest of the form (inputs, labels, dialog background) remains white/light.",
-        "The button styling is consistent across all viewports (desktop and mobile).",
-        "No other UI elements are changed by this update."
+        "BookAppointmentDialog container has a pure white (#FFFFFF) background color.",
+        "A soft drop shadow is visible around the dialog container.",
+        "The dialog does not appear transparent or show the gradient through it.",
+        "The dialog visually looks elevated and separate from the page background."
+      ]
+    },
+    {
+      "id": "REQ-73",
+      "text": "In BookAppointmentDialog, style all input fields (Patient Name, Phone Number, Service dropdown, Preferred Date) with a light grey border (e.g., #D1D5DB) by default. On focus, each input must display a teal-blue glow (box-shadow and border-color using the site's teal accent #0D9488). Use a CSS transition of ~200ms for the focus effect.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Input Fields: Saare boxes (Name, Phone, etc.) ke borders light grey hon aur click karne par 'Teal Blue' color mein glow karein."
+        ]
+      },
+      "acceptanceCriteria": [
+        "All input fields in the booking dialog have a light grey border in their default state.",
+        "Clicking or tabbing into any input field changes the border color to teal (#0D9488) and adds a teal glow shadow.",
+        "The focus transition is smooth (~200ms).",
+        "The glow disappears when the field loses focus."
+      ]
+    },
+    {
+      "id": "REQ-74",
+      "text": "In BookAppointmentDialog, ensure all text inside the form (labels, placeholder text, input values, helper text) uses a high-contrast dark color (e.g., #111827 or #1F2937) against the white form background. Remove any light, muted, or low-opacity text styles applied to form labels or content.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Text Visibility: Form ke andar ka text ekdum dark aur saaf (High Contrast) hona chahiye."
+        ]
+      },
+      "acceptanceCriteria": [
+        "All labels inside BookAppointmentDialog use a dark color (#111827 or equivalent).",
+        "Input placeholder text and entered values are clearly visible with high contrast.",
+        "No form text is rendered in a light grey or low-opacity style that could be hard to read on white."
+      ]
+    },
+    {
+      "id": "REQ-75",
+      "text": "Confirm and enforce that the Footer component contains a small (28–36px) visible tooth SVG icon using teal/royal-blue accent colors at the very bottom of the footer. A single click on this tooth icon must open the HiddenAdminLoginModal. The tooth icon must remain semi-transparent but visible. Credentials: username '6352174912', password '63521'.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Secret Entry: Footer ke sabse niche ek Tooth Logo hoga. Us par click karte hi login khulega.",
+          "Credentials: User: 6352174912 | Pass: 63521"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A small tooth SVG icon (28–36px) is visible at the bottom of the Footer.",
+        "The icon uses teal or royal-blue accent color and is semi-transparent.",
+        "Single-clicking the icon opens the HiddenAdminLoginModal.",
+        "Entering username '6352174912' and password '63521' successfully navigates to the admin dashboard.",
+        "No other visible admin link or button exists on the public site."
+      ]
+    },
+    {
+      "id": "REQ-76",
+      "text": "Confirm and enforce that clicking the 'XYZ Dental Clinic' brand name in Header.tsx calls window.location.reload(). No router navigation should occur on the brand name click. The visual styling of the brand name must remain unchanged.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Refresh Feature: Header mein 'XYZ Clinic' name par click karte hi website Refresh honi chahiye."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Clicking 'XYZ Dental Clinic' in the header triggers a full page reload.",
+        "No router navigation (e.g., navigate('/')) occurs on the brand name click.",
+        "The brand name appearance (font, color, size) is unchanged."
+      ]
+    },
+    {
+      "id": "REQ-77",
+      "text": "Confirm and enforce that the CustomCursor component renders nothing and no cursor: none CSS rule is applied to body or html. The browser's native OS cursor must be active across the entire site. Remove any remaining cursor override CSS from index.css or any component stylesheets.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Standard Cursor: Kisi bhi tarah ka extra circle ya cursor follower nahi chahiye."
+        ]
+      },
+      "acceptanceCriteria": [
+        "No custom cursor circle, trail, or follower element is rendered anywhere on the page.",
+        "The browser's native OS cursor is visible and fully functional across the entire site.",
+        "No CSS rule sets cursor: none on body, html, or any global selector.",
+        "CustomCursor component is either empty or not rendered."
+      ]
+    },
+    {
+      "id": "REQ-78",
+      "text": "Confirm and enforce scroll-triggered reveal animations site-wide: all major sections (ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider gallery, ContactSection, and service detail page sections) must fade in and slide up (translateY from ~30px to 0, opacity 0 to 1) when they scroll into the viewport. Use IntersectionObserver (via the existing useScrollReveal hook or equivalent) to trigger each section's animation once per page load.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Smooth Reveal: Website ke saare sections (Services, Reviews, Before/After) niche se upar ki taraf 'Fade-in' hokar aane chahiye."
+        ]
+      },
+      "acceptanceCriteria": [
+        "ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider gallery, and ContactSection all fade in and slide up on scroll entry.",
+        "Each animation triggers once per page load via IntersectionObserver.",
+        "Service detail page sections also have the same scroll-reveal animation.",
+        "Sections that have already entered the viewport do not re-animate on scroll back."
+      ]
+    },
+    {
+      "id": "REQ-79",
+      "text": "Confirm and enforce the animated mesh gradient background throughout the entire site (all public and admin pages). The gradient must subtly shift between very light shades of white, pale silver, and soft blue over a 15–20 second continuous CSS animation loop. This must be applied at the root layout level (App.tsx or index.css body/html) so it appears behind all page content.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Background: White space ko bharne ke liye piche ek bahut halka Moving Gradient chalta rahega."
+        ]
+      },
+      "acceptanceCriteria": [
+        "An animated mesh gradient is visible behind all page content on every public and admin page.",
+        "The gradient cycles between very light white, pale silver, and soft blue shades.",
+        "The animation loop is 15–20 seconds and runs continuously.",
+        "The background animation is applied at the root layout level and does not need to be added per-component."
+      ]
+    },
+    {
+      "id": "REQ-80",
+      "text": "Confirm the interactive Before/After drag slider (BeforeAfterSlider component) is prominently displayed in a dedicated 'Results Gallery' section on the Home page. The slider must support both mouse drag and touch drag to reveal the before (left) and after (right) dental treatment images. Use backend-stored before/after pairs if available, otherwise fall back to static example pairs. The section must be clearly labeled.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Interactive Slider: Before/After images ke liye drag karne wala slider zaruri hai."
+        ]
+      },
+      "acceptanceCriteria": [
+        "A 'Results Gallery' or equivalently labeled section appears on the Home page featuring the BeforeAfterSlider.",
+        "Users can click and drag (or touch drag on mobile) the divider handle to reveal before/left and after/right images.",
+        "The slider uses backend-stored before/after pairs if available, or falls back to static dental treatment image pairs.",
+        "The section is clearly labeled and visible without excessive scrolling."
       ]
     }
   ],
   "constraints": [
-    "Do not change any form fields, layout, or submission logic in BookAppointmentDialog.",
-    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "Use existing teal/royal-blue design tokens from tailwind.config.js or index.css — do not introduce new arbitrary color values."
+    "Do not modify any files listed in frontend.immutablePaths.",
+    "All Motoko logic must remain in backend/main.mo.",
+    "Admin credentials must remain: username '6352174912', password '63521'.",
+    "The booking form must remain frictionless — no Internet Identity or authentication required.",
+    "The animated mesh gradient background must not be removed or replaced."
   ],
   "nonGoals": [
-    "Changing any other buttons on the site outside the BookAppointmentDialog submit button.",
-    "Modifying form fields, validation logic, or submission behaviour.",
-    "Altering the white form background or dialog styling beyond the button."
+    "Adding any new backend data models or API endpoints.",
+    "Changing the admin dashboard layout or capabilities beyond what is specified.",
+    "Adding new service cards or pages.",
+    "Modifying the scroll-progress bar component.",
+    "Changing any authentication or Internet Identity logic."
   ],
   "imageRequirements": {
     "required": [],
