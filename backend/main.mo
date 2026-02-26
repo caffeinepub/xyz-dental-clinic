@@ -22,7 +22,7 @@ actor {
     #cancelled;
   };
 
-  type Service = {
+  public type Service = {
     id : Text;
     displayName : Text;
     description : Text;
@@ -39,7 +39,7 @@ actor {
     doctorId : ?Nat;
   };
 
-  type ClinicStatus = {
+  public type ClinicStatus = {
     #open;
     #closed;
     #emergency;

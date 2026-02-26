@@ -1,129 +1,103 @@
-import React, { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useGetAllAppointments, useUpdateAppointmentStatus } from '@/hooks/useQueries';
+import { ArrowLeft, Clock, CheckCircle, XCircle, Phone, User, Calendar } from 'lucide-react';
+import { useGetAllAppointments, useUpdateAppointmentStatus } from '../../hooks/useQueries';
 import { AppointmentStatus } from '../../backend';
-import { toast } from 'sonner';
 
 const statusColors: Record<string, string> = {
-  pending: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30',
-  confirmed: 'bg-teal-500/20 text-teal-300 border-teal-400/30',
-  completed: 'bg-blue-500/20 text-blue-300 border-blue-400/30',
-  cancelled: 'bg-red-500/20 text-red-300 border-red-400/30',
+  pending: 'bg-yellow-100 text-yellow-700',
+  confirmed: 'bg-blue-100 text-blue-700',
+  completed: 'bg-green-100 text-green-700',
+  cancelled: 'bg-red-100 text-red-700',
 };
 
 export default function Appointments() {
   const navigate = useNavigate();
-  const { data: appointments, isLoading } = useGetAllAppointments({ refetchInterval: 30000 });
-  const updateStatus = useUpdateAppointmentStatus();
-  const [filter, setFilter] = useState<string>('all');
+  const { data: appointments, isLoading } = useGetAllAppointments();
+  const { mutate: updateStatus } = useUpdateAppointmentStatus();
 
-  const filtered =
-    appointments?.filter((a) => (filter === 'all' ? true : a.status === filter)) ?? [];
-
-  const handleStatusChange = async (appointmentId: bigint, newStatus: AppointmentStatus) => {
-    try {
-      await updateStatus.mutateAsync({ appointmentId, newStatus });
-      toast.success('Status updated');
-    } catch {
-      toast.error('Failed to update status');
-    }
+  const formatDate = (ns: bigint) => {
+    const ms = Number(ns) / 1_000_000;
+    return new Date(ms).toLocaleDateString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+    });
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => navigate({ to: '/admin/dashboard' })}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-2 text-gray-500 hover:text-royal-blue transition-colors"
           >
-            ← Back
+            <ArrowLeft size={18} /> Dashboard
           </button>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Appointments</h1>
-            <p className="text-muted-foreground text-sm">Manage all patient bookings</p>
-          </div>
-        </div>
-
-        {/* Filter */}
-        <div className="glass-card rounded-2xl p-4 mb-6 flex flex-wrap gap-2 border border-border/40">
-          {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                filter === f
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
+          <h1 className="text-3xl font-playfair font-bold text-royal-blue">Appointments</h1>
         </div>
 
         {isLoading ? (
-          <div className="text-center py-20 text-muted-foreground">Loading appointments...</div>
-        ) : filtered.length === 0 ? (
-          <div className="glass-card rounded-2xl p-10 text-center text-muted-foreground border border-border/40">
-            No appointments found.
+          <div className="flex justify-center py-20">
+            <div className="w-10 h-10 border-4 border-royal-blue border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : !appointments || appointments.length === 0 ? (
+          <div className="glass-card rounded-2xl p-12 text-center">
+            <Calendar size={48} className="text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">No appointments yet.</p>
           </div>
         ) : (
-          <div className="glass-card rounded-2xl overflow-hidden border border-border/40">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border/40">
-                    <th className="text-left p-4 text-muted-foreground font-medium">Patient</th>
-                    <th className="text-left p-4 text-muted-foreground font-medium">Contact</th>
-                    <th className="text-left p-4 text-muted-foreground font-medium">Service</th>
-                    <th className="text-left p-4 text-muted-foreground font-medium">Date</th>
-                    <th className="text-left p-4 text-muted-foreground font-medium">Status</th>
-                    <th className="text-left p-4 text-muted-foreground font-medium">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((appt) => (
-                    <tr
-                      key={String(appt.id)}
-                      className="border-b border-border/20 hover:bg-muted/20 transition-colors"
-                    >
-                      <td className="p-4 font-medium text-foreground">{appt.patientName}</td>
-                      <td className="p-4 text-muted-foreground">{appt.contactInfo}</td>
-                      <td className="p-4 text-muted-foreground">{appt.serviceType}</td>
-                      <td className="p-4 text-muted-foreground">
-                        {new Date(Number(appt.preferredDate) / 1_000_000).toLocaleDateString()}
-                      </td>
-                      <td className="p-4">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs border ${
-                            statusColors[String(appt.status)] ?? ''
-                          }`}
+          <div className="space-y-4">
+            {appointments.map((apt) => (
+              <div key={String(apt.id)} className="glass-card rounded-2xl p-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <User size={16} className="text-royal-blue" />
+                      <span className="font-bold text-gray-800">{apt.patientName}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[apt.status] || 'bg-gray-100 text-gray-600'}`}>
+                        {apt.status}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Phone size={14} className="text-teal" />
+                      <span>{apt.contactInfo}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Clock size={14} className="text-teal" />
+                      <span>{apt.serviceType}</span>
+                      <span className="text-gray-400">•</span>
+                      <span>{formatDate(apt.preferredDate)}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 flex-shrink-0">
+                    {apt.status === AppointmentStatus.pending && (
+                      <>
+                        <button
+                          onClick={() => updateStatus({ appointmentId: apt.id, newStatus: AppointmentStatus.confirmed })}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg transition-colors"
                         >
-                          {String(appt.status)}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <select
-                          className="bg-muted border border-border text-foreground text-xs rounded-lg px-2 py-1"
-                          value={String(appt.status)}
-                          onChange={(e) =>
-                            handleStatusChange(appt.id, e.target.value as AppointmentStatus)
-                          }
-                          disabled={updateStatus.isPending}
+                          <CheckCircle size={14} /> Confirm
+                        </button>
+                        <button
+                          onClick={() => updateStatus({ appointmentId: apt.id, newStatus: AppointmentStatus.cancelled })}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-colors"
                         >
-                          {['pending', 'confirmed', 'completed', 'cancelled'].map((s) => (
-                            <option key={s} value={s}>
-                              {s}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                          <XCircle size={14} /> Cancel
+                        </button>
+                      </>
+                    )}
+                    {apt.status === AppointmentStatus.confirmed && (
+                      <button
+                        onClick={() => updateStatus({ appointmentId: apt.id, newStatus: AppointmentStatus.completed })}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                      >
+                        <CheckCircle size={14} /> Complete
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

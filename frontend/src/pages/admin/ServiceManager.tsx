@@ -1,238 +1,177 @@
-import React, { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { toast } from 'sonner';
+import { ArrowLeft, Upload, Save, Loader2 } from 'lucide-react';
+import { useGetAllServices, useUpdateService } from '../../hooks/useQueries';
 import { ExternalBlob } from '../../backend';
-import { useGetAllServices, useUpdateService } from '@/hooks/useQueries';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 
 const PREMIUM_SERVICES = [
-  { id: 'dental-implants', defaultName: 'Dental Implants', defaultDesc: 'Advanced titanium implants for permanent tooth replacement.' },
-  { id: 'invisalign', defaultName: 'Invisalign', defaultDesc: 'Clear aligner therapy for a straighter smile without metal braces.' },
-  { id: 'pediatric-dentistry', defaultName: 'Kids Dentistry', defaultDesc: 'Gentle, child-friendly dental care for growing smiles.' },
-  { id: 'smile-makeover', defaultName: 'Smile Makeover', defaultDesc: 'Comprehensive cosmetic treatment to transform your smile.' },
-  { id: 'laser-dentistry', defaultName: 'Laser Dentistry', defaultDesc: 'Precision laser treatments for painless dental procedures.' },
+  { id: 'dental-implants', name: 'Dental Implants' },
+  { id: 'invisalign', name: 'Invisalign' },
+  { id: 'laser-dentistry', name: 'Laser Dentistry' },
+  { id: 'pediatric-dentistry', name: 'Pediatric Dentistry' },
+  { id: 'smile-makeover', name: 'Smile Makeover' },
 ];
 
-interface ServiceFormState {
+interface ServiceForm {
   displayName: string;
   description: string;
   photoFile: File | null;
-  photoPreview: string | null;
   uploadProgress: number;
+  isSaving: boolean;
+  savedOk: boolean;
 }
 
 export default function ServiceManager() {
   const navigate = useNavigate();
   const { data: services } = useGetAllServices();
-  const { mutate: updateService, isPending } = useUpdateService();
+  const { mutateAsync: saveService } = useUpdateService();
 
-  const [forms, setForms] = useState<Record<string, ServiceFormState>>(() => {
-    const init: Record<string, ServiceFormState> = {};
-    PREMIUM_SERVICES.forEach((s) => {
-      init[s.id] = {
-        displayName: s.defaultName,
-        description: s.defaultDesc,
-        photoFile: null,
-        photoPreview: null,
-        uploadProgress: 0,
-      };
-    });
-    return init;
-  });
+  const [forms, setForms] = useState<Record<string, ServiceForm>>(() =>
+    Object.fromEntries(
+      PREMIUM_SERVICES.map((s) => [
+        s.id,
+        { displayName: s.name, description: '', photoFile: null, uploadProgress: 0, isSaving: false, savedOk: false },
+      ])
+    )
+  );
 
-  const [savingId, setSavingId] = useState<string | null>(null);
-  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
-
-  // Sync form state with backend data
-  React.useEffect(() => {
-    if (services) {
-      setForms((prev) => {
-        const updated = { ...prev };
-        services.forEach((svc) => {
-          if (updated[svc.id]) {
-            updated[svc.id] = {
-              ...updated[svc.id],
-              displayName: svc.displayName || updated[svc.id].displayName,
-              description: svc.description || updated[svc.id].description,
-              photoPreview: svc.featuredPhoto ? svc.featuredPhoto.getDirectURL() : updated[svc.id].photoPreview,
-            };
-          }
-        });
-        return updated;
-      });
-    }
-  }, [services]);
-
-  const updateField = (id: string, field: keyof ServiceFormState, value: string | File | null | number) => {
-    setForms((prev) => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
+  const getForm = (id: string): ServiceForm => {
+    const backendService = services?.find((s) => s.id === id);
+    const form = forms[id];
+    return {
+      ...form,
+      displayName: form.displayName || backendService?.displayName || '',
+      description: form.description || backendService?.description || '',
+    };
   };
 
-  const handleFileSelect = (id: string, file: File) => {
-    const preview = URL.createObjectURL(file);
-    setForms((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], photoFile: file, photoPreview: preview },
-    }));
+  const updateForm = (id: string, updates: Partial<ServiceForm>) => {
+    setForms((prev) => ({ ...prev, [id]: { ...prev[id], ...updates } }));
   };
 
   const handleSave = async (serviceId: string) => {
     const form = forms[serviceId];
-    setSavingId(serviceId);
+    updateForm(serviceId, { isSaving: true, savedOk: false });
 
     try {
-      let featuredPhoto: ExternalBlob | null = null;
-
+      let blob: ExternalBlob | null = null;
       if (form.photoFile) {
         const bytes = new Uint8Array(await form.photoFile.arrayBuffer());
-        featuredPhoto = ExternalBlob.fromBytes(bytes).withUploadProgress((p) => {
-          updateField(serviceId, 'uploadProgress', p);
-        });
+        blob = ExternalBlob.fromBytes(bytes).withUploadProgress((pct) =>
+          updateForm(serviceId, { uploadProgress: pct })
+        );
       }
 
-      updateService(
-        {
-          id: serviceId,
-          displayName: form.displayName,
-          description: form.description,
-          featuredPhoto,
-        },
-        {
-          onSuccess: () => {
-            toast.success(`${form.displayName} updated successfully!`);
-            setSavingId(null);
-            updateField(serviceId, 'uploadProgress', 0);
-          },
-          onError: (err) => {
-            toast.error('Failed to save: ' + (err as Error).message);
-            setSavingId(null);
-          },
-        }
-      );
+      await saveService({
+        id: serviceId,
+        displayName: form.displayName,
+        description: form.description,
+        featuredPhoto: blob,
+      });
+
+      updateForm(serviceId, { isSaving: false, savedOk: true, uploadProgress: 0 });
+      setTimeout(() => updateForm(serviceId, { savedOk: false }), 3000);
     } catch {
-      toast.error('Failed to process image');
-      setSavingId(null);
+      updateForm(serviceId, { isSaving: false });
     }
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => navigate({ to: '/admin/dashboard' })}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-2 text-gray-500 hover:text-royal-blue transition-colors"
           >
-            ← Back
+            <ArrowLeft size={18} /> Dashboard
           </button>
-          <div>
-            <h1 className="text-2xl font-display font-bold text-foreground">Service Editor</h1>
-            <p className="text-muted-foreground text-sm">Edit service names, descriptions, and featured photos</p>
-          </div>
+          <h1 className="text-3xl font-playfair font-bold text-royal-blue">Service Manager</h1>
         </div>
 
         <div className="space-y-6">
-          {PREMIUM_SERVICES.map((svc) => {
-            const form = forms[svc.id];
-            const isSaving = savingId === svc.id && isPending;
+          {PREMIUM_SERVICES.map((service) => {
+            const form = getForm(service.id);
+            const backendService = services?.find((s) => s.id === service.id);
 
             return (
-              <div key={svc.id} className="glass-card rounded-2xl border border-border/40 p-6">
-                <h2 className="text-lg font-bold text-foreground mb-4">{svc.defaultName}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Left: Text fields */}
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor={`name-${svc.id}`} className="text-sm font-semibold mb-1 block">
-                        Display Name
-                      </Label>
-                      <Input
-                        id={`name-${svc.id}`}
-                        value={form.displayName}
-                        onChange={(e) => updateField(svc.id, 'displayName', e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor={`desc-${svc.id}`} className="text-sm font-semibold mb-1 block">
-                        Description
-                      </Label>
-                      <Textarea
-                        id={`desc-${svc.id}`}
-                        value={form.description}
-                        onChange={(e) => updateField(svc.id, 'description', e.target.value)}
-                        rows={3}
-                      />
-                    </div>
+              <div key={service.id} className="glass-card rounded-2xl p-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">{service.name}</h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-1">
+                    <Label>Display Name</Label>
+                    <Input
+                      value={form.displayName}
+                      onChange={(e) => updateForm(service.id, { displayName: e.target.value })}
+                      placeholder="Service display name"
+                    />
                   </div>
 
-                  {/* Right: Photo upload */}
-                  <div>
-                    <Label className="text-sm font-semibold mb-1 block">Featured Photo</Label>
-                    <div
-                      className="border-2 border-dashed border-border/60 rounded-xl p-3 text-center cursor-pointer hover:border-primary/50 transition-colors"
-                      onClick={() => fileInputRefs.current[svc.id]?.click()}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        const f = e.dataTransfer.files[0];
-                        if (f && f.type.startsWith('image/')) handleFileSelect(svc.id, f);
-                      }}
-                    >
-                      {form.photoPreview ? (
-                        <img
-                          src={form.photoPreview}
-                          alt="Preview"
-                          className="w-full h-32 object-cover rounded-lg"
+                  <div className="space-y-1">
+                    <Label>Featured Photo</Label>
+                    <div className="flex items-center gap-2">
+                      <label className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 text-sm text-gray-600 transition-colors">
+                        <Upload size={14} />
+                        {form.photoFile ? form.photoFile.name : 'Choose photo'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => updateForm(service.id, { photoFile: e.target.files?.[0] || null })}
                         />
-                      ) : (
-                        <div className="py-6 text-muted-foreground">
-                          <div className="text-2xl mb-1">📷</div>
-                          <p className="text-xs">Drag & drop or click to upload</p>
-                        </div>
+                      </label>
+                      {backendService?.featuredPhoto && !form.photoFile && (
+                        <img
+                          src={backendService.featuredPhoto.getDirectURL()}
+                          alt="Current"
+                          className="w-10 h-10 rounded-lg object-cover border"
+                        />
                       )}
-                      <input
-                        ref={(el) => { fileInputRefs.current[svc.id] = el; }}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f) handleFileSelect(svc.id, f);
-                        }}
-                      />
                     </div>
-                    {form.photoFile && (
-                      <p className="text-xs text-muted-foreground mt-1">{form.photoFile.name}</p>
+                    {form.uploadProgress > 0 && form.uploadProgress < 100 && (
+                      <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                        <div
+                          className="bg-teal h-1.5 rounded-full transition-all"
+                          style={{ width: `${form.uploadProgress}%` }}
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
 
-                {isSaving && form.uploadProgress > 0 && (
-                  <div className="mt-3">
-                    <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                      <span>Uploading photo...</span>
-                      <span>{form.uploadProgress}%</span>
-                    </div>
-                    <div className="w-full bg-border rounded-full h-1.5">
-                      <div
-                        className="bg-primary h-1.5 rounded-full transition-all"
-                        style={{ width: `${form.uploadProgress}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="mt-4 flex justify-end">
-                  <Button
-                    onClick={() => handleSave(svc.id)}
-                    disabled={isSaving}
-                    size="sm"
-                  >
-                    {isSaving ? 'Saving...' : 'Save Changes'}
-                  </Button>
+                <div className="space-y-1 mb-4">
+                  <Label>Description</Label>
+                  <textarea
+                    value={form.description}
+                    onChange={(e) => updateForm(service.id, { description: e.target.value })}
+                    placeholder="Service description..."
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-royal-blue/30 resize-none"
+                  />
                 </div>
+
+                <Button
+                  onClick={() => handleSave(service.id)}
+                  disabled={form.isSaving}
+                  className="bg-royal-blue hover:bg-teal text-white rounded-full px-6"
+                >
+                  {form.isSaving ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 size={14} className="animate-spin" />
+                      Saving...
+                    </span>
+                  ) : form.savedOk ? (
+                    '✓ Saved!'
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Save size={14} /> Save Changes
+                    </span>
+                  )}
+                </Button>
               </div>
             );
           })}

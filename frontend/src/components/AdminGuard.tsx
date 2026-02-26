@@ -1,9 +1,7 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useIsCallerAdmin } from '../hooks/useQueries';
-import { useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
 
 interface AdminGuardProps {
   children: ReactNode;
@@ -27,7 +25,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
   if (isInitializing || isAdminLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-royal-blue" />
+        <div className="w-8 h-8 border-4 border-teal-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }

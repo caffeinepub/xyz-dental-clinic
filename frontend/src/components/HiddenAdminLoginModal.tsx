@@ -7,10 +7,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Lock, AlertCircle, Loader2 } from 'lucide-react';
 
 const ADMIN_USERNAME = '6352174912';
 const ADMIN_PASSWORD = '63521';
@@ -25,28 +24,28 @@ export default function HiddenAdminLoginModal({ open, onOpenChange }: HiddenAdmi
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
+    setLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    await new Promise((r) => setTimeout(r, 400));
 
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      setIsLoading(false);
+      setLoading(false);
       onOpenChange(false);
       setUsername('');
       setPassword('');
       navigate({ to: '/admin/dashboard' });
     } else {
-      setIsLoading(false);
+      setLoading(false);
       setError('Invalid credentials. Please try again.');
     }
   };
 
-  const handleOpenChange = (val: boolean) => {
+  const handleClose = (val: boolean) => {
     if (!val) {
       setUsername('');
       setPassword('');
@@ -56,58 +55,58 @@ export default function HiddenAdminLoginModal({ open, onOpenChange }: HiddenAdmi
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5 text-royal-blue" />
-            Secure Access
+          <DialogTitle className="text-slate-800 font-playfair flex items-center gap-2">
+            <span>🦷</span> Admin Access
           </DialogTitle>
           <DialogDescription>
-            Enter your credentials to continue.
+            Enter your credentials to access the admin panel.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleLogin} className="space-y-4 mt-2">
-          <div className="space-y-2">
+        <form onSubmit={handleLogin} className="space-y-4 py-2">
+          <div className="space-y-1">
             <Label htmlFor="admin-username">Username</Label>
             <Input
               id="admin-username"
               type="text"
+              placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username"
               autoComplete="off"
-              required
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="admin-password">Password</Label>
             <Input
               id="admin-password"
               type="password"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter password"
-              autoComplete="off"
-              required
             />
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 p-3 rounded-lg">
-              <AlertCircle className="h-4 w-4 shrink-0" />
-              <span>{error}</span>
-            </div>
+            <p className="text-red-500 text-sm text-center">{error}</p>
           )}
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-teal-600 hover:bg-teal-700 text-white rounded-full"
+          >
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
                 Verifying...
-              </>
+              </span>
             ) : (
               'Login'
             )}

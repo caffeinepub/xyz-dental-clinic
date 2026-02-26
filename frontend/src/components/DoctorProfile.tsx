@@ -1,58 +1,72 @@
-export default function DoctorProfile() {
-  return (
-    <section id="doctor" className="py-20 px-4">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">Meet Your Doctor</h2>
-          <p className="text-white/70 text-lg">Expert care from a trusted professional</p>
-        </div>
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
-        <div
-          className="glass-card rounded-3xl overflow-hidden"
-          style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr' }}
-        >
-          {/* Photo */}
-          <div className="relative">
-            <img
-              src="/assets/generated/doctor-profile.dim_600x800.png"
-              alt="Dr. Mehta"
-              className="w-full h-full object-cover"
-              style={{ minHeight: 380 }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/30" />
+export default function DoctorProfile() {
+  const { ref: imgRef, isVisible: imgVisible } = useScrollReveal<HTMLDivElement>();
+  const { ref: textRef, isVisible: textVisible } = useScrollReveal<HTMLDivElement>();
+
+  return (
+    <section id="about" className="py-20 px-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          {/* Doctor Image */}
+          <div
+            ref={imgRef}
+            className={`transition-all duration-700 ${
+              imgVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+            }`}
+          >
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-200 to-blue-200 rounded-3xl transform rotate-3 opacity-40" />
+              <img
+                src="/assets/generated/doctor-profile.dim_600x800.png"
+                alt="Dr. Sharma"
+                className="relative rounded-3xl shadow-2xl w-full object-cover"
+                style={{ maxHeight: '500px' }}
+              />
+            </div>
           </div>
 
-          {/* Info */}
-          <div className="p-8 md:p-10 flex flex-col justify-center">
-            <div className="inline-block px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-xs font-semibold mb-4 w-fit">
-              Chief Dental Surgeon
-            </div>
-            <h3 className="text-3xl font-bold text-white mb-1">Dr. Anjali Mehta</h3>
-            <p className="text-teal-300 font-medium mb-5">BDS, MDS – Prosthodontics & Implantology</p>
-
-            <p className="text-white/75 text-sm leading-relaxed mb-6">
-              With over 15 years of experience, Dr. Mehta specializes in full-mouth rehabilitation,
-              cosmetic dentistry, and advanced implantology. She has transformed thousands of smiles
-              with her gentle approach and precision techniques.
+          {/* Doctor Info */}
+          <div
+            ref={textRef}
+            className={`transition-all duration-700 delay-200 ${
+              textVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            <span className="text-teal-600 font-semibold text-sm uppercase tracking-wider">
+              Meet Your Doctor
+            </span>
+            <h2 className="text-4xl font-bold text-slate-800 font-playfair mt-2 mb-4">
+              Dr. Priya Sharma
+            </h2>
+            <p className="text-slate-500 text-lg mb-2">BDS, MDS – Prosthodontics</p>
+            <p className="text-slate-600 leading-relaxed mb-6">
+              With over 15 years of experience in advanced dental care, Dr. Sharma combines
+              technical expertise with a gentle approach to ensure every patient feels comfortable
+              and confident in their treatment journey.
             </p>
 
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-4 mb-6">
               {[
-                { label: 'Years Experience', value: '15+' },
-                { label: 'Smiles Transformed', value: '5000+' },
-                { label: 'Awards Won', value: '12' },
-                { label: 'Success Rate', value: '99.2%' },
+                { value: '15+', label: 'Years Experience' },
+                { value: '5000+', label: 'Happy Patients' },
+                { value: '98%', label: 'Success Rate' },
               ].map((stat) => (
-                <div key={stat.label} className="glass-card rounded-xl p-3 text-center">
-                  <div className="text-2xl font-bold text-teal-300">{stat.value}</div>
-                  <div className="text-white/60 text-xs mt-1">{stat.label}</div>
+                <div key={stat.label} className="glass-card rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-teal-600">{stat.value}</div>
+                  <div className="text-slate-500 text-xs mt-1">{stat.label}</div>
                 </div>
               ))}
             </div>
 
+            {/* Specialties */}
             <div className="flex flex-wrap gap-2">
-              {['Implantology', 'Cosmetic Dentistry', 'Invisalign Certified', 'Laser Dentistry'].map((tag) => (
-                <span key={tag} className="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/80 text-xs">
+              {['Implantology', 'Cosmetic Dentistry', 'Orthodontics', 'Laser Dentistry'].map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-teal-50 text-teal-700 text-xs font-medium px-3 py-1 rounded-full border border-teal-200"
+                >
                   {tag}
                 </span>
               ))}

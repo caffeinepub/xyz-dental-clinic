@@ -1,81 +1,294 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Frictionless Zero-Login Appointment Booking",
+  "title": "Replace hidden admin trigger with visible footer tooth logo, consolidate admin dashboard, and confirm all UX/animation features",
   "requirements": [
     {
-      "id": "REQ-50",
-      "summary": "Replace BookAppointmentDialog with a fully frictionless booking form that requires no authentication and displays an inline confirmation message on success",
+      "id": "REQ-62",
+      "summary": "Replace invisible bottom-right corner admin trigger with a visible small tooth SVG logo in the Footer that opens the HiddenAdminLoginModal on single click",
       "acceptanceCriteria": [
-        "The booking dialog/form renders immediately when the 'Book Appointment' button is clicked — no login or identity prompt appears.",
-        "The form contains exactly four fields: Patient Name, Phone Number, Service (dropdown), and Preferred Date.",
-        "Submitting the form with valid data calls the backend bookAppointment function using an anonymous actor (no Internet Identity required).",
-        "On successful submission, a 'Thank You' confirmation message is displayed inside the dialog.",
-        "No OTP, no sign-up, no Internet Identity login step is present anywhere in the booking flow.",
-        "The 'Book Appointment' CTA in the Hero section, Header, and service detail pages all open this frictionless form.",
-        "Form submission is disabled and shows inline validation if Name or Phone Number is empty."
+        "A small tooth icon is visible at the bottom of the Footer on all pages.",
+        "Single-clicking the tooth icon opens the HiddenAdminLoginModal.",
+        "The modal accepts username '6352174912' and password '63521' and navigates to the admin dashboard on success.",
+        "The old invisible 50×50px bottom-right corner trigger (HiddenAdminTrigger component) is removed from App.tsx and no longer present in the DOM.",
+        "No other hidden admin triggers (triple-click footer copyright, 1×1px dot, logo long-press) exist anywhere in the site."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Footer.tsx",
+          "operation": "modify",
+          "description": "Add a visible tooth logo icon at the bottom of the Footer component. The tooth logo must be the generated image at frontend/public/assets/generated/tooth-logo-footer.dim_48x48.png. Style it as a small (28-36px display size), semi-transparent but visible clickable element using teal/royal-blue accent colors. Attach an onClick handler that opens the HiddenAdminLoginModal (import and use state to control the modal visibility). Position the tooth icon centered or aligned at the very bottom of the footer layout. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Remove the HiddenAdminTrigger component import and its usage from the App layout. Ensure no invisible admin trigger element remains in the DOM. Confirm that the only admin access point is now the tooth logo in the Footer component."
+        },
+        {
+          "path": "frontend/src/components/HiddenAdminTrigger.tsx",
+          "operation": "delete",
+          "description": "Delete the HiddenAdminTrigger component file entirely as it is no longer needed after the tooth logo replaces it in the Footer."
+        }
+      ]
+    },
+    {
+      "id": "REQ-63",
+      "summary": "Consolidate Admin Dashboard to display appointments table with auto-refresh, clinic status toggle, and service manager CMS in a single accessible view",
+      "acceptanceCriteria": [
+        "Admin Dashboard page shows all booked appointments in a table with Patient Name, Phone Number, Service, and Date/Time columns.",
+        "Appointments table auto-refreshes without page reload using React Query polling.",
+        "Clinic Status toggle (Open/Closed/Emergency) is present on the dashboard and updates the public-facing banner/modal in real time.",
+        "Service Manager CMS section is present on the dashboard (or accessible via a tab/link within the admin panel) with editable name, description, and photo upload for all 5 premium services.",
+        "Changes to service data persist in the backend and are reflected on the public service cards and detail pages."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/admin/Dashboard.tsx",
+          "operation": "modify",
+          "description": "Consolidate the Admin Dashboard to display all three required admin capabilities in a single page view: (1) Appointments table with columns Patient Name, Phone Number, Service, Date/Time using the getAllAppointments query with refetchInterval set to 10 seconds or less for auto-refresh polling; (2) Clinic Status toggle (Open/Closed/Emergency) using the clinic status query and mutation to control the public-facing banner/modal; (3) Service Manager CMS section (or tabbed/linked navigation within the admin panel) allowing the admin to edit display name, description, and upload/replace the featured photo for each of the 5 premium services (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry). Ensure all sections are accessible from the dashboard without requiring separate page navigations. Use the authorization component to guard admin-only access. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Ensure the getAllAppointments query hook supports a refetchInterval option (≤10 seconds) to enable auto-refresh polling for the appointments table on the admin dashboard. Confirm the clinic status query and mutation hooks are available and properly configured to update the public-facing ClinicStatusBanner in real time. Verify all service-related query hooks support fetching and updating service data (name, description, photo) for the CMS section."
+        },
+        {
+          "path": "frontend/src/pages/admin/ServiceManager.tsx",
+          "operation": "modify",
+          "description": "Ensure the ServiceManager component provides a form interface to edit display name, description, and upload/replace the featured photo for each of the 5 premium services. Use the blob-storage component to handle photo uploads with progress tracking. Confirm changes persist in the backend via the addOrUpdateService mutation and are immediately reflected on public-facing service cards and detail pages. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-64",
+      "summary": "Audit and confirm the BookAppointmentDialog is fully frictionless with no Internet Identity login prompt, no auth check, and displays inline confirmation on success",
+      "acceptanceCriteria": [
+        "BookAppointmentDialog opens directly without any login prompt on all public pages.",
+        "Form contains Patient Name and Phone Number fields as required minimum.",
+        "No auth-gated logic, disabled state, or Internet Identity prompt exists anywhere in the booking flow.",
+        "On form submission, inline confirmation message appears inside the dialog.",
+        "All 'Book Appointment' / 'Book Now' buttons on Home, HeroSection, and all 5 service detail pages open the frictionless dialog directly."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/BookAppointmentDialog.tsx",
           "operation": "modify",
-          "description": "Remove all authentication checks and Internet Identity dependencies from the booking dialog. Replace the existing authenticated booking flow with a fully anonymous form containing exactly four fields: Patient Name (text input), Phone Number (tel input), Service (dropdown select populated from backend via useGetAllServices), and Preferred Date (date picker). Update the useBookAppointment mutation hook call to use an anonymous actor instead of an authenticated one. On successful form submission, display an inline 'Thank You! Your appointment has been booked. We will contact you shortly.' confirmation message inside the dialog without redirecting or closing the modal. Add client-side validation to disable the submit button when Name or Phone Number is empty, showing inline validation messages. Remove any conditional rendering that gates the form behind isAuthenticated checks."
+          "description": "Audit the BookAppointmentDialog component to ensure it is fully frictionless: remove any Internet Identity login prompt, auth check, or disabled state tied to authentication. Confirm the form contains at minimum Patient Name (text input) and Phone Number (tel input) fields. Service (dropdown) and Preferred Date (date picker) fields may remain if already present. On successful submission, display an inline confirmation message inside the dialog: 'Thank You! Your appointment has been booked. We will contact you shortly.' Do not redirect the user. Ensure the bookAppointment backend capability is called without any authentication requirement."
         },
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/pages/Home.tsx",
           "operation": "modify",
-          "description": "Update the useBookAppointment mutation hook to create and use an anonymous actor (via createActor with AnonymousIdentity) instead of requiring the authenticated actor from useActor. Ensure the mutation calls backend.bookAppointment with the four required parameters: patientName, contactInfo, preferredDate, and serviceType. Remove any authentication or identity requirements from this mutation hook so it works for unauthenticated users."
-        }
-      ]
-    },
-    {
-      "id": "REQ-51",
-      "summary": "Remove all authentication gates from 'Book Appointment' buttons across all public-facing pages so the frictionless booking form opens immediately for any user",
-      "acceptanceCriteria": [
-        "No 'Book Appointment' button on any public page shows a login prompt or requires authentication.",
-        "All 'Book Appointment' / 'Book Now' buttons across HeroSection, Header, and all service detail pages open the frictionless BookAppointmentDialog directly.",
-        "Unauthenticated users can open and submit the booking form without being redirected or prompted to log in."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/HeroSection.tsx",
-          "operation": "modify",
-          "description": "Remove any conditional logic that gates the 'Book Appointment' button behind authentication checks. Ensure the button always renders and directly opens the BookAppointmentDialog component when clicked, regardless of user authentication status."
-        },
-        {
-          "path": "frontend/src/components/Header.tsx",
-          "operation": "modify",
-          "description": "Remove any authentication gates or conditional rendering around the 'Book Appointment' button in the header navigation. Ensure the button is always visible and directly opens the BookAppointmentDialog when clicked, without checking isAuthenticated or prompting for login."
+          "description": "Confirm all 'Book Appointment' or 'Book Now' buttons on the Home page (including those in the HeroSection component) open the BookAppointmentDialog directly without any authentication step. Verify no login prompt or auth check is triggered before the dialog opens."
         },
         {
           "path": "frontend/src/pages/DentalImplantsDetail.tsx",
           "operation": "modify",
-          "description": "Remove any authentication checks or login prompts from the 'Book Appointment' / 'Book Now' buttons on the Dental Implants detail page. Ensure all booking buttons directly open the frictionless BookAppointmentDialog without requiring user authentication."
+          "description": "Confirm the 'Book Appointment' or 'Book Now' button on the DentalImplantsDetail page opens the BookAppointmentDialog directly without any authentication step. Verify no login prompt or auth check is triggered before the dialog opens."
         },
         {
           "path": "frontend/src/pages/InvisalignDetail.tsx",
           "operation": "modify",
-          "description": "Remove any authentication gates from the 'Book Appointment' / 'Book Now' buttons on the Invisalign detail page. Ensure the buttons directly open the frictionless BookAppointmentDialog for all users, authenticated or not."
+          "description": "Confirm the 'Book Appointment' or 'Book Now' button on the InvisalignDetail page opens the BookAppointmentDialog directly without any authentication step. Verify no login prompt or auth check is triggered before the dialog opens."
         },
         {
           "path": "frontend/src/pages/LaserDentistryDetail.tsx",
           "operation": "modify",
-          "description": "Remove any authentication checks from the 'Book Appointment' / 'Book Now' buttons on the Laser Dentistry detail page. Ensure the booking dialog opens immediately when clicked, without requiring login or identity verification."
+          "description": "Confirm the 'Book Appointment' or 'Book Now' button on the LaserDentistryDetail page opens the BookAppointmentDialog directly without any authentication step. Verify no login prompt or auth check is triggered before the dialog opens."
         },
         {
           "path": "frontend/src/pages/PediatricDentistryDetail.tsx",
           "operation": "modify",
-          "description": "Remove any authentication gates from the 'Book Appointment' / 'Book Now' buttons on the Pediatric Dentistry detail page. Ensure the frictionless BookAppointmentDialog opens directly when the button is clicked, regardless of authentication status."
+          "description": "Confirm the 'Book Appointment' or 'Book Now' button on the PediatricDentistryDetail page opens the BookAppointmentDialog directly without any authentication step. Verify no login prompt or auth check is triggered before the dialog opens."
         },
         {
           "path": "frontend/src/pages/SmileMakeoverDetail.tsx",
           "operation": "modify",
-          "description": "Remove any authentication checks from the 'Book Appointment' / 'Book Now' buttons on the Smile Makeover detail page. Ensure all booking buttons open the frictionless BookAppointmentDialog immediately without requiring user login."
+          "description": "Confirm the 'Book Appointment' or 'Book Now' button on the SmileMakeoverDetail page opens the BookAppointmentDialog directly without any authentication step. Verify no login prompt or auth check is triggered before the dialog opens."
         },
         {
-          "path": "frontend/src/pages/ServiceDetail.tsx",
+          "path": "frontend/src/components/HeroSection.tsx",
           "operation": "modify",
-          "description": "Remove any authentication gates from the 'Book Appointment' / 'Book Now' buttons on the generic ServiceDetail page. Ensure the booking dialog opens directly when clicked, without checking authentication status or prompting for login."
+          "description": "Confirm the 'Book Appointment' or 'Book Now' button in the HeroSection component opens the BookAppointmentDialog directly without any authentication step. Verify no login prompt or auth check is triggered before the dialog opens."
+        }
+      ]
+    },
+    {
+      "id": "REQ-65",
+      "summary": "Confirm the 'XYZ Dental Clinic' brand name in the Header triggers window.location.reload() on click with no router navigation and unchanged visual styling",
+      "acceptanceCriteria": [
+        "Clicking the 'XYZ Dental Clinic' brand name in the Header causes a full page reload.",
+        "No router Link or navigation event fires on brand name click.",
+        "Brand name visual appearance (color, font, weight) is unchanged."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Ensure the 'XYZ Dental Clinic' brand name element in the Header triggers window.location.reload() on click. Remove any router Link or navigation event handler from the brand name element and replace it with an onClick handler that calls window.location.reload(). Confirm the visual styling of the brand name (color, font, weight) remains unchanged and no underline appears on hover."
+        }
+      ]
+    },
+    {
+      "id": "REQ-66",
+      "summary": "Confirm the custom cursor follower (circle, trail, 'View' text expansion) is fully removed from the site and the browser's native OS cursor is active",
+      "acceptanceCriteria": [
+        "No cursor circle, trail, or 'View' text element appears anywhere on the site.",
+        "Body and html elements do not have cursor: none applied.",
+        "The browser's default system cursor is visible and functional across all pages."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/CustomCursor.tsx",
+          "operation": "modify",
+          "description": "Confirm the CustomCursor component is empty or disabled and does not render any cursor follower elements (circle, trail, 'View' text). If the component still contains any active logic, remove it entirely or ensure it returns null."
+        },
+        {
+          "path": "frontend/src/context/CursorContext.tsx",
+          "operation": "modify",
+          "description": "Confirm the CursorContext file is empty or does not inject any cursor overrides into the application. If any context provider or cursor logic remains, remove it entirely or ensure it does nothing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Confirm the App.tsx file does not import or render the CustomCursor component or CursorContext provider. If any references remain, remove them entirely."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Audit the global CSS file to ensure no CSS rule sets cursor: none on body or html elements. Remove any such rule if present. Confirm the browser's native OS cursor is active and visible across the entire site."
+        }
+      ]
+    },
+    {
+      "id": "REQ-67",
+      "summary": "Confirm and enforce the animated mesh gradient background throughout the entire site with a 15-20 second continuous CSS animation loop",
+      "acceptanceCriteria": [
+        "A slow-moving mesh gradient background is visible on all pages (home, detail pages, and admin pages).",
+        "The gradient cycles through light white, pale silver, and soft blue shades continuously.",
+        "The animation loop duration is between 15 and 20 seconds.",
+        "The background does not obscure any text or interactive elements."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Confirm the animated mesh gradient background is defined in the global CSS and applied to the body or html element. The gradient must shift subtly between very light white, pale silver, and soft blue shades over a 15-20 second continuous CSS animation loop. Ensure the background is applied at the root layout level so it appears behind all page content on every page (home, detail pages, admin pages) without obscuring text or interactive elements."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Confirm the App.tsx root layout does not override or block the global animated mesh gradient background. Ensure all child pages and components inherit the background from the root layout."
+        }
+      ]
+    },
+    {
+      "id": "REQ-68",
+      "summary": "Confirm and enforce scroll-triggered reveal animations site-wide: text sections fade in and slide up, images zoom in and fade in using IntersectionObserver",
+      "acceptanceCriteria": [
+        "Text content in all major sections fades in and slides up as the section enters the viewport.",
+        "Images in all major sections animate from scale(0.85)/opacity-0 to full size/opacity-1 on scroll entry.",
+        "Each element's animation triggers only once per page load via IntersectionObserver.",
+        "Animations are present on ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider, ContactSection, and service detail page sections."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useScrollReveal.ts",
+          "operation": "modify",
+          "description": "Confirm the useScrollReveal hook uses IntersectionObserver to toggle an isVisible flag once an element enters the viewport. Ensure the hook triggers only once per element per page load. Verify the hook is available and correctly implemented for use in all major sections."
+        },
+        {
+          "path": "frontend/src/components/ServicesGrid.tsx",
+          "operation": "modify",
+          "description": "Confirm scroll-triggered reveal animations are applied to text and image elements in the ServicesGrid component. Text sections must fade in and slide up when entering the viewport. Images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use the useScrollReveal hook or equivalent IntersectionObserver logic."
+        },
+        {
+          "path": "frontend/src/components/DoctorProfile.tsx",
+          "operation": "modify",
+          "description": "Confirm scroll-triggered reveal animations are applied to text and image elements in the DoctorProfile component. Text sections must fade in and slide up when entering the viewport. Images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use the useScrollReveal hook or equivalent IntersectionObserver logic."
+        },
+        {
+          "path": "frontend/src/components/TestimonialCarousel.tsx",
+          "operation": "modify",
+          "description": "Confirm scroll-triggered reveal animations are applied to text and image elements in the TestimonialCarousel component. Text sections must fade in and slide up when entering the viewport. Images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use the useScrollReveal hook or equivalent IntersectionObserver logic."
+        },
+        {
+          "path": "frontend/src/components/BeforeAfterSlider.tsx",
+          "operation": "modify",
+          "description": "Confirm scroll-triggered reveal animations are applied to text and image elements in the BeforeAfterSlider component. Text sections must fade in and slide up when entering the viewport. Images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use the useScrollReveal hook or equivalent IntersectionObserver logic."
+        },
+        {
+          "path": "frontend/src/components/ContactSection.tsx",
+          "operation": "modify",
+          "description": "Confirm scroll-triggered reveal animations are applied to text and image elements in the ContactSection component. Text sections must fade in and slide up when entering the viewport. Images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use the useScrollReveal hook or equivalent IntersectionObserver logic."
+        },
+        {
+          "path": "frontend/src/pages/DentalImplantsDetail.tsx",
+          "operation": "modify",
+          "description": "Confirm scroll-triggered reveal animations are applied to text and image elements in the DentalImplantsDetail page sections. Text sections must fade in and slide up when entering the viewport. Images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use the useScrollReveal hook or equivalent IntersectionObserver logic."
+        },
+        {
+          "path": "frontend/src/pages/InvisalignDetail.tsx",
+          "operation": "modify",
+          "description": "Confirm scroll-triggered reveal animations are applied to text and image elements in the InvisalignDetail page sections. Text sections must fade in and slide up when entering the viewport. Images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use the useScrollReveal hook or equivalent IntersectionObserver logic."
+        },
+        {
+          "path": "frontend/src/pages/LaserDentistryDetail.tsx",
+          "operation": "modify",
+          "description": "Confirm scroll-triggered reveal animations are applied to text and image elements in the LaserDentistryDetail page sections. Text sections must fade in and slide up when entering the viewport. Images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use the useScrollReveal hook or equivalent IntersectionObserver logic."
+        },
+        {
+          "path": "frontend/src/pages/PediatricDentistryDetail.tsx",
+          "operation": "modify",
+          "description": "Confirm scroll-triggered reveal animations are applied to text and image elements in the PediatricDentistryDetail page sections. Text sections must fade in and slide up when entering the viewport. Images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use the useScrollReveal hook or equivalent IntersectionObserver logic."
+        },
+        {
+          "path": "frontend/src/pages/SmileMakeoverDetail.tsx",
+          "operation": "modify",
+          "description": "Confirm scroll-triggered reveal animations are applied to text and image elements in the SmileMakeoverDetail page sections. Text sections must fade in and slide up when entering the viewport. Images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use the useScrollReveal hook or equivalent IntersectionObserver logic."
+        }
+      ]
+    },
+    {
+      "id": "REQ-69",
+      "summary": "Confirm the interactive Before/After drag slider (BeforeAfterSlider component) is prominently displayed in a dedicated 'Results Gallery' section on the Home page",
+      "acceptanceCriteria": [
+        "A Before/After slider is present and visible in a results/gallery section on the Home page.",
+        "Users can click-drag and touch-drag the divider handle to reveal before and after images.",
+        "The slider uses backend data if available, or falls back to static dental treatment image pairs.",
+        "The section is labeled (e.g., 'Treatment Results' or 'Before & After')."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Confirm the BeforeAfterSlider component is included in a dedicated 'Results Gallery' or 'Before & After' section on the Home page. The section must be prominently displayed without requiring too much scrolling and be clearly labeled. Ensure the slider component is properly wired into the Home page layout."
+        },
+        {
+          "path": "frontend/src/components/BeforeAfterSlider.tsx",
+          "operation": "modify",
+          "description": "Confirm the BeforeAfterSlider component supports mouse drag and touch drag to reveal before (left) and after (right) dental treatment images. Use backend-stored before/after pairs via the getAllBeforeAfterPairs query if available, otherwise fall back to static example image pairs. Ensure the component is interactive and functional."
+        }
+      ]
+    },
+    {
+      "id": "REQ-70",
+      "summary": "Confirm and enforce the soft glow hover effect on all 5 premium service cards in the ServicesGrid with lift and box-shadow glow",
+      "acceptanceCriteria": [
+        "All 5 premium service cards lift upward (translateY negative) on hover.",
+        "All 5 premium service cards emit a teal or royal-blue box-shadow glow on hover.",
+        "Hover transition is smooth (~300ms) both on enter and exit.",
+        "Existing card-specific animations (3D rotation on Dental Implants, scan line on Laser Dentistry, etc.) remain functional alongside the glow/lift effect."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ServicesGrid.tsx",
+          "operation": "modify",
+          "description": "Confirm and enforce the soft glow hover effect on all 5 premium service cards (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry). On mouse hover, each card must lift slightly (translateY(-6px) to -8px) and emit a gentle box-shadow glow using the site's teal or royal-blue accent color. The lift and glow must transition smoothly in and out with a CSS transition of approximately 300ms. Ensure this effect coexists with each card's existing specific animation (3D rotation, scan line, etc.)."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Confirm the Tailwind configuration includes custom glow box-shadow utilities using the site's teal or royal-blue accent colors. Ensure the glow utilities are available for use in the ServicesGrid component hover effects."
         }
       ]
     }

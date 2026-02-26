@@ -1,160 +1,93 @@
-import React, { useState, useRef, useCallback } from 'react';
-import HiddenAdminLoginModal from './HiddenAdminLoginModal';
+import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import BookAppointmentDialog from './BookAppointmentDialog';
 
 export default function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [adminModalOpen, setAdminModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [bookingOpen, setBookingOpen] = useState(false);
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleLogoMouseDown = useCallback(() => {
-    longPressTimer.current = setTimeout(() => {
-      setAdminModalOpen(true);
-    }, 3000);
-  }, []);
-
-  const handleLogoMouseUp = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  }, []);
-
-  const handleLogoTouchStart = useCallback(() => {
-    longPressTimer.current = setTimeout(() => {
-      setAdminModalOpen(true);
-    }, 3000);
-  }, []);
-
-  const handleLogoTouchEnd = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  }, []);
-
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-    setMobileMenuOpen(false);
-  };
+  const navLinks = [
+    { label: 'Home', path: '/' },
+    { label: 'Services', path: '/#services' },
+    { label: 'About', path: '/#about' },
+    { label: 'Contact', path: '/#contact' },
+  ];
 
   return (
-    <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo with long-press trigger */}
-            <div
-              className="flex items-center gap-2 cursor-pointer select-none"
-              onMouseDown={handleLogoMouseDown}
-              onMouseUp={handleLogoMouseUp}
-              onMouseLeave={handleLogoMouseUp}
-              onTouchStart={handleLogoTouchStart}
-              onTouchEnd={handleLogoTouchEnd}
-              onTouchCancel={handleLogoTouchEnd}
-              onClick={() => scrollTo('hero')}
+    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Brand Name - clicking causes full page reload */}
+        <button
+          onClick={() => window.location.reload()}
+          className="text-xl font-bold text-teal-700 font-playfair hover:text-teal-600 transition-colors focus:outline-none cursor-pointer"
+          style={{ background: 'none', border: 'none', padding: 0 }}
+        >
+          XYZ Dental Clinic
+        </button>
+
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-6">
+          {navLinks.map((link) => (
+            <a
+              key={link.path}
+              href={link.path}
+              className="text-slate-600 hover:text-teal-600 transition-colors text-sm font-medium"
             >
-              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M12 2C9.5 2 7 4 7 7c0 1.5.5 3 1 4.5C8.5 13 9 15 9 17c0 2 1 4 3 4s3-2 3-4c0-2 .5-4 1-5.5.5-1.5 1-3 1-4.5C17 4 14.5 2 12 2z"
-                    fill="white"
-                  />
-                </svg>
-              </div>
-              <span className="font-bold text-xl text-foreground">Dr. Smile</span>
-            </div>
+              {link.label}
+            </a>
+          ))}
+        </nav>
 
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-6">
-              {[
-                { label: 'Home', id: 'hero' },
-                { label: 'Services', id: 'services' },
-                { label: 'Doctor', id: 'doctor' },
-                { label: 'Gallery', id: 'gallery' },
-                { label: 'Reviews', id: 'reviews' },
-                { label: 'Contact', id: 'contact' },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => scrollTo(item.id)}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-
-            {/* Book Button */}
-            <div className="hidden md:flex items-center gap-3">
-              <button
-                onClick={() => setBookingOpen(true)}
-                className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
-              >
-                Book Appointment
-              </button>
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                {mobileMenuOpen ? (
-                  <path d="M18 6L6 18M6 6l12 12" />
-                ) : (
-                  <path d="M3 12h18M3 6h18M3 18h18" />
-                )}
-              </svg>
-            </button>
-          </div>
+        {/* Book Appointment Button */}
+        <div className="hidden md:block">
+          <button
+            onClick={() => setBookingOpen(true)}
+            className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-full text-sm font-semibold transition-colors shadow-md"
+          >
+            Book Appointment
+          </button>
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-background/95 backdrop-blur-md border-t border-border/40 px-4 py-4 space-y-3">
-            {[
-              { label: 'Home', id: 'hero' },
-              { label: 'Services', id: 'services' },
-              { label: 'Doctor', id: 'doctor' },
-              { label: 'Gallery', id: 'gallery' },
-              { label: 'Reviews', id: 'reviews' },
-              { label: 'Contact', id: 'contact' },
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollTo(item.id)}
-                className="block w-full text-left text-sm font-medium text-muted-foreground hover:text-foreground py-2"
-              >
-                {item.label}
-              </button>
-            ))}
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setBookingOpen(true);
-              }}
-              className="w-full px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold"
-            >
-              Book Appointment
-            </button>
-          </div>
-        )}
-      </header>
+        {/* Mobile Menu Toggle */}
+        <button
+          className="md:hidden text-slate-600 hover:text-teal-600 transition-colors"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {mobileMenuOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
+      </div>
 
-      <HiddenAdminLoginModal open={adminModalOpen} onOpenChange={setAdminModalOpen} />
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-white border-t border-slate-200 px-4 py-4 space-y-3">
+          {navLinks.map((link) => (
+            <a
+              key={link.path}
+              href={link.path}
+              className="block text-slate-600 hover:text-teal-600 transition-colors text-sm font-medium py-1"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {link.label}
+            </a>
+          ))}
+          <button
+            onClick={() => { setBookingOpen(true); setMobileMenuOpen(false); }}
+            className="w-full bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-full text-sm font-semibold transition-colors"
+          >
+            Book Appointment
+          </button>
+        </div>
+      )}
+
       <BookAppointmentDialog open={bookingOpen} onOpenChange={setBookingOpen} />
-    </>
+    </header>
   );
 }

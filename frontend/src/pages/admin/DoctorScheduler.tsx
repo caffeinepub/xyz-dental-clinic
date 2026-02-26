@@ -16,8 +16,8 @@ export default function DoctorScheduler() {
       return;
     }
     try {
-      await addDoctor.mutateAsync({ name: form.name, specialty: form.specialty, availability: [] });
-      toast.success('Doctor added successfully');
+      await addDoctor.mutateAsync({ name: form.name, specialty: form.specialty });
+      toast.success('Doctor added successfully!');
       setForm({ name: '', specialty: '' });
     } catch {
       toast.error('Failed to add doctor');
@@ -25,68 +25,84 @@ export default function DoctorScheduler() {
   };
 
   return (
-    <div className="min-h-screen p-6 md:p-10">
+    <div className="min-h-screen p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
-          <button onClick={() => navigate({ to: '/admin/dashboard' })} className="text-white/60 hover:text-white transition-colors">
+          <button
+            onClick={() => navigate({ to: '/admin/dashboard' })}
+            className="text-slate-500 hover:text-slate-800 transition-colors"
+          >
             ← Back
           </button>
-          <h1 className="text-3xl font-bold text-white">Doctor Scheduler</h1>
+          <h1 className="text-3xl font-bold text-slate-800 font-playfair">Doctor Scheduler</h1>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Add Doctor Form */}
-          <div className="glass-card rounded-2xl p-6">
-            <h2 className="text-white font-semibold text-lg mb-5">Add New Doctor</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Add Doctor Form */}
+        <div className="glass-card rounded-2xl p-6 mb-8">
+          <h2 className="text-lg font-semibold text-slate-800 mb-4">Add New Doctor</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-white/70 text-sm mb-1.5">Doctor Name</label>
+                <label className="block text-slate-600 text-sm mb-1.5">Doctor Name</label>
                 <input
                   type="text"
                   value={form.name}
-                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="Dr. Full Name"
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-teal-400/60 transition-colors"
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-400 transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-white/70 text-sm mb-1.5">Specialty</label>
+                <label className="block text-slate-600 text-sm mb-1.5">Specialty</label>
                 <input
                   type="text"
                   value={form.specialty}
-                  onChange={e => setForm(f => ({ ...f, specialty: e.target.value }))}
+                  onChange={(e) => setForm((f) => ({ ...f, specialty: e.target.value }))}
                   placeholder="e.g. Orthodontics"
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-teal-400/60 transition-colors"
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-400 transition-colors"
                 />
               </div>
-              <button
-                type="submit"
-                disabled={addDoctor.isPending}
-                className="w-full py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-white font-semibold transition-colors disabled:opacity-50"
-              >
-                {addDoctor.isPending ? 'Adding...' : 'Add Doctor'}
-              </button>
-            </form>
-          </div>
+            </div>
+            <button
+              type="submit"
+              disabled={addDoctor.isPending}
+              className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-full transition-colors disabled:opacity-50"
+            >
+              {addDoctor.isPending ? 'Adding...' : 'Add Doctor'}
+            </button>
+          </form>
+        </div>
 
-          {/* Doctor List */}
-          <div className="glass-card rounded-2xl p-6">
-            <h2 className="text-white font-semibold text-lg mb-5">Current Doctors</h2>
-            {isLoading ? (
-              <p className="text-white/50 text-sm">Loading...</p>
-            ) : !doctors || doctors.length === 0 ? (
-              <p className="text-white/50 text-sm">No doctors added yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {doctors.map(doc => (
-                  <div key={String(doc.id)} className="glass-card rounded-xl p-4">
-                    <p className="text-white font-medium">{doc.name}</p>
-                    <p className="text-teal-300 text-sm">{doc.specialty}</p>
+        {/* Doctors List */}
+        <div className="glass-card rounded-2xl p-6">
+          <h2 className="text-lg font-semibold text-slate-800 mb-4">
+            Doctors ({doctors?.length ?? 0})
+          </h2>
+          {isLoading ? (
+            <div className="text-center py-8 text-slate-400">Loading...</div>
+          ) : !doctors || doctors.length === 0 ? (
+            <div className="text-center py-8 text-slate-400">
+              <div className="text-4xl mb-3">👨‍⚕️</div>
+              <p>No doctors added yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {doctors.map((doctor) => (
+                <div
+                  key={String(doctor.id)}
+                  className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100"
+                >
+                  <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-teal-700 font-bold">
+                    {doctor.name.charAt(0)}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  <div>
+                    <p className="font-semibold text-slate-800">{doctor.name}</p>
+                    <p className="text-slate-500 text-sm">{doctor.specialty}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

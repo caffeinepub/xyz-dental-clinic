@@ -1,150 +1,135 @@
-import React, { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import BackgroundParticles from '@/components/BackgroundParticles';
-import BookAppointmentDialog from '@/components/BookAppointmentDialog';
-import ZoomInImage from '@/components/ZoomInImage';
-import TypewriterText from '@/components/TypewriterText';
-import { useGetService } from '@/hooks/useQueries';
+import { useState } from 'react';
+import BookAppointmentDialog from '../components/BookAppointmentDialog';
+import { useScrollReveal } from '../hooks/useScrollReveal';
+
+function RevealSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function RevealImage({ src, alt, className = '' }: { src: string; alt: string; className?: string }) {
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ${
+        isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+      } ${className}`}
+    >
+      <img src={src} alt={alt} className="w-full rounded-2xl shadow-xl object-cover" />
+    </div>
+  );
+}
 
 export default function PediatricDentistryDetail() {
-  const navigate = useNavigate();
-  const { data: service } = useGetService('pediatric-dentistry');
   const [bookingOpen, setBookingOpen] = useState(false);
 
-  const title = service?.displayName || 'Pediatric Dentistry';
-  const description =
-    service?.description ||
-    'Fun, fear-free dental care designed especially for children aged 1–16.';
-  const imageUrl =
-    service?.featuredPhoto?.getDirectURL() ||
-    '/assets/generated/pediatric-dentistry-icon.dim_600x400.png';
-
-  const benefits = [
-    'Child-friendly, anxiety-free environment',
-    'Gentle techniques designed for young patients',
-    'Preventive care to build healthy habits early',
-    'Fun, colorful treatment rooms kids love',
-    'Experienced pediatric dental specialists',
-    'Parent education and guidance included',
-  ];
-
-  const steps = [
-    { step: '01', title: 'Warm Welcome', desc: 'Fun introduction to the clinic with child-friendly tools.' },
-    { step: '02', title: 'Gentle Examination', desc: 'Thorough but gentle check-up using kid-safe instruments.' },
-    { step: '03', title: 'Digital X-Rays', desc: 'Low-radiation digital X-rays for accurate diagnosis.' },
-    { step: '04', title: 'Cleaning & Fluoride', desc: 'Professional cleaning and fluoride treatment.' },
-    { step: '05', title: 'Fun Reward', desc: 'Sticker, prize, and take-home care kit for every visit.' },
+  const features = [
+    'Child-friendly environment',
+    'Gentle, patient approach',
+    'Preventive care focus',
+    'Fun and stress-free visits',
+    'Early orthodontic assessment',
+    'Fluoride treatments',
   ];
 
   return (
-    <div className="relative min-h-screen bg-background overflow-hidden">
-      <BackgroundParticles />
-
-      {/* Floating bubbles */}
-      {[...Array(8)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            width: `${12 + (i % 4) * 8}px`,
-            height: `${12 + (i % 4) * 8}px`,
-            left: `${5 + i * 12}%`,
-            bottom: 0,
-            background: 'rgba(20,184,166,0.15)',
-            animation: `bubbleRise ${3 + i * 0.5}s ease-in infinite`,
-            animationDelay: `${i * 0.4}s`,
-          }}
-        />
-      ))}
-
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <button
-          onClick={() => navigate({ to: '/' })}
-          className="text-muted-foreground hover:text-foreground transition-colors mb-8 flex items-center gap-2"
-        >
-          ← Back to Home
-        </button>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16 items-center">
-          <div>
-            <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
-              Kids Dentistry
-            </div>
-            <TypewriterText
-              text={title}
-              tag="h1"
-              className="text-4xl font-bold text-foreground mb-4"
-              speed={40}
-            />
-            <p className="text-muted-foreground text-lg leading-relaxed mb-6">{description}</p>
+    <div className="min-h-screen">
+      {/* Hero */}
+      <section className="relative py-24 px-4 bg-gradient-to-br from-orange-800 to-yellow-900 text-white overflow-hidden">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <RevealSection>
+            <span className="text-yellow-400 font-semibold text-sm uppercase tracking-wider">Kids Dentistry</span>
+            <h1 className="text-5xl font-bold font-playfair mt-2 mb-4">Pediatric Dentistry</h1>
+            <p className="text-slate-200 text-lg leading-relaxed mb-6">
+              Making dental visits fun and stress-free for your little ones. We create positive
+              experiences that last a lifetime.
+            </p>
             <button
               onClick={() => setBookingOpen(true)}
-              className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+              className="bg-yellow-500 hover:bg-yellow-400 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all hover:-translate-y-1 shadow-lg"
             >
               Book Kids Appointment
             </button>
-          </div>
-          <ZoomInImage src={imageUrl} alt={title} className="rounded-2xl shadow-xl" />
-        </div>
-
-        {/* Benefits */}
-        <div className="glass-card rounded-2xl p-8 mb-10 border border-border/40">
-          <TypewriterText
-            text="Why Kids Love Us"
-            tag="h2"
-            className="text-2xl font-bold text-foreground mb-6"
-            speed={35}
+          </RevealSection>
+          <RevealImage
+            src="/assets/generated/pediatric-dentistry-icon.dim_600x400.png"
+            alt="Pediatric Dentistry"
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {benefits.map((b, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <span className="text-primary mt-0.5">✓</span>
-                <span className="text-muted-foreground">{b}</span>
-              </div>
-            ))}
-          </div>
         </div>
+      </section>
 
-        {/* Process */}
-        <div className="mb-10">
-          <TypewriterText
-            text="What to Expect"
-            tag="h2"
-            className="text-2xl font-bold text-foreground mb-6"
-            speed={35}
-          />
-          <div className="space-y-4">
-            {steps.map((s) => (
-              <div
-                key={s.step}
-                className="glass-card rounded-xl p-5 border border-border/40 flex gap-4 items-start"
-              >
-                <span className="text-primary font-bold text-lg shrink-0">{s.step}</span>
-                <div>
-                  <h3 className="font-semibold text-foreground">{s.title}</h3>
-                  <p className="text-muted-foreground text-sm mt-1">{s.desc}</p>
+      {/* Features */}
+      <section className="py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <RevealSection className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-800 font-playfair">Our Approach to Kids' Care</h2>
+          </RevealSection>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {features.map((feature, i) => (
+              <RevealSection key={i}>
+                <div className="glass-card rounded-xl p-4 flex items-center gap-3">
+                  <span className="text-yellow-500 text-xl">⭐</span>
+                  <span className="text-slate-700 font-medium">{feature}</span>
                 </div>
-              </div>
+              </RevealSection>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* CTA */}
-        <div className="text-center glass-card rounded-2xl p-8 border border-border/40">
-          <h2 className="text-2xl font-bold text-foreground mb-3">Make Dental Visits Fun! 🎉</h2>
-          <p className="text-muted-foreground mb-6">
-            Book your child's first appointment and start a lifetime of healthy smiles.
-          </p>
+      {/* Fun Section */}
+      <section className="py-20 px-4 bg-yellow-50">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <RevealImage
+            src="/assets/generated/kids-tooth-cartoon.dim_200x200.png"
+            alt="Kids Dental Care"
+            className="max-w-xs mx-auto"
+          />
+          <RevealSection>
+            <h2 className="text-3xl font-bold text-slate-800 font-playfair mb-4">
+              Building Healthy Habits Early
+            </h2>
+            <p className="text-slate-600 leading-relaxed mb-4">
+              We believe that positive early dental experiences set the foundation for a lifetime
+              of good oral health. Our team is specially trained to work with children of all ages.
+            </p>
+            <p className="text-slate-600 leading-relaxed">
+              From the first tooth to teenage years, we're here to guide your child's dental journey
+              with care, patience, and a smile.
+            </p>
+          </RevealSection>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-4 bg-orange-600 text-white text-center">
+        <RevealSection>
+          <h2 className="text-3xl font-bold font-playfair mb-4">Book Your Child's First Visit</h2>
+          <p className="text-orange-100 mb-8 text-lg">We make it fun, we make it easy.</p>
           <button
             onClick={() => setBookingOpen(true)}
-            className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+            className="bg-white text-orange-600 hover:bg-orange-50 px-8 py-4 rounded-full text-lg font-semibold transition-all hover:-translate-y-1 shadow-lg"
           >
-            Book Kids Appointment
+            Book Now
           </button>
-        </div>
-      </div>
+        </RevealSection>
+      </section>
 
-      <BookAppointmentDialog open={bookingOpen} onOpenChange={setBookingOpen} />
+      <BookAppointmentDialog
+        open={bookingOpen}
+        onOpenChange={setBookingOpen}
+        defaultService="Pediatric Dentistry"
+      />
     </div>
   );
 }

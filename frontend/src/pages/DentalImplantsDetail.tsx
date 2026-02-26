@@ -1,132 +1,140 @@
-import React, { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import BackgroundParticles from '@/components/BackgroundParticles';
-import BookAppointmentDialog from '@/components/BookAppointmentDialog';
-import ZoomInImage from '@/components/ZoomInImage';
-import TypewriterText from '@/components/TypewriterText';
-import { useGetService } from '@/hooks/useQueries';
+import { useState } from 'react';
+import BookAppointmentDialog from '../components/BookAppointmentDialog';
+import { useScrollReveal } from '../hooks/useScrollReveal';
+
+function RevealSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function RevealImage({ src, alt, className = '' }: { src: string; alt: string; className?: string }) {
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ${
+        isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+      } ${className}`}
+    >
+      <img src={src} alt={alt} className="w-full rounded-2xl shadow-xl object-cover" />
+    </div>
+  );
+}
 
 export default function DentalImplantsDetail() {
-  const navigate = useNavigate();
-  const { data: service } = useGetService('dental-implants');
   const [bookingOpen, setBookingOpen] = useState(false);
 
-  const title = service?.displayName || 'Advanced Dental Implants';
-  const description =
-    service?.description ||
-    'Permanent, natural-looking tooth replacement with titanium implants.';
-  const imageUrl =
-    service?.featuredPhoto?.getDirectURL() ||
-    '/assets/generated/dental-implant-diagram.dim_600x400.png';
-
   const benefits = [
-    'Permanent solution lasting 20+ years',
-    'Natural look and feel',
+    'Permanent, lifetime solution',
+    'Looks and feels like natural teeth',
     'Preserves jawbone density',
     'No adhesives or removal needed',
     'Improves speech and chewing',
-    'Easy maintenance like natural teeth',
+    '98% success rate',
   ];
 
   const steps = [
-    { step: '01', title: 'Consultation & 3D Scan', desc: 'Comprehensive examination with digital X-rays and 3D imaging.' },
-    { step: '02', title: 'Treatment Planning', desc: 'Custom implant placement plan using advanced software.' },
-    { step: '03', title: 'Implant Placement', desc: 'Titanium post surgically placed under local anesthesia.' },
-    { step: '04', title: 'Healing Period', desc: '3-6 months for osseointegration with the jawbone.' },
-    { step: '05', title: 'Crown Placement', desc: 'Custom ceramic crown attached for a perfect smile.' },
+    { step: '01', title: 'Consultation', desc: 'Comprehensive examination and 3D imaging to plan your implant.' },
+    { step: '02', title: 'Implant Placement', desc: 'Titanium post surgically placed into the jawbone under local anesthesia.' },
+    { step: '03', title: 'Osseointegration', desc: '3-6 months for the implant to fuse with your jawbone.' },
+    { step: '04', title: 'Crown Placement', desc: 'Custom-made crown attached for a perfect, natural-looking smile.' },
   ];
 
   return (
-    <div className="relative min-h-screen bg-background">
-      <BackgroundParticles />
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Back */}
-        <button
-          onClick={() => navigate({ to: '/' })}
-          className="text-muted-foreground hover:text-foreground transition-colors mb-8 flex items-center gap-2"
-        >
-          ← Back to Home
-        </button>
-
-        {/* Hero */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16 items-center">
-          <div>
-            <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
-              Premium Treatment
-            </div>
-            <TypewriterText
-              text={title}
-              tag="h1"
-              className="text-4xl font-bold text-foreground mb-4"
-              speed={40}
-            />
-            <p className="text-muted-foreground text-lg leading-relaxed mb-6">{description}</p>
+    <div className="min-h-screen">
+      {/* Hero */}
+      <section className="relative py-24 px-4 bg-gradient-to-br from-teal-900 to-slate-900 text-white overflow-hidden">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <RevealSection>
+            <span className="text-teal-400 font-semibold text-sm uppercase tracking-wider">Premium Service</span>
+            <h1 className="text-5xl font-bold font-playfair mt-2 mb-4">Dental Implants</h1>
+            <p className="text-slate-300 text-lg leading-relaxed mb-6">
+              The gold standard in tooth replacement. Permanent, natural-looking implants that restore
+              your smile and confidence for life.
+            </p>
             <button
               onClick={() => setBookingOpen(true)}
-              className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+              className="bg-teal-500 hover:bg-teal-400 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all hover:-translate-y-1 shadow-lg"
             >
               Book Consultation
             </button>
-          </div>
-          <ZoomInImage src={imageUrl} alt={title} className="rounded-2xl shadow-xl" />
-        </div>
-
-        {/* Benefits */}
-        <div className="glass-card rounded-2xl p-8 mb-10 border border-border/40">
-          <TypewriterText
-            text="Why Choose Dental Implants?"
-            tag="h2"
-            className="text-2xl font-bold text-foreground mb-6"
-            speed={35}
+          </RevealSection>
+          <RevealImage
+            src="/assets/generated/dental-implant-diagram.dim_600x400.png"
+            alt="Dental Implant Diagram"
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {benefits.map((b, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <span className="text-primary mt-0.5">✓</span>
-                <span className="text-muted-foreground">{b}</span>
-              </div>
-            ))}
-          </div>
         </div>
+      </section>
 
-        {/* Process */}
-        <div className="mb-10">
-          <TypewriterText
-            text="The Implant Process"
-            tag="h2"
-            className="text-2xl font-bold text-foreground mb-6"
-            speed={35}
-          />
-          <div className="space-y-4">
-            {steps.map((s) => (
-              <div
-                key={s.step}
-                className="glass-card rounded-xl p-5 border border-border/40 flex gap-4 items-start"
-              >
-                <span className="text-primary font-bold text-lg shrink-0">{s.step}</span>
-                <div>
-                  <h3 className="font-semibold text-foreground">{s.title}</h3>
-                  <p className="text-muted-foreground text-sm mt-1">{s.desc}</p>
+      {/* Benefits */}
+      <section className="py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <RevealSection className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-800 font-playfair">Why Choose Implants?</h2>
+          </RevealSection>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {benefits.map((benefit, i) => (
+              <RevealSection key={i}>
+                <div className="glass-card rounded-xl p-4 flex items-center gap-3">
+                  <span className="text-teal-500 text-xl">✓</span>
+                  <span className="text-slate-700 font-medium">{benefit}</span>
                 </div>
-              </div>
+              </RevealSection>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* CTA */}
-        <div className="text-center glass-card rounded-2xl p-8 border border-border/40">
-          <h2 className="text-2xl font-bold text-foreground mb-3">Ready to Restore Your Smile?</h2>
-          <p className="text-muted-foreground mb-6">Book a free consultation today and take the first step.</p>
+      {/* Process */}
+      <section className="py-20 px-4 bg-slate-50">
+        <div className="max-w-5xl mx-auto">
+          <RevealSection className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-800 font-playfair">The Process</h2>
+          </RevealSection>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {steps.map((s) => (
+              <RevealSection key={s.step}>
+                <div className="text-center">
+                  <div className="w-14 h-14 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                    {s.step}
+                  </div>
+                  <h3 className="font-bold text-slate-800 mb-2">{s.title}</h3>
+                  <p className="text-slate-500 text-sm">{s.desc}</p>
+                </div>
+              </RevealSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-4 bg-teal-700 text-white text-center">
+        <RevealSection>
+          <h2 className="text-3xl font-bold font-playfair mb-4">Ready to Restore Your Smile?</h2>
+          <p className="text-teal-100 mb-8 text-lg">Book a free consultation today and take the first step.</p>
           <button
             onClick={() => setBookingOpen(true)}
-            className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+            className="bg-white text-teal-700 hover:bg-teal-50 px-8 py-4 rounded-full text-lg font-semibold transition-all hover:-translate-y-1 shadow-lg"
           >
             Book Free Consultation
           </button>
-        </div>
-      </div>
+        </RevealSection>
+      </section>
 
-      <BookAppointmentDialog open={bookingOpen} onOpenChange={setBookingOpen} />
+      <BookAppointmentDialog
+        open={bookingOpen}
+        onOpenChange={setBookingOpen}
+        defaultService="Dental Implants"
+      />
     </div>
   );
 }

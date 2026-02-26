@@ -1,13 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import {
-  AppointmentStatus,
-  ClinicStatus,
-  ExternalBlob,
-  DoctorAvailability,
-  ReviewInput,
-  UserProfile,
-} from '../backend';
+import { AppointmentStatus, ClinicStatus, type Appointment, type Service, type Review, type ReviewInput, ExternalBlob } from '../backend';
 
 // ─── Admin Check ──────────────────────────────────────────────────────────────
 
@@ -26,18 +19,45 @@ export function useIsCallerAdmin() {
 
 // ─── Appointments ─────────────────────────────────────────────────────────────
 
-export function useGetAllAppointments(options?: { refetchInterval?: number }) {
+export function useGetAllAppointments() {
   const { actor, isFetching } = useActor();
-  return useQuery({
+  return useQuery<Appointment[]>({
     queryKey: ['appointments'],
     queryFn: async () => {
       if (!actor) return [];
       return actor.getAllAppointments();
     },
     enabled: !!actor && !isFetching,
-    refetchInterval: options?.refetchInterval,
+    refetchInterval: 10_000,
   });
 }
+
+export function useBookAppointment() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      patientName: string;
+      contactInfo: string;
+      preferredDate: bigint;
+      serviceType: string;
+    }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.bookAppointment(
+        params.patientName,
+        params.contactInfo,
+        params.preferredDate,
+        params.serviceType
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    },
+  });
+}
+
+// Alias for backward compatibility
+export const useCreateAppointment = useBookAppointment;
 
 export function useUpdateAppointmentStatus() {
   const { actor } = useActor();
@@ -59,34 +79,6 @@ export function useUpdateAppointmentStatus() {
   });
 }
 
-// Anonymous-friendly: uses the actor as-is (anonymous actor works for bookAppointment)
-export function useBookAppointment() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({
-      patientName,
-      contactInfo,
-      preferredDate,
-      serviceType,
-    }: {
-      patientName: string;
-      contactInfo: string;
-      preferredDate: bigint;
-      serviceType: string;
-    }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.bookAppointment(patientName, contactInfo, preferredDate, serviceType);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-    },
-  });
-}
-
-// Keep old name as alias for backward compatibility
-export const useCreateAppointment = useBookAppointment;
-
 // ─── Clinic Status ────────────────────────────────────────────────────────────
 
 export function useGetClinicStatus() {
@@ -98,7 +90,7 @@ export function useGetClinicStatus() {
       return actor.getClinicStatus();
     },
     enabled: !!actor && !isFetching,
-    refetchInterval: 30000,
+    refetchInterval: 30_000,
   });
 }
 
@@ -116,11 +108,61 @@ export function useSetClinicStatus() {
   });
 }
 
-// ─── Reviews ─────────────────────────────────────────────────────────────────
+// ─── Services ─────────────────────────────────────────────────────────────────
+
+export function useGetAllServices() {
+  const { actor, isFetching } = useActor();
+  return useQuery<Service[]>({
+    queryKey: ['services'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllServices();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useGetService(serviceId: string) {
+  const { actor, isFetching } = useActor();
+  return useQuery<Service | null>({
+    queryKey: ['service', serviceId],
+    queryFn: async () => {
+      if (!actor) return null;
+      return actor.getService(serviceId);
+    },
+    enabled: !!actor && !isFetching && !!serviceId,
+  });
+}
+
+export function useUpdateService() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      id: string;
+      displayName: string;
+      description: string;
+      featuredPhoto: ExternalBlob | null;
+    }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.addOrUpdateService(
+        params.id,
+        params.displayName,
+        params.description,
+        params.featuredPhoto
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['services'] });
+    },
+  });
+}
+
+// ─── Reviews ──────────────────────────────────────────────────────────────────
 
 export function useGetApprovedReviews() {
   const { actor, isFetching } = useActor();
-  return useQuery({
+  return useQuery<Review[]>({
     queryKey: ['approvedReviews'],
     queryFn: async () => {
       if (!actor) return [];
@@ -132,7 +174,7 @@ export function useGetApprovedReviews() {
 
 export function useGetPendingReviews() {
   const { actor, isFetching } = useActor();
-  return useQuery({
+  return useQuery<Review[]>({
     queryKey: ['pendingReviews'],
     queryFn: async () => {
       if (!actor) return [];
@@ -187,68 +229,30 @@ export function useDeleteReview() {
   });
 }
 
-export function useRejectReview() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (reviewId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.deleteReview(reviewId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pendingReviews'] });
-      queryClient.invalidateQueries({ queryKey: ['approvedReviews'] });
-    },
-  });
-}
+// ─── Doctors ──────────────────────────────────────────────────────────────────
 
-// ─── Services ─────────────────────────────────────────────────────────────────
-
-export function useGetAllServices() {
+export function useGetAllDoctors() {
   const { actor, isFetching } = useActor();
   return useQuery({
-    queryKey: ['services'],
+    queryKey: ['doctors'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllServices();
+      return actor.getAllDoctors();
     },
     enabled: !!actor && !isFetching,
   });
 }
 
-export function useGetService(serviceId: string) {
-  const { actor, isFetching } = useActor();
-  return useQuery({
-    queryKey: ['service', serviceId],
-    queryFn: async () => {
-      if (!actor) return null;
-      return actor.getService(serviceId);
-    },
-    enabled: !!actor && !isFetching && !!serviceId,
-  });
-}
-
-export function useUpdateService() {
+export function useAddDoctor() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      id,
-      displayName,
-      description,
-      featuredPhoto,
-    }: {
-      id: string;
-      displayName: string;
-      description: string;
-      featuredPhoto: ExternalBlob | null;
-    }) => {
+    mutationFn: async (params: { name: string; specialty: string }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.addOrUpdateService(id, displayName, description, featuredPhoto);
+      return actor.addDoctor(params.name, params.specialty, []);
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['services'] });
-      queryClient.invalidateQueries({ queryKey: ['service', variables.id] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['doctors'] });
     },
   });
 }
@@ -271,56 +275,16 @@ export function useAddBeforeAfterPair() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      beforeImage,
-      afterImage,
-      description,
-    }: {
+    mutationFn: async (params: {
       beforeImage: ExternalBlob;
       afterImage: ExternalBlob;
       description: string;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.addBeforeAfterPair(beforeImage, afterImage, description);
+      return actor.addBeforeAfterPair(params.beforeImage, params.afterImage, params.description);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['beforeAfterPairs'] });
-    },
-  });
-}
-
-// ─── Doctors ──────────────────────────────────────────────────────────────────
-
-export function useGetAllDoctors() {
-  const { actor, isFetching } = useActor();
-  return useQuery({
-    queryKey: ['doctors'],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getAllDoctors();
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-export function useAddDoctor() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({
-      name,
-      specialty,
-      availability,
-    }: {
-      name: string;
-      specialty: string;
-      availability: DoctorAvailability[];
-    }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.addDoctor(name, specialty, availability);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['doctors'] });
     },
   });
 }
@@ -329,7 +293,7 @@ export function useAddDoctor() {
 
 export function useGetCallerUserProfile() {
   const { actor, isFetching: actorFetching } = useActor();
-  const query = useQuery<UserProfile | null>({
+  const query = useQuery({
     queryKey: ['currentUserProfile'],
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
@@ -350,7 +314,7 @@ export function useSaveCallerUserProfile() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (profile: UserProfile) => {
+    mutationFn: async (profile: { name: string }) => {
       if (!actor) throw new Error('Actor not available');
       return actor.saveCallerUserProfile(profile);
     },

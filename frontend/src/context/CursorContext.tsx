@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 type CursorIcon = 'default' | 'dental';
 
@@ -12,7 +12,7 @@ const CursorContext = createContext<CursorContextType>({
   setCursorIcon: () => {},
 });
 
-export function CursorContextProvider({ children }: { children: React.ReactNode }) {
+export function CursorContextProvider({ children }: { children: ReactNode }) {
   const [cursorIcon, setCursorIcon] = useState<CursorIcon>('default');
   return (
     <CursorContext.Provider value={{ cursorIcon, setCursorIcon }}>

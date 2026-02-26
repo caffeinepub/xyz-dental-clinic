@@ -1,150 +1,153 @@
-import React, { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import BackgroundParticles from '@/components/BackgroundParticles';
-import BookAppointmentDialog from '@/components/BookAppointmentDialog';
-import ZoomInImage from '@/components/ZoomInImage';
-import TypewriterText from '@/components/TypewriterText';
-import { useGetService } from '@/hooks/useQueries';
+import { useState } from 'react';
+import BookAppointmentDialog from '../components/BookAppointmentDialog';
+import { useScrollReveal } from '../hooks/useScrollReveal';
+
+function RevealSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      } ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function RevealImage({ src, alt, className = '' }: { src: string; alt: string; className?: string }) {
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ${
+        isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+      } ${className}`}
+    >
+      <img src={src} alt={alt} className="w-full rounded-2xl shadow-xl object-cover" />
+    </div>
+  );
+}
 
 export default function LaserDentistryDetail() {
-  const navigate = useNavigate();
-  const { data: service } = useGetService('laser-dentistry');
   const [bookingOpen, setBookingOpen] = useState(false);
 
-  const title = service?.displayName || 'Laser Dentistry';
-  const description =
-    service?.description ||
-    'Painless precision laser treatments for gums, cavities, and whitening.';
-  const imageUrl =
-    service?.featuredPhoto?.getDirectURL() ||
-    '/assets/generated/laser-dentistry-card.dim_600x400.png';
-
   const benefits = [
-    'Virtually painless — minimal anesthesia needed',
-    'Faster healing and reduced discomfort',
-    'Highly precise — targets only affected tissue',
+    'Minimally invasive procedures',
+    'Reduced bleeding and swelling',
+    'Faster healing time',
+    'Less need for anesthesia',
+    'Highly precise treatment',
     'Reduced risk of infection',
-    'Less bleeding and swelling',
-    'Suitable for gum disease, cavities, and more',
   ];
 
-  const steps = [
-    { step: '01', title: 'Consultation', desc: 'Laser treatment assessment and digital mapping.' },
-    { step: '02', title: 'Preparation', desc: 'Protective eyewear fitted for patient and team.' },
-    { step: '03', title: 'Laser Treatment', desc: 'Precise laser application to targeted tissue.' },
-    { step: '04', title: 'Post-Care', desc: 'Immediate post-treatment care and cooling.' },
-    { step: '05', title: 'Follow-Up', desc: 'Healing progress check and maintenance guidance.' },
+  const treatments = [
+    { icon: '⚡', title: 'Gum Disease Treatment', desc: 'Laser removes infected tissue precisely.' },
+    { icon: '🔬', title: 'Cavity Detection', desc: 'Early detection with laser diagnostics.' },
+    { icon: '✨', title: 'Teeth Whitening', desc: 'Laser-activated whitening for faster results.' },
+    { icon: '🛡️', title: 'Gum Contouring', desc: 'Reshape your gumline for a perfect smile.' },
   ];
 
   return (
-    <div className="relative min-h-screen bg-background overflow-hidden">
-      <BackgroundParticles />
+    <div className="min-h-screen">
+      {/* Hero */}
+      <section className="relative py-24 px-4 bg-gradient-to-br from-green-900 to-teal-900 text-white overflow-hidden">
+        {/* Laser beam decoration */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            className="absolute h-0.5 bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-60"
+            style={{
+              width: '200%',
+              top: '30%',
+              left: '-50%',
+              animation: 'laserScan 3s ease-in-out infinite',
+            }}
+          />
+        </div>
 
-      {/* Laser beam decoration */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <div
-          style={{
-            position: 'absolute',
-            top: '30%',
-            left: '-20%',
-            width: '140%',
-            height: '2px',
-            background:
-              'linear-gradient(90deg, transparent, rgba(20,184,166,0.4), rgba(56,189,248,0.6), rgba(20,184,166,0.4), transparent)',
-            boxShadow: '0 0 20px 4px rgba(20,184,166,0.2)',
-            animation: 'laserSweep 6s ease-in-out infinite',
-          }}
-        />
-      </div>
-
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <button
-          onClick={() => navigate({ to: '/' })}
-          className="text-muted-foreground hover:text-foreground transition-colors mb-8 flex items-center gap-2"
-        >
-          ← Back to Home
-        </button>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16 items-center">
-          <div>
-            <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
-              Advanced Technology
-            </div>
-            <TypewriterText
-              text={title}
-              tag="h1"
-              className="text-4xl font-bold text-foreground mb-4"
-              speed={40}
-            />
-            <p className="text-muted-foreground text-lg leading-relaxed mb-6">{description}</p>
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-10">
+          <RevealSection>
+            <span className="text-green-400 font-semibold text-sm uppercase tracking-wider">Advanced Technology</span>
+            <h1 className="text-5xl font-bold font-playfair mt-2 mb-4">Laser Dentistry</h1>
+            <p className="text-slate-200 text-lg leading-relaxed mb-6">
+              Experience the future of dental care with our state-of-the-art laser technology.
+              Precise, comfortable, and faster healing.
+            </p>
             <button
               onClick={() => setBookingOpen(true)}
-              className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+              className="bg-green-500 hover:bg-green-400 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all hover:-translate-y-1 shadow-lg"
             >
-              Book Laser Treatment
+              Book Consultation
             </button>
-          </div>
-          <ZoomInImage src={imageUrl} alt={title} className="rounded-2xl shadow-xl" />
-        </div>
-
-        {/* Benefits */}
-        <div className="glass-card rounded-2xl p-8 mb-10 border border-border/40">
-          <TypewriterText
-            text="Laser Advantages"
-            tag="h2"
-            className="text-2xl font-bold text-foreground mb-6"
-            speed={35}
+          </RevealSection>
+          <RevealImage
+            src="/assets/generated/laser-dentistry-card.dim_600x400.png"
+            alt="Laser Dentistry"
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {benefits.map((b, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <span className="text-primary mt-0.5">✓</span>
-                <span className="text-muted-foreground">{b}</span>
-              </div>
-            ))}
-          </div>
         </div>
+      </section>
 
-        {/* Process */}
-        <div className="mb-10">
-          <TypewriterText
-            text="Treatment Process"
-            tag="h2"
-            className="text-2xl font-bold text-foreground mb-6"
-            speed={35}
-          />
-          <div className="space-y-4">
-            {steps.map((s) => (
-              <div
-                key={s.step}
-                className="glass-card rounded-xl p-5 border border-border/40 flex gap-4 items-start"
-              >
-                <span className="text-primary font-bold text-lg shrink-0">{s.step}</span>
-                <div>
-                  <h3 className="font-semibold text-foreground">{s.title}</h3>
-                  <p className="text-muted-foreground text-sm mt-1">{s.desc}</p>
+      {/* Benefits */}
+      <section className="py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <RevealSection className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-800 font-playfair">Benefits of Laser Dentistry</h2>
+          </RevealSection>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {benefits.map((benefit, i) => (
+              <RevealSection key={i}>
+                <div className="glass-card rounded-xl p-4 flex items-center gap-3">
+                  <span className="text-green-500 text-xl">⚡</span>
+                  <span className="text-slate-700 font-medium">{benefit}</span>
                 </div>
-              </div>
+              </RevealSection>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* CTA */}
-        <div className="text-center glass-card rounded-2xl p-8 border border-border/40">
-          <h2 className="text-2xl font-bold text-foreground mb-3">Experience Painless Dentistry ⚡</h2>
-          <p className="text-muted-foreground mb-6">
-            Book your laser treatment consultation today.
-          </p>
+      {/* Treatments */}
+      <section className="py-20 px-4 bg-slate-50">
+        <div className="max-w-5xl mx-auto">
+          <RevealSection className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-800 font-playfair">Laser Treatments We Offer</h2>
+          </RevealSection>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {treatments.map((t) => (
+              <RevealSection key={t.title}>
+                <div className="glass-card rounded-xl p-6 flex items-start gap-4">
+                  <span className="text-3xl">{t.icon}</span>
+                  <div>
+                    <h3 className="font-bold text-slate-800 mb-1">{t.title}</h3>
+                    <p className="text-slate-500 text-sm">{t.desc}</p>
+                  </div>
+                </div>
+              </RevealSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-4 bg-green-700 text-white text-center">
+        <RevealSection>
+          <h2 className="text-3xl font-bold font-playfair mb-4">Experience Pain-Free Dentistry</h2>
+          <p className="text-green-100 mb-8 text-lg">Book a laser dentistry consultation today.</p>
           <button
             onClick={() => setBookingOpen(true)}
-            className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors"
+            className="bg-white text-green-700 hover:bg-green-50 px-8 py-4 rounded-full text-lg font-semibold transition-all hover:-translate-y-1 shadow-lg"
           >
-            Book Laser Treatment
+            Book Consultation
           </button>
-        </div>
-      </div>
+        </RevealSection>
+      </section>
 
-      <BookAppointmentDialog open={bookingOpen} onOpenChange={setBookingOpen} />
+      <BookAppointmentDialog
+        open={bookingOpen}
+        onOpenChange={setBookingOpen}
+        defaultService="Laser Dentistry"
+      />
     </div>
   );
 }
