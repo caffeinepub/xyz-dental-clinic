@@ -1,8 +1,17 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { CheckCircle, Loader2 } from 'lucide-react';
-import { useBookAppointment } from '../hooks/useQueries';
-import { useActor } from '../hooks/useActor';
+import React, { useState, useEffect } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useBookAppointment, useGetClinicStatus } from '../hooks/useQueries';
+import { ClinicStatus } from '../backend';
+import { CheckCircle, AlertCircle, Loader2, RefreshCw, X } from 'lucide-react';
 
 interface BookAppointmentDialogProps {
   open: boolean;
@@ -10,331 +19,347 @@ interface BookAppointmentDialogProps {
   defaultService?: string;
 }
 
-const SERVICES = [
+const PENDING_KEY = 'pending_appointment';
+
+interface PendingAppointment {
+  patientName: string;
+  contactInfo: string;
+  preferredDate: string;
+  serviceType: string;
+}
+
+const serviceOptions = [
   'Dental Implants',
   'Invisalign',
-  'Laser Dentistry',
-  'Pediatric Dentistry',
   'Smile Makeover',
+  'Pediatric Dentistry',
+  'Laser Dentistry',
   'Teeth Whitening',
   'Root Canal',
   'General Checkup',
+  'Other',
 ];
 
+/**
+ * Returns true only if the stored pending appointment has at least one
+ * meaningful (non-empty) field — preventing stale/empty entries from
+ * triggering the "Unsaved appointment found" banner.
+ */
+function isValidPendingAppointment(data: PendingAppointment): boolean {
+  return (
+    data.patientName.trim().length > 0 ||
+    data.contactInfo.trim().length > 0 ||
+    data.preferredDate.trim().length > 0 ||
+    data.serviceType.trim().length > 0
+  );
+}
+
 export default function BookAppointmentDialog({ open, onOpenChange, defaultService }: BookAppointmentDialogProps) {
+  const { data: clinicStatus } = useGetClinicStatus();
+  const isClinicOpen = clinicStatus === ClinicStatus.open || clinicStatus === undefined;
+
   const [patientName, setPatientName] = useState('');
   const [contactInfo, setContactInfo] = useState('');
   const [preferredDate, setPreferredDate] = useState('');
   const [serviceType, setServiceType] = useState(defaultService || '');
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [success, setSuccess] = useState(false);
+  // errorMsg is only set after an actual failed submission attempt in the current session
+  const [errorMsg, setErrorMsg] = useState('');
+  // hasPending: localStorage has data from a previous failed session
+  const [hasPending, setHasPending] = useState(false);
+  // submissionFailed: tracks if the current session had a real backend failure
+  const [submissionFailed, setSubmissionFailed] = useState(false);
 
-  const { actor, isFetching: actorLoading } = useActor();
   const bookAppointment = useBookAppointment();
 
-  const isActorReady = !!actor && !actorLoading;
+  // Check for pending appointment when dialog opens — only restore data, never show error banner
+  useEffect(() => {
+    if (!open) return;
+
+    // Always clear the error/failure state on open — it should only appear after a real failure
+    setErrorMsg('');
+    setSubmissionFailed(false);
+
+    const raw = localStorage.getItem(PENDING_KEY);
+    if (raw) {
+      try {
+        const data: PendingAppointment = JSON.parse(raw);
+        // Only restore and show the amber banner if the stored data has real content
+        if (isValidPendingAppointment(data)) {
+          setPatientName(data.patientName);
+          setContactInfo(data.contactInfo);
+          setPreferredDate(data.preferredDate);
+          setServiceType(data.serviceType || defaultService || '');
+          setHasPending(true);
+        } else {
+          // Stale/empty entry — silently remove it and start fresh
+          localStorage.removeItem(PENDING_KEY);
+          setPatientName('');
+          setContactInfo('');
+          setPreferredDate('');
+          setServiceType(defaultService || '');
+          setHasPending(false);
+        }
+      } catch {
+        // Corrupt entry — remove it
+        localStorage.removeItem(PENDING_KEY);
+        setPatientName('');
+        setContactInfo('');
+        setPreferredDate('');
+        setServiceType(defaultService || '');
+        setHasPending(false);
+      }
+    } else {
+      // No pending entry — start fresh
+      setPatientName('');
+      setContactInfo('');
+      setPreferredDate('');
+      setServiceType(defaultService || '');
+      setHasPending(false);
+    }
+  }, [open]); // intentionally omit defaultService to avoid re-running mid-session
+
+  // If clinic is closed while dialog is open, close it
+  useEffect(() => {
+    if (!isClinicOpen && open) {
+      onOpenChange(false);
+    }
+  }, [isClinicOpen, open, onOpenChange]);
+
+  const resetForm = () => {
+    setPatientName('');
+    setContactInfo('');
+    setPreferredDate('');
+    setServiceType(defaultService || '');
+    setSuccess(false);
+    setErrorMsg('');
+    setHasPending(false);
+    setSubmissionFailed(false);
+    bookAppointment.reset();
+  };
+
+  const handleClose = (val: boolean) => {
+    if (!val) resetForm();
+    onOpenChange(val);
+  };
+
+  /** User explicitly discards the pending appointment */
+  const handleDiscard = () => {
+    localStorage.removeItem(PENDING_KEY);
+    setHasPending(false);
+    setErrorMsg('');
+    setSubmissionFailed(false);
+    setPatientName('');
+    setContactInfo('');
+    setPreferredDate('');
+    setServiceType(defaultService || '');
+    bookAppointment.reset();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!patientName || !contactInfo || !preferredDate || !serviceType) return;
-    if (!isActorReady) return;
-
-    // Convert date string to nanoseconds (bigint)
-    const dateMs = new Date(preferredDate).getTime();
-    const dateNs = BigInt(Math.floor(dateMs)) * BigInt(1_000_000);
+    if (!isClinicOpen) {
+      setErrorMsg('The clinic is currently closed. Please try again later.');
+      return;
+    }
+    setErrorMsg('');
+    setSubmissionFailed(false);
 
     try {
+      const dateMs = new Date(preferredDate).getTime();
+      const dateNs = BigInt(dateMs) * BigInt(1_000_000);
+
       const result = await bookAppointment.mutateAsync({
         patientName,
         contactInfo,
         preferredDate: dateNs,
         serviceType,
       });
-      if (result) {
-        setShowSuccess(true);
-        setPatientName('');
-        setContactInfo('');
-        setPreferredDate('');
-        setServiceType(defaultService || '');
+
+      if (result === false) {
+        setErrorMsg('Booking failed: The clinic is currently closed.');
+        // Clear localStorage since the clinic is closed — retrying won't help
+        localStorage.removeItem(PENDING_KEY);
+        setHasPending(false);
+        return;
       }
+
+      // Success — clear localStorage immediately so the banner never reappears
+      localStorage.removeItem(PENDING_KEY);
+      setSuccess(true);
+      setHasPending(false);
+      setSubmissionFailed(false);
     } catch (_err) {
-      // error is shown via bookAppointment.isError
+      // Only NOW save to localStorage (after a real failure) so data isn't lost
+      const pendingData: PendingAppointment = { patientName, contactInfo, preferredDate, serviceType };
+      localStorage.setItem(PENDING_KEY, JSON.stringify(pendingData));
+      setHasPending(true);
+      setSubmissionFailed(true);
+      setErrorMsg(
+        'Connection issue. Your data has been saved locally. Please click "Retry" to try again.'
+      );
     }
   };
 
-  const handleClose = () => {
-    setShowSuccess(false);
-    bookAppointment.reset();
-    onOpenChange(false);
-  };
-
-  const getErrorMessage = () => {
-    if (!bookAppointment.error) return 'Something went wrong. Please try again.';
-    const msg = (bookAppointment.error as Error).message || '';
-    if (msg.includes('initializing')) return 'Service is still loading. Please wait a moment and try again.';
-    if (msg.includes('Actor not available')) return 'Connection not ready. Please try again.';
-    return 'Something went wrong. Please try again.';
-  };
+  const today = new Date().toISOString().split('T')[0];
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent
-        style={{
-          background: '#ffffff',
-          border: '2px solid #000',
-          borderRadius: '16px',
-          maxWidth: '480px',
-          width: '95vw',
-          padding: '32px',
-        }}
-      >
-        {showSuccess ? (
-          <div style={{ textAlign: 'center', padding: '24px 0' }}>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '80px',
-                height: '80px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #10b981, #059669)',
-                marginBottom: '20px',
-                animation: 'successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
-              }}
-            >
-              <CheckCircle size={44} color="#fff" strokeWidth={2.5} />
+      <DialogContent className="sm:max-w-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
+            {success ? 'Appointment Confirmed! 🎉' : 'Book Your Appointment'}
+          </DialogTitle>
+          <DialogDescription className="text-gray-500 dark:text-gray-400">
+            {success
+              ? 'We will contact you shortly to confirm your appointment.'
+              : 'Fill in your details and we will get back to you.'}
+          </DialogDescription>
+        </DialogHeader>
+
+        {!isClinicOpen ? (
+          <div className="flex flex-col items-center gap-4 py-6">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+              <AlertCircle className="w-8 h-8 text-red-500" />
             </div>
-            <h2
-              style={{
-                fontSize: '24px',
-                fontWeight: 700,
-                color: '#059669',
-                marginBottom: '8px',
-                animation: 'fadeSlideUp 0.4s ease 0.2s both',
-              }}
-            >
-              Appointment Confirmed!
-            </h2>
-            <p
-              style={{
-                color: '#6b7280',
-                fontSize: '15px',
-                marginBottom: '28px',
-                animation: 'fadeSlideUp 0.4s ease 0.35s both',
-              }}
-            >
-              We've received your booking request. Our team will contact you shortly to confirm your appointment.
+            <p className="text-center text-gray-700 dark:text-gray-300 font-medium">
+              The clinic is currently closed. Please check back later.
             </p>
-            <button
-              onClick={handleClose}
-              style={{
-                background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '12px 32px',
-                fontSize: '15px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                animation: 'fadeSlideUp 0.4s ease 0.5s both',
-              }}
-            >
+            <Button variant="outline" onClick={() => handleClose(false)}>
               Close
-            </button>
+            </Button>
+          </div>
+        ) : success ? (
+          <div className="flex flex-col items-center gap-4 py-6">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <CheckCircle className="w-8 h-8 text-green-500" />
+            </div>
+            <div className="text-center">
+              <p className="font-semibold text-gray-900 dark:text-white">{patientName}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Service: {serviceType}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Date: {new Date(preferredDate).toLocaleDateString('en-IN', { dateStyle: 'long' })}
+              </p>
+            </div>
+            <Button
+              className="bg-teal-500 hover:bg-teal-600 text-white rounded-full px-8"
+              onClick={() => handleClose(false)}
+            >
+              Done
+            </Button>
           </div>
         ) : (
-          <>
-            <DialogHeader>
-              <DialogTitle
-                style={{
-                  fontSize: '22px',
-                  fontWeight: 700,
-                  color: '#0f172a',
-                  marginBottom: '4px',
-                }}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-2">
+            {/* Amber banner: shown when localStorage has data from a previous failed session,
+                but only when there was NO failure in the current session (to avoid duplicate banners) */}
+            {hasPending && !submissionFailed && (
+              <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+                <RefreshCw className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span className="flex-1">Unsaved appointment found. Review and submit to confirm.</span>
+                <button
+                  type="button"
+                  onClick={handleDiscard}
+                  className="ml-1 flex-shrink-0 text-amber-600 hover:text-amber-900 transition-colors"
+                  aria-label="Discard saved appointment"
+                  title="Discard and start fresh"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            {/* Red error banner: only shown after a real failed submission attempt in the current session */}
+            {errorMsg && (
+              <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="patientName" className="text-gray-700 dark:text-gray-300 font-medium">Full Name *</Label>
+              <Input
+                id="patientName"
+                placeholder="Your full name"
+                value={patientName}
+                onChange={(e) => setPatientName(e.target.value)}
+                required
+                className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder:text-gray-400"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="contactInfo" className="text-gray-700 dark:text-gray-300 font-medium">Phone / Email *</Label>
+              <Input
+                id="contactInfo"
+                placeholder="Phone number or email"
+                value={contactInfo}
+                onChange={(e) => setContactInfo(e.target.value)}
+                required
+                className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder:text-gray-400"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="preferredDate" className="text-gray-700 dark:text-gray-300 font-medium">Preferred Date *</Label>
+              <Input
+                id="preferredDate"
+                type="date"
+                min={today}
+                value={preferredDate}
+                onChange={(e) => setPreferredDate(e.target.value)}
+                required
+                className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="serviceType" className="text-gray-700 dark:text-gray-300 font-medium">Service *</Label>
+              <select
+                id="serviceType"
+                value={serviceType}
+                onChange={(e) => setServiceType(e.target.value)}
+                required
+                className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2"
               >
-                Book an Appointment
-              </DialogTitle>
-              <DialogDescription style={{ color: '#64748b', fontSize: '14px' }}>
-                Fill in your details and we'll confirm your appointment shortly.
-              </DialogDescription>
-            </DialogHeader>
+                <option value="" className="text-gray-400">Select a service</option>
+                {serviceOptions.map((s) => (
+                  <option key={s} value={s} className="text-gray-900 bg-white dark:bg-gray-800 dark:text-white">{s}</option>
+                ))}
+              </select>
+            </div>
 
-            <form onSubmit={handleSubmit} style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  value={patientName}
-                  onChange={e => setPatientName(e.target.value)}
-                  placeholder="Enter your full name"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '10px 14px',
-                    border: '1.5px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    transition: 'border-color 0.2s',
-                  }}
-                  onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
-                  onBlur={e => (e.target.style.borderColor = '#d1d5db')}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-                  Phone / Email *
-                </label>
-                <input
-                  type="text"
-                  value={contactInfo}
-                  onChange={e => setContactInfo(e.target.value)}
-                  placeholder="Phone number or email"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '10px 14px',
-                    border: '1.5px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    transition: 'border-color 0.2s',
-                  }}
-                  onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
-                  onBlur={e => (e.target.style.borderColor = '#d1d5db')}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-                  Preferred Date *
-                </label>
-                <input
-                  type="date"
-                  value={preferredDate}
-                  onChange={e => setPreferredDate(e.target.value)}
-                  required
-                  min={new Date().toISOString().split('T')[0]}
-                  style={{
-                    width: '100%',
-                    padding: '10px 14px',
-                    border: '1.5px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    transition: 'border-color 0.2s',
-                  }}
-                  onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
-                  onBlur={e => (e.target.style.borderColor = '#d1d5db')}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-                  Service *
-                </label>
-                <select
-                  value={serviceType}
-                  onChange={e => setServiceType(e.target.value)}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '10px 14px',
-                    border: '1.5px solid #d1d5db',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    background: '#fff',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <option value="">Select a service</option>
-                  {SERVICES.map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
-
-              {bookAppointment.isError && (
-                <div
-                  style={{
-                    background: '#fef2f2',
-                    border: '1px solid #fca5a5',
-                    borderRadius: '8px',
-                    padding: '10px 14px',
-                    color: '#dc2626',
-                    fontSize: '13px',
-                  }}
-                >
-                  {getErrorMessage()}
-                </div>
-              )}
-
-              {actorLoading && !bookAppointment.isPending && (
-                <div
-                  style={{
-                    background: '#eff6ff',
-                    border: '1px solid #bfdbfe',
-                    borderRadius: '8px',
-                    padding: '10px 14px',
-                    color: '#1d4ed8',
-                    fontSize: '13px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}
-                >
-                  <Loader2 size={14} style={{ animation: 'spin 1s linear infinite', flexShrink: 0 }} />
-                  Connecting to service, please wait...
-                </div>
-              )}
-
-              <button
+            <div className="flex gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                onClick={() => handleClose(false)}
+                disabled={bookAppointment.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
                 type="submit"
-                disabled={bookAppointment.isPending || actorLoading}
-                style={{
-                  background: (bookAppointment.isPending || actorLoading)
-                    ? '#94a3b8'
-                    : 'linear-gradient(135deg, #0ea5e9, #0284c7)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '13px',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                  cursor: (bookAppointment.isPending || actorLoading) ? 'not-allowed' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  marginTop: '4px',
-                  transition: 'background 0.2s',
-                }}
+                className="flex-1 bg-teal-500 hover:bg-teal-600 text-white rounded-full"
+                disabled={bookAppointment.isPending}
               >
                 {bookAppointment.isPending ? (
                   <>
-                    <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Booking...
                   </>
-                ) : actorLoading ? (
+                ) : submissionFailed ? (
                   <>
-                    <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
-                    Loading...
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Retry
                   </>
                 ) : (
                   'Book Now'
                 )}
-              </button>
-            </form>
-          </>
+              </Button>
+            </div>
+          </form>
         )}
       </DialogContent>
     </Dialog>

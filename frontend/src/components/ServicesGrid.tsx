@@ -1,57 +1,110 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useGetAllServices } from '../hooks/useQueries';
-import { useStaggeredTextReveal } from '../hooks/useStaggeredTextReveal';
 
-const SERVICE_ICONS: Record<string, string> = {
-  'dental-implants': '/assets/generated/icon-implants.dim_256x256.png',
-  'invisalign': '/assets/generated/icon-braces.dim_256x256.png',
-  'laser-dentistry': '/assets/generated/laser-dentistry-card.dim_600x400.png',
-  'pediatric-dentistry': '/assets/generated/pediatric-dentistry-icon.dim_600x400.png',
-  'smile-makeover': '/assets/generated/magic-wand-sparkle.dim_300x200.png',
-};
-
-const STATIC_SERVICES = [
-  { id: 'dental-implants', displayName: 'Dental Implants', description: 'Permanent tooth replacement with natural-looking implants.' },
-  { id: 'invisalign', displayName: 'Invisalign', description: 'Clear aligners for a straighter smile without metal braces.' },
-  { id: 'laser-dentistry', displayName: 'Laser Dentistry', description: 'Painless, precise treatments using advanced laser technology.' },
-  { id: 'pediatric-dentistry', displayName: 'Pediatric Dentistry', description: 'Gentle, fun dental care designed especially for children.' },
-  { id: 'smile-makeover', displayName: 'Smile Makeover', description: 'Complete smile transformation combining multiple treatments.' },
+const staticServices = [
+  {
+    id: 'dental-implants',
+    displayName: 'Dental Implants',
+    description: 'Permanent tooth replacement with titanium implants that look and feel natural.',
+    icon: '/assets/generated/icon-implants.dim_256x256.png',
+    route: '/services/dental-implants',
+    accentColor: '#0ea5e9',
+    bgColor: 'rgba(14,165,233,0.08)',
+  },
+  {
+    id: 'invisalign',
+    displayName: 'Invisalign',
+    description: 'Clear aligners for a straighter smile without traditional metal braces.',
+    icon: '/assets/generated/icon-braces.dim_256x256.png',
+    route: '/services/invisalign',
+    accentColor: '#06b6d4',
+    bgColor: 'rgba(6,182,212,0.08)',
+  },
+  {
+    id: 'smile-makeover',
+    displayName: 'Smile Makeover',
+    description: 'Complete smile transformation combining multiple cosmetic procedures.',
+    icon: '/assets/generated/icon-whitening.dim_256x256.png',
+    route: '/services/smile-makeover',
+    accentColor: '#8b5cf6',
+    bgColor: 'rgba(139,92,246,0.08)',
+  },
+  {
+    id: 'pediatric-dentistry',
+    displayName: 'Pediatric Dentistry',
+    description: 'Gentle, child-friendly dental care in a fun and welcoming environment.',
+    icon: '/assets/generated/pediatric-dentistry-icon.dim_600x400.png',
+    route: '/services/pediatric-dentistry',
+    accentColor: '#10b981',
+    bgColor: 'rgba(16,185,129,0.08)',
+  },
+  {
+    id: 'laser-dentistry',
+    displayName: 'Laser Dentistry',
+    description: 'Advanced laser treatments for precise, painless dental procedures.',
+    icon: '/assets/generated/icon-root-canal.dim_256x256.png',
+    route: '/services/laser-dentistry',
+    accentColor: '#f59e0b',
+    bgColor: 'rgba(245,158,11,0.08)',
+  },
 ];
-
-const GLOW_COLORS: Record<string, string> = {
-  'dental-implants': 'rgba(14,165,233,0.35)',
-  'invisalign': 'rgba(6,182,212,0.35)',
-  'laser-dentistry': 'rgba(239,68,68,0.25)',
-  'pediatric-dentistry': 'rgba(34,197,94,0.25)',
-  'smile-makeover': 'rgba(168,85,247,0.25)',
-};
 
 export default function ServicesGrid() {
   const navigate = useNavigate();
   const { data: backendServices } = useGetAllServices();
-  const headingText = 'Our Premium Services';
-  const { ref: headingRef, wordElements } = useStaggeredTextReveal(headingText);
+  const sectionRef = useRef<HTMLElement>(null);
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  const services = (backendServices && backendServices.length > 0) ? backendServices : STATIC_SERVICES;
+  const services = staticServices.map((s) => {
+    const backend = backendServices?.find((b) => b.id === s.id);
+    return backend
+      ? { ...s, displayName: backend.displayName, description: backend.description }
+      : s;
+  });
+
+  // CSS-based staggered reveal using IntersectionObserver (no GSAP needed)
+  useEffect(() => {
+    const cards = cardsRef.current.filter(Boolean) as HTMLDivElement[];
+    if (cards.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const card = entry.target as HTMLDivElement;
+            const index = cards.indexOf(card);
+            setTimeout(() => {
+              card.style.opacity = '1';
+              card.style.transform = 'translateY(0) scale(1)';
+            }, index * 120);
+            observer.unobserve(card);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section id="services" style={{ padding: '100px 24px', position: 'relative' }}>
+    <section id="services" ref={sectionRef} style={{ padding: '100px 24px', position: 'relative' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h2
-            ref={headingRef as React.RefObject<HTMLHeadingElement>}
             style={{
               fontSize: 'clamp(28px, 4vw, 48px)',
               fontWeight: 800,
               color: '#0f172a',
               marginBottom: '16px',
               letterSpacing: '-0.02em',
+              fontFamily: 'Playfair Display, serif',
             }}
           >
-            {wordElements.map(({ word, style }, i) => (
-              <span key={i} style={style}>{word}</span>
-            ))}
+            Our Premium Services
           </h2>
           <p style={{ color: '#64748b', fontSize: '17px', maxWidth: '500px', margin: '0 auto' }}>
             Advanced treatments tailored to give you the smile you deserve.
@@ -65,43 +118,60 @@ export default function ServicesGrid() {
             gap: '24px',
           }}
         >
-          {services.map(service => (
+          {services.map((service, i) => (
             <div
               key={service.id}
-              onClick={() => navigate({ to: `/services/${service.id}` })}
+              ref={(el) => { cardsRef.current[i] = el; }}
+              onClick={() => navigate({ to: service.route })}
               style={{
-                background: 'rgba(255,255,255,0.85)',
+                background: 'rgba(255,255,255,0.88)',
                 backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(14,165,233,0.15)',
+                border: `1px solid ${service.accentColor}22`,
                 borderRadius: '16px',
                 padding: '28px 24px',
                 cursor: 'pointer',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                opacity: 0,
+                transform: 'translateY(50px) scale(0.95)',
+                transition: 'opacity 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease',
               }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-10px)';
-                (e.currentTarget as HTMLDivElement).style.boxShadow = `0 20px 40px ${GLOW_COLORS[service.id] || 'rgba(14,165,233,0.25)'}`;
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLDivElement;
+                el.style.transform = 'translateY(-10px) scale(1)';
+                el.style.boxShadow = `0 20px 40px ${service.accentColor}40`;
               }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
-                (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.06)';
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLDivElement;
+                el.style.transform = 'translateY(0) scale(1)';
+                el.style.boxShadow = '0 4px 20px rgba(0,0,0,0.06)';
               }}
             >
-              <div style={{ marginBottom: '16px' }}>
+              <div
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '14px',
+                  background: service.bgColor,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '16px',
+                  border: `1px solid ${service.accentColor}33`,
+                }}
+              >
                 <img
-                  src={SERVICE_ICONS[service.id] || '/assets/generated/tooth-logo-icon.dim_64x64.png'}
+                  src={service.icon}
                   alt={service.displayName}
-                  style={{ width: '56px', height: '56px', objectFit: 'contain', borderRadius: '12px' }}
+                  style={{ width: '32px', height: '32px', objectFit: 'contain' }}
                 />
               </div>
-              <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#0f172a', marginBottom: '8px', fontFamily: 'Playfair Display, serif' }}>
                 {service.displayName}
               </h3>
               <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6 }}>
                 {service.description}
               </p>
-              <div style={{ marginTop: '16px', color: '#0ea5e9', fontSize: '13px', fontWeight: 600 }}>
+              <div style={{ marginTop: '16px', color: service.accentColor, fontSize: '13px', fontWeight: 600 }}>
                 Learn More →
               </div>
             </div>

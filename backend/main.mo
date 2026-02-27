@@ -142,13 +142,29 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Unauthenticated appointment booking now returns just success boolean
+  // global flag for clinic open/closed
+  public shared ({ caller }) func setClinicStatus(adminPrincipal : Principal, status : ClinicStatus) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update clinic status");
+    };
+    clinicStatus := status;
+  };
+
+  public query ({ caller }) func getClinicStatus() : async ClinicStatus {
+    clinicStatus;
+  };
+
+  // Unauthenticated appointment booking
   public shared ({ caller }) func bookAppointment(
     patientName : Text,
     contactInfo : Text,
     preferredDate : Time.Time,
     serviceType : Text,
   ) : async Bool {
+    if (clinicStatus == #closed) {
+      return false;
+    };
+
     let newAppointment : Appointment = {
       id = nextAppointmentId;
       patientName;
@@ -181,18 +197,6 @@ actor {
       Runtime.trap("Unauthorized: Only admins can view all appointments");
     };
     appointments.values().toArray().sort();
-  };
-
-  // Clinic Status Management
-  public shared ({ caller }) func setClinicStatus(status : ClinicStatus) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can update clinic status");
-    };
-    clinicStatus := status;
-  };
-
-  public query ({ caller }) func getClinicStatus() : async ClinicStatus {
-    clinicStatus;
   };
 
   // Review Management

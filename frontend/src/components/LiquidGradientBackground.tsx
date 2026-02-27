@@ -1,11 +1,21 @@
 import React, { useEffect, useRef } from 'react';
 
+interface Blob {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  color: string;
+  phase: number;
+  speed: number;
+}
+
 export default function LiquidGradientBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animFrameRef = useRef<number>(0);
   const mouseRef = useRef({ x: 0.5, y: 0.5 });
-  const targetRef = useRef({ x: 0.5, y: 0.5 });
-  const animRef = useRef<number>(0);
-  const timeRef = useRef(0);
+  const targetMouseRef = useRef({ x: 0.5, y: 0.5 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -21,67 +31,83 @@ export default function LiquidGradientBackground() {
     window.addEventListener('resize', resize);
 
     const handleMouseMove = (e: MouseEvent) => {
-      targetRef.current = {
+      targetMouseRef.current = {
         x: e.clientX / window.innerWidth,
         y: e.clientY / window.innerHeight,
       };
     };
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mousemove', handleMouseMove);
+
+    // Create blobs
+    const blobs: Blob[] = [
+      { x: 0.2, y: 0.3, vx: 0.0003, vy: 0.0002, radius: 0.45, color: 'rgba(56, 189, 248, 0.28)', phase: 0, speed: 0.8 },
+      { x: 0.7, y: 0.6, vx: -0.0002, vy: 0.0003, radius: 0.4, color: 'rgba(14, 165, 233, 0.22)', phase: 1.2, speed: 0.6 },
+      { x: 0.5, y: 0.2, vx: 0.0001, vy: -0.0002, radius: 0.35, color: 'rgba(186, 230, 253, 0.3)', phase: 2.4, speed: 1.0 },
+      { x: 0.8, y: 0.1, vx: -0.0003, vy: 0.0001, radius: 0.3, color: 'rgba(125, 211, 252, 0.25)', phase: 0.6, speed: 0.7 },
+      { x: 0.1, y: 0.8, vx: 0.0002, vy: -0.0003, radius: 0.38, color: 'rgba(224, 242, 254, 0.35)', phase: 1.8, speed: 0.9 },
+      { x: 0.6, y: 0.9, vx: -0.0001, vy: -0.0002, radius: 0.32, color: 'rgba(2, 132, 199, 0.18)', phase: 3.0, speed: 0.5 },
+    ];
+
+    let time = 0;
 
     const draw = () => {
-      timeRef.current += 0.008;
-      const t = timeRef.current;
+      time += 0.008;
 
-      // Smooth lerp toward mouse
-      mouseRef.current.x += (targetRef.current.x - mouseRef.current.x) * 0.04;
-      mouseRef.current.y += (targetRef.current.y - mouseRef.current.y) * 0.04;
+      // Smooth mouse lerp
+      mouseRef.current.x += (targetMouseRef.current.x - mouseRef.current.x) * 0.04;
+      mouseRef.current.y += (targetMouseRef.current.y - mouseRef.current.y) * 0.04;
 
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
       const w = canvas.width;
       const h = canvas.height;
 
-      // Base gradient
-      const grad = ctx.createLinearGradient(
-        w * (0.1 + mx * 0.3 + Math.sin(t) * 0.05),
-        h * (0.0 + my * 0.2),
-        w * (0.7 + mx * 0.3 + Math.cos(t * 0.7) * 0.05),
-        h * (0.8 + my * 0.2)
-      );
-
-      grad.addColorStop(0, `hsl(${200 + mx * 20 + Math.sin(t) * 5}, 85%, ${92 + my * 4}%)`);
-      grad.addColorStop(0.35, `hsl(${210 + my * 15 + Math.cos(t * 0.8) * 5}, 80%, ${88 + mx * 4}%)`);
-      grad.addColorStop(0.65, `hsl(${195 + mx * 10 + Math.sin(t * 1.2) * 4}, 75%, ${90 + my * 3}%)`);
-      grad.addColorStop(1, `hsl(${220 + my * 10 + Math.cos(t * 0.6) * 6}, 70%, ${94 + mx * 3}%)`);
-
-      ctx.fillStyle = grad;
+      // Clear with very light base
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = 'rgba(240, 249, 255, 1)';
       ctx.fillRect(0, 0, w, h);
 
-      // Soft radial blobs
-      const blobs = [
-        { x: 0.2 + mx * 0.3 + Math.sin(t * 0.9) * 0.08, y: 0.3 + my * 0.2 + Math.cos(t * 0.7) * 0.06, r: 0.35, h: 195 + mx * 20, s: 90, l: 75 },
-        { x: 0.7 + mx * 0.2 + Math.cos(t * 1.1) * 0.07, y: 0.6 + my * 0.3 + Math.sin(t * 0.8) * 0.07, r: 0.3, h: 210 + my * 15, s: 85, l: 70 },
-        { x: 0.5 + Math.sin(t * 0.6) * 0.1, y: 0.15 + Math.cos(t * 0.9) * 0.05, r: 0.25, h: 185 + mx * 15, s: 80, l: 80 },
-      ];
+      // Draw blobs
+      blobs.forEach((blob) => {
+        // Animate position with sine waves
+        const bx = (blob.x + Math.sin(time * blob.speed + blob.phase) * 0.15 + mouseRef.current.x * 0.05) * w;
+        const by = (blob.y + Math.cos(time * blob.speed * 0.7 + blob.phase) * 0.12 + mouseRef.current.y * 0.05) * h;
+        const r = blob.radius * Math.min(w, h);
 
-      for (const blob of blobs) {
-        const rg = ctx.createRadialGradient(
-          blob.x * w, blob.y * h, 0,
-          blob.x * w, blob.y * h, blob.r * Math.min(w, h)
-        );
-        rg.addColorStop(0, `hsla(${blob.h}, ${blob.s}%, ${blob.l}%, 0.45)`);
-        rg.addColorStop(1, `hsla(${blob.h}, ${blob.s}%, ${blob.l}%, 0)`);
-        ctx.fillStyle = rg;
-        ctx.fillRect(0, 0, w, h);
+        const grad = ctx.createRadialGradient(bx, by, 0, bx, by, r);
+        grad.addColorStop(0, blob.color);
+        grad.addColorStop(0.5, blob.color.replace(/[\d.]+\)$/, '0.1)'));
+        grad.addColorStop(1, 'rgba(240, 249, 255, 0)');
+
+        ctx.beginPath();
+        ctx.arc(bx, by, r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      });
+
+      // Subtle wave overlay
+      ctx.save();
+      ctx.globalAlpha = 0.06;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, h * 0.5);
+        for (let x = 0; x <= w; x += 10) {
+          const y = h * 0.5 + Math.sin(x * 0.005 + time * 0.5 + i * 1.2) * h * 0.08;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(w, h);
+        ctx.lineTo(0, h);
+        ctx.closePath();
+        ctx.fillStyle = `rgba(14, 165, 233, ${0.08 - i * 0.02})`;
+        ctx.fill();
       }
+      ctx.restore();
 
-      animRef.current = requestAnimationFrame(draw);
+      animFrameRef.current = requestAnimationFrame(draw);
     };
 
-    animRef.current = requestAnimationFrame(draw);
+    draw();
 
     return () => {
-      cancelAnimationFrame(animRef.current);
+      cancelAnimationFrame(animFrameRef.current);
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handleMouseMove);
     };
@@ -94,9 +120,9 @@ export default function LiquidGradientBackground() {
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '100vw',
-        height: '100vh',
-        zIndex: -10,
+        width: '100%',
+        height: '100%',
+        zIndex: -1,
         pointerEvents: 'none',
       }}
     />

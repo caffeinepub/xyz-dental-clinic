@@ -1,46 +1,25 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Web project with admin panel and appointment management. User wants all references to 'Caffeine AI' (name, logo, links) removed from the website's footer, header, and all sections.",
+  "summary": "Appointment booking app with a known connection issue showing 'Connection issue. Your data has been saved locally. Please click Retry to try again' error unexpectedly.",
   "architectural_notes": [],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "Appointment booking: 'Connection issue. Your data has been saved locally. Please click Retry to try again' message appearing unexpectedly during appointment booking flow."
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-remove-all-references-to-caffeine-ai-from-the-footer-component-including-the-name-any-logo-icon-and-any-associated-links-or-attribution-text",
-      "title": "Remove all references to 'Caffeine AI' from the Footer component — including the name, any logo/icon, and any associated links or attribution text.",
+      "id": "feature-fix-the-bookappointmentdialog-component-so-that-the-connection-issue-your-data-has-been-saved-locally-please-click-retry-to-try-again-message-does-not-appear-unexpectedly-the-error-retry-banner-should-only-be-shown-when-there-is-an-actual-confirmed-network-or-canister-call-failure-not-on-initial-load-not-when-localstorage-contains-stale-data-from-a-previous-session-and-not-when-the-form-has-not-yet-been-submitted-clear-any-stale-localstorage-pending-appointment-data-that-would-incorrectly-trigger-this-state-on-mount",
+      "title": "Fix the BookAppointmentDialog component so that the 'Connection issue. Your data has been saved locally. Please click \"Retry\" to try again' message does not appear unexpectedly. The error/retry banner should only be shown when there is an actual, confirmed network or canister call failure — not on initial load, not when localStorage contains stale data from a previous session, and not when the form has not yet been submitted. Clear any stale localStorage pending appointment data that would incorrectly trigger this state on mount.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Remove all 'Caffeine AI' branding (name, logo, links) from website footer, header, and every section",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Remove all references to 'Caffeine AI' from the Header component — including the name, any logo/icon, and any associated links.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Audit and remove all references to 'Caffeine AI' (name, logo, links, or attribution) from every other page or section component across the entire frontend — including but not limited to Home, HeroSection, ContactSection, ServicesGrid, DoctorProfile, TestimonialCarousel, and all admin pages.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "status": "pending"
-    }
-  ],
+  "new_feature_requests": [],
   "gameProjectType": "none",
-  "projectName": "Dental Clinic",
+  "projectName": "Appointment Booking App",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -83,6 +83,7 @@ export default function ServiceDetail() {
                   color: '#0f172a',
                   marginBottom: '16px',
                   letterSpacing: '-0.02em',
+                  fontFamily: 'Playfair Display, serif',
                 }}
               >
                 {displayName}
@@ -101,10 +102,7 @@ export default function ServiceDetail() {
               >
                 {['Expert Care', 'Modern Equipment', 'Comfortable Experience', 'Affordable Pricing'].map(
                   (feature) => (
-                    <div
-                      key={feature}
-                      style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
-                    >
+                    <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <CheckCircle size={18} color="#0ea5e9" style={{ flexShrink: 0 }} />
                       <span style={{ color: '#374151', fontSize: '14px', fontWeight: 500 }}>{feature}</span>
                     </div>

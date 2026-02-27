@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-remove-all-references-to-caffeine-ai-from-the-footer-component-including-the-name-any-logo-icon-and-any-associated-links-or-attribution-text",
-      "featureTitle": "Remove all references to 'Caffeine AI' from the Footer component — including the name, any logo/icon, and any associated links or attribution text.",
+      "featureId": "feature-fix-the-bookappointmentdialog-component-so-that-the-connection-issue-your-data-has-been-saved-locally-please-click-retry-to-try-again-message-does-not-appear-unexpectedly-the-error-retry-banner-should-only-be-shown-when-there-is-an-actual-confirmed-network-or-canister-call-failure-not-on-initial-load-not-when-localstorage-contains-stale-data-from-a-previous-session-and-not-when-the-form-has-not-yet-been-submitted-clear-any-stale-localstorage-pending-appointment-data-that-would-incorrectly-trigger-this-state-on-mount",
+      "featureTitle": "Fix the BookAppointmentDialog component so that the 'Connection issue. Your data has been saved locally. Please click \"Retry\" to try again' message does not appear unexpectedly. The error/retry banner should only be shown when there is an actual, confirmed network or canister call failure — not on initial load, not when localStorage contains stale data from a previous session, and not when the form has not yet been submitted. Clear any stale localStorage pending appointment data that would incorrectly trigger this state on mount.",
       "files": [
-        "frontend/src/components/Footer.tsx"
+        "frontend/src/components/BookAppointmentDialog.tsx"
       ],
       "components": [
         "authorization@4.0.0",

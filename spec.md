@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Remove all "Caffeine AI" branding, references, logos, and links from every part of the dental clinic website frontend.
+**Goal:** Fix the `BookAppointmentDialog` component so the "Connection issue" error/retry banner does not appear unexpectedly on dialog open.
 
 **Planned changes:**
-- Remove all "Caffeine AI" text, logos, icons, and hyperlinks from the Footer component
-- Remove all "Caffeine AI" text, logos, icons, and hyperlinks from the Header component
-- Audit and remove all remaining "Caffeine AI" references from every other page and section component (Home, HeroSection, ContactSection, ServicesGrid, DoctorProfile, TestimonialCarousel, admin pages, etc.)
+- Clear any stale localStorage pending appointment data on dialog mount so it does not incorrectly trigger the connection error state.
+- Ensure the connection error/retry banner is only shown after an actual failed backend submission attempt, not on initial load or when stale data exists from a previous session.
+- After a successful appointment submission, clear the pending localStorage entry so the retry banner does not appear on the next dialog open.
+- Keep the Retry button functional so it re-attempts submission using locally saved data after a genuine failure.
 
-**User-visible outcome:** No "Caffeine AI" branding, attribution, or links appear anywhere on the website; all other content and functionality remains unchanged.
+**User-visible outcome:** Opening the appointment booking dialog no longer shows the "Connection issue" banner unexpectedly. The banner only appears when a real network or backend failure occurs during form submission.

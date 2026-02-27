@@ -203,7 +203,7 @@ export interface backendInterface {
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    setClinicStatus(status: ClinicStatus): Promise<void>;
+    setClinicStatus(adminPrincipal: Principal, status: ClinicStatus): Promise<void>;
     updateAppointmentStatus(appointmentId: bigint, newStatus: AppointmentStatus): Promise<void>;
 }
 import type { Appointment as _Appointment, AppointmentStatus as _AppointmentStatus, BeforeAfterPair as _BeforeAfterPair, ClinicStatus as _ClinicStatus, DoctorAvailability as _DoctorAvailability, ExternalBlob as _ExternalBlob, Review as _Review, ReviewInput as _ReviewInput, ReviewState as _ReviewState, Service as _Service, Time as _Time, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
@@ -629,17 +629,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async setClinicStatus(arg0: ClinicStatus): Promise<void> {
+    async setClinicStatus(arg0: Principal, arg1: ClinicStatus): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.setClinicStatus(to_candid_ClinicStatus_n39(this._uploadFile, this._downloadFile, arg0));
+                const result = await this.actor.setClinicStatus(arg0, to_candid_ClinicStatus_n39(this._uploadFile, this._downloadFile, arg1));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.setClinicStatus(to_candid_ClinicStatus_n39(this._uploadFile, this._downloadFile, arg0));
+            const result = await this.actor.setClinicStatus(arg0, to_candid_ClinicStatus_n39(this._uploadFile, this._downloadFile, arg1));
             return result;
         }
     }

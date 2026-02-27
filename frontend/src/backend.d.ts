@@ -110,6 +110,6 @@ export interface backendInterface {
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    setClinicStatus(status: ClinicStatus): Promise<void>;
+    setClinicStatus(adminPrincipal: Principal, status: ClinicStatus): Promise<void>;
     updateAppointmentStatus(appointmentId: bigint, newStatus: AppointmentStatus): Promise<void>;
 }

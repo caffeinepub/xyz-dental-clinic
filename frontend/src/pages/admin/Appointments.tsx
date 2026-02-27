@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import React, { useState, useEffect } from 'react';
 import { useGetAllAppointments, useUpdateAppointmentStatus } from '../../hooks/useQueries';
-import { isAdminAuthenticated } from '../../components/AdminGuard';
 import { AppointmentStatus } from '../../backend';
 import {
   Table,
@@ -11,11 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, RefreshCw, AlertCircle, Loader2 } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Loader2, RefreshCw, Clock } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -24,209 +19,160 @@ const statusColors: Record<string, string> = {
   cancelled: 'bg-red-100 text-red-800 border-red-200',
 };
 
-function formatDate(timestamp: bigint): string {
-  try {
-    const ms = Number(timestamp) / 1_000_000;
-    return new Date(ms).toLocaleString();
-  } catch {
-    return 'Invalid date';
-  }
-}
+export default function Appointments() {
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-export default function AdminAppointments() {
-  const navigate = useNavigate();
-  const isAdmin = isAdminAuthenticated();
-
+  // Do NOT gate on isAdminAuthenticated() here — AdminGuard already protects this route.
+  // Passing enabled:true lets the query run as soon as the actor (with admin identity) is ready.
   const {
     data: appointments,
     isLoading,
+    isError,
     error,
+    dataUpdatedAt,
     refetch,
     isFetching,
-  } = useGetAllAppointments({ enabled: isAdmin });
+  } = useGetAllAppointments({
+    refetchInterval: 8000,
+  });
 
   const updateStatus = useUpdateAppointmentStatus();
-  const [updatingId, setUpdatingId] = useState<bigint | null>(null);
 
-  const handleStatusChange = async (appointmentId: bigint, newStatus: AppointmentStatus) => {
-    setUpdatingId(appointmentId);
-    try {
-      await updateStatus.mutateAsync({ appointmentId, newStatus });
-    } finally {
-      setUpdatingId(null);
+  useEffect(() => {
+    if (dataUpdatedAt) {
+      setLastUpdated(new Date(dataUpdatedAt));
     }
+  }, [dataUpdatedAt]);
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
 
-  const getErrorMessage = (err: unknown): string => {
-    if (!err) return 'Unknown error';
-    const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes('Unauthorized') || msg.includes('Only admins')) {
-      return 'Authorization error: Your session may have expired. Please log out and log in again as admin.';
+  const formatDate = (timestamp: bigint) => {
+    const ms = Number(timestamp) / 1_000_000;
+    return new Date(ms).toLocaleDateString('en-IN', { dateStyle: 'medium' });
+  };
+
+  const handleStatusChange = async (appointmentId: bigint, newStatus: AppointmentStatus) => {
+    try {
+      await updateStatus.mutateAsync({ appointmentId, newStatus });
+    } catch (err) {
+      console.error('Failed to update status:', err);
     }
-    return `Failed to load appointments: ${msg}`;
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate({ to: '/admin/dashboard' })}
-              className="text-gray-600 hover:text-gray-900"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Appointments</h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Manage all patient appointments
-              </p>
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="flex items-center gap-2"
-          >
-            {isFetching ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <RefreshCw className="w-4 h-4" />
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Playfair Display, serif' }}>
+            Appointments
+          </h1>
+          <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
+            <Clock className="w-4 h-4" />
+            <span>Last updated: {formatTime(lastUpdated)}</span>
+            {isFetching && (
+              <span className="flex items-center gap-1 text-teal-600">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Syncing...
+              </span>
             )}
-            Refresh
-          </Button>
+          </div>
         </div>
-
-        {/* Error State */}
-        {error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error Loading Appointments</AlertTitle>
-            <AlertDescription>{getErrorMessage(error)}</AlertDescription>
-          </Alert>
-        )}
-
-        {/* Loading State */}
-        {isLoading && (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center gap-3">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-              <p className="text-sm text-gray-500">Loading appointments...</p>
-            </div>
-          </div>
-        )}
-
-        {/* Appointments Table */}
-        {!isLoading && !error && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-            {appointments && appointments.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-gray-50 dark:bg-gray-700">
-                    <TableHead className="font-semibold text-gray-700 dark:text-gray-300">ID</TableHead>
-                    <TableHead className="font-semibold text-gray-700 dark:text-gray-300">Patient</TableHead>
-                    <TableHead className="font-semibold text-gray-700 dark:text-gray-300">Contact</TableHead>
-                    <TableHead className="font-semibold text-gray-700 dark:text-gray-300">Service</TableHead>
-                    <TableHead className="font-semibold text-gray-700 dark:text-gray-300">Date</TableHead>
-                    <TableHead className="font-semibold text-gray-700 dark:text-gray-300">Status</TableHead>
-                    <TableHead className="font-semibold text-gray-700 dark:text-gray-300">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {appointments.map((appt) => (
-                    <TableRow
-                      key={appt.id.toString()}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <TableCell className="font-mono text-sm text-gray-600 dark:text-gray-400">
-                        #{appt.id.toString()}
-                      </TableCell>
-                      <TableCell className="font-medium text-gray-900 dark:text-white">
-                        {appt.patientName}
-                      </TableCell>
-                      <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
-                        {appt.contactInfo}
-                      </TableCell>
-                      <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
-                        {appt.serviceType}
-                      </TableCell>
-                      <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
-                        {formatDate(appt.preferredDate)}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                            statusColors[appt.status] || 'bg-gray-100 text-gray-800 border-gray-200'
-                          }`}
-                        >
-                          {appt.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {updatingId === appt.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                          ) : (
-                            <Select
-                              value={appt.status}
-                              onValueChange={(val) =>
-                                handleStatusChange(appt.id, val as AppointmentStatus)
-                              }
-                            >
-                              <SelectTrigger className="w-32 h-8 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value={AppointmentStatus.pending}>Pending</SelectItem>
-                                <SelectItem value={AppointmentStatus.confirmed}>Confirmed</SelectItem>
-                                <SelectItem value={AppointmentStatus.completed}>Completed</SelectItem>
-                                <SelectItem value={AppointmentStatus.cancelled}>Cancelled</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-                <div className="text-5xl mb-4">📅</div>
-                <p className="text-lg font-medium text-gray-500">No appointments yet</p>
-                <p className="text-sm text-gray-400 mt-1">
-                  Appointments will appear here once patients book them.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Summary */}
-        {appointments && appointments.length > 0 && (
-          <div className="mt-4 flex gap-4 text-sm text-gray-500">
-            <span>Total: {appointments.length}</span>
-            <span>
-              Pending:{' '}
-              {appointments.filter((a) => a.status === AppointmentStatus.pending).length}
-            </span>
-            <span>
-              Confirmed:{' '}
-              {appointments.filter((a) => a.status === AppointmentStatus.confirmed).length}
-            </span>
-            <span>
-              Completed:{' '}
-              {appointments.filter((a) => a.status === AppointmentStatus.completed).length}
-            </span>
-          </div>
-        )}
+        <button
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-700 text-sm font-medium transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
       </div>
+
+      {isLoading ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
+          <span className="ml-3 text-gray-600">Loading appointments...</span>
+        </div>
+      ) : isError ? (
+        <div className="p-6 bg-red-50 border border-red-200 rounded-xl text-center">
+          <p className="text-red-700 font-medium">
+            {(error as Error)?.message?.includes('Unauthorized')
+              ? 'Authorization error. Please log out and log back in as admin.'
+              : 'Failed to load appointments. Please try refreshing.'}
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="mt-3 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg text-sm font-medium transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      ) : !appointments || appointments.length === 0 ? (
+        <div className="p-12 bg-gray-50 border border-gray-200 rounded-xl text-center">
+          <p className="text-gray-500 text-lg">No appointments yet.</p>
+          <p className="text-gray-400 text-sm mt-1">New bookings will appear here automatically.</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50">
+                <TableHead className="font-semibold text-gray-700">ID</TableHead>
+                <TableHead className="font-semibold text-gray-700">Patient Name</TableHead>
+                <TableHead className="font-semibold text-gray-700">Contact</TableHead>
+                <TableHead className="font-semibold text-gray-700">Service</TableHead>
+                <TableHead className="font-semibold text-gray-700">Date</TableHead>
+                <TableHead className="font-semibold text-gray-700">Status</TableHead>
+                <TableHead className="font-semibold text-gray-700">Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {appointments.map((apt) => (
+                <TableRow key={apt.id.toString()} className="hover:bg-gray-50 transition-colors">
+                  <TableCell className="font-mono text-sm text-gray-500">
+                    #{apt.id.toString()}
+                  </TableCell>
+                  <TableCell className="font-medium text-gray-900">{apt.patientName}</TableCell>
+                  <TableCell className="text-gray-600 text-sm">{apt.contactInfo}</TableCell>
+                  <TableCell className="text-gray-600 text-sm">{apt.serviceType}</TableCell>
+                  <TableCell className="text-gray-600 text-sm">{formatDate(apt.preferredDate)}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                        statusColors[apt.status] || 'bg-gray-100 text-gray-700 border-gray-200'
+                      }`}
+                    >
+                      {apt.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <Select
+                      value={apt.status}
+                      onValueChange={(val) =>
+                        handleStatusChange(apt.id, val as AppointmentStatus)
+                      }
+                    >
+                      <SelectTrigger className="w-32 h-8 text-xs bg-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white">
+                        <SelectItem value={AppointmentStatus.pending}>Pending</SelectItem>
+                        <SelectItem value={AppointmentStatus.confirmed}>Confirmed</SelectItem>
+                        <SelectItem value={AppointmentStatus.completed}>Completed</SelectItem>
+                        <SelectItem value={AppointmentStatus.cancelled}>Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 text-sm text-gray-500">
+            Total: {appointments.length} appointment{appointments.length !== 1 ? 's' : ''} • Auto-refreshes every 8 seconds
+          </div>
+        </div>
+      )}
     </div>
   );
 }

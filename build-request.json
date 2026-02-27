@@ -1,70 +1,38 @@
 {
   "kind": "build_request",
-  "title": "Remove all Caffeine AI branding from website",
-  "projectName": "Dental Clinic",
-  "priority": "normal",
+  "title": "Fix unexpected 'Connection issue' error in appointment booking",
+  "projectName": "XYZ Dental Clinic",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Remove all references to 'Caffeine AI' from the Footer component — including the name, any logo/icon, and any associated links or attribution text.",
+      "text": "Fix the BookAppointmentDialog component so that the 'Connection issue. Your data has been saved locally. Please click \"Retry\" to try again' message does not appear unexpectedly. The error/retry banner should only be shown when there is an actual, confirmed network or canister call failure — not on initial load, not when localStorage contains stale data from a previous session, and not when the form has not yet been submitted. Clear any stale localStorage pending appointment data that would incorrectly trigger this state on mount.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-4"
         ],
         "quotes": [
-          "Website ke footer, header ya kisi bhi section se 'Caffeine AI' ka naam, logo aur links puri tarah delete kar do."
+          "now solve it apoint ment book vala problem hau Connection issue. Your data has been saved locally. Please click \"Retry\" to try again"
         ]
       },
       "acceptanceCriteria": [
-        "The Footer component contains no text, image, or hyperlink mentioning 'Caffeine AI'.",
-        "No 'Powered by', 'Built with', or similar attribution referencing Caffeine AI appears in the footer."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Remove all references to 'Caffeine AI' from the Header component — including the name, any logo/icon, and any associated links.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "Website ke footer, header ya kisi bhi section se 'Caffeine AI' ka naam, logo aur links puri tarah delete kar do."
-        ]
-      },
-      "acceptanceCriteria": [
-        "The Header component contains no text, image, or hyperlink mentioning 'Caffeine AI'.",
-        "Header layout and existing navigation links remain intact after removal."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Audit and remove all references to 'Caffeine AI' (name, logo, links, or attribution) from every other page or section component across the entire frontend — including but not limited to Home, HeroSection, ContactSection, ServicesGrid, DoctorProfile, TestimonialCarousel, and all admin pages.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "Website ke footer, header ya kisi bhi section se 'Caffeine AI' ka naam, logo aur links puri tarah delete kar do."
-        ]
-      },
-      "acceptanceCriteria": [
-        "A search across all frontend source files for the string 'Caffeine' returns zero results.",
-        "No page, section, modal, or dialog displays any Caffeine AI branding, logo image, or link.",
-        "All other existing content and functionality remains unaffected."
+        "Opening the BookAppointmentDialog for the first time does not show the 'Connection issue' banner.",
+        "The 'Connection issue. Your data has been saved locally. Please click \"Retry\" to try again' banner only appears after a real failed backend submission attempt.",
+        "Stale localStorage pending appointment entries from previous sessions do not trigger the connection error/retry UI on dialog open.",
+        "After a successful appointment submission, any pending localStorage entry is cleared and the retry banner is not shown on the next dialog open.",
+        "The Retry button, when clicked after a genuine failure, re-attempts submission using the locally saved data."
       ]
     }
   ],
   "constraints": [
-    "Do not alter any other branding, content, or functionality while removing Caffeine AI references.",
-    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
+    "Only fix the connection error banner logic — do not alter unrelated booking form fields or submission flow."
   ],
   "nonGoals": [
-    "Replacing Caffeine AI branding with any other third-party attribution.",
-    "Redesigning the footer, header, or any section layout beyond removing the Caffeine AI references.",
-    "Any backend changes."
+    "Redesigning the appointment booking form UI.",
+    "Changing backend appointment storage or schema.",
+    "Adding new form fields or validation rules."
   ],
   "imageRequirements": {
     "required": [],

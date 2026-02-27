@@ -136,7 +136,7 @@ export interface _SERVICE {
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'setClinicStatus' : ActorMethod<[ClinicStatus], undefined>,
+  'setClinicStatus' : ActorMethod<[Principal, ClinicStatus], undefined>,
   'updateAppointmentStatus' : ActorMethod<
     [bigint, AppointmentStatus],
     undefined

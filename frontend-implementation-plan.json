@@ -1,161 +1,23 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Remove all Caffeine AI branding from website",
+  "title": "Fix unexpected 'Connection issue' error in appointment booking",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Remove all references to 'Caffeine AI' from the Footer component — including the name, any logo/icon, and any associated links or attribution text.",
+      "summary": "Fix BookAppointmentDialog component so the 'Connection issue. Your data has been saved locally. Please click \"Retry\" to try again' message only appears after actual backend submission failures, not on initial load or when stale localStorage data exists from previous sessions",
       "acceptanceCriteria": [
-        "The Footer component contains no text, image, or hyperlink mentioning 'Caffeine AI'.",
-        "No 'Powered by', 'Built with', or similar attribution referencing Caffeine AI appears in the footer."
+        "Opening the BookAppointmentDialog for the first time does not show the 'Connection issue' banner.",
+        "The 'Connection issue. Your data has been saved locally. Please click \"Retry\" to try again' banner only appears after a real failed backend submission attempt.",
+        "Stale localStorage pending appointment entries from previous sessions do not trigger the connection error/retry UI on dialog open.",
+        "After a successful appointment submission, any pending localStorage entry is cleared and the retry banner is not shown on the next dialog open.",
+        "The Retry button, when clicked after a genuine failure, re-attempts submission using the locally saved data."
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/components/Footer.tsx",
-          "operation": "modify",
-          "description": "Remove all Caffeine AI branding elements from the Footer component. Search for and delete any text containing 'Caffeine AI', 'Caffeine', 'Powered by Caffeine', 'Built with Caffeine', or similar attribution. Remove any logo images, icons, or hyperlinks associated with Caffeine AI. Preserve all other footer content including brand info, quick links, services list, contact details, and the hidden admin login modal functionality."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Remove all references to 'Caffeine AI' from the Header component — including the name, any logo/icon, and any associated links.",
-      "acceptanceCriteria": [
-        "The Header component contains no text, image, or hyperlink mentioning 'Caffeine AI'.",
-        "Header layout and existing navigation links remain intact after removal."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/Header.tsx",
-          "operation": "modify",
-          "description": "Remove all Caffeine AI branding elements from the Header component. Search for and delete any text containing 'Caffeine AI', 'Caffeine', or related attribution. Remove any logo images, icons, or hyperlinks that reference Caffeine AI. Preserve the existing header functionality including scroll-aware styling, smooth-scroll navigation links, mobile menu toggle, and the 'Book Appointment' button."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Audit and remove all references to 'Caffeine AI' (name, logo, links, or attribution) from every other page or section component across the entire frontend — including but not limited to Home, HeroSection, ContactSection, ServicesGrid, DoctorProfile, TestimonialCarousel, and all admin pages.",
-      "acceptanceCriteria": [
-        "A search across all frontend source files for the string 'Caffeine' returns zero results.",
-        "No page, section, modal, or dialog displays any Caffeine AI branding, logo image, or link.",
-        "All other existing content and functionality remains unaffected."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/HeroSection.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the HeroSection component. Search for 'Caffeine' in text content, image sources, or links and delete all occurrences. Preserve the full-viewport hero layout, background image, animated floating dental icons, staggered text reveal heading, and call-to-action button functionality."
-        },
-        {
-          "path": "frontend/src/components/ContactSection.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the ContactSection component. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the contact cards displaying clinic phone, email, address, hours, WhatsApp link, and animated staggered text heading."
-        },
-        {
-          "path": "frontend/src/components/ServicesGrid.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the ServicesGrid component. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the grid layout, service icons, backend data fetching, static fallback data, hover effects, and navigation to individual service pages."
-        },
-        {
-          "path": "frontend/src/components/DoctorProfile.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the DoctorProfile component. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the doctor profile section with photo, bio, stats, specialty tags, and staggered text reveal animation."
-        },
-        {
-          "path": "frontend/src/components/TestimonialCarousel.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the TestimonialCarousel component. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the auto-scrolling infinite carousel, star ratings, requestAnimationFrame animation, and staggered text reveal for the section heading."
-        },
         {
           "path": "frontend/src/components/BookAppointmentDialog.tsx",
           "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the BookAppointmentDialog component. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the modal dialog structure, appointment booking form, patient detail inputs, and success/error state handling."
-        },
-        {
-          "path": "frontend/src/components/HiddenAdminLoginModal.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the HiddenAdminLoginModal component. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the two-step admin authentication flow, credential validation, Internet Identity trigger, and redirect logic."
-        },
-        {
-          "path": "frontend/src/components/UserProfileSetup.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the UserProfileSetup component. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the modal dialog prompting new users to enter their name and the profile creation flow."
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the Home page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the composed sections (Hero, Services, Doctor Profile, Before/After, Testimonials, Contact) and scroll-reveal animations."
-        },
-        {
-          "path": "frontend/src/pages/ServiceDetail.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the ServiceDetail page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the dynamic service detail display with featured photo, description, feature highlights, and booking dialog trigger."
-        },
-        {
-          "path": "frontend/src/pages/DentalImplantsDetail.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the DentalImplantsDetail page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the hero section with image, benefits grid, and booking dialog functionality."
-        },
-        {
-          "path": "frontend/src/pages/InvisalignDetail.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the InvisalignDetail page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the hero section, embedded BeforeAfterSlider, benefits grid, and booking dialog."
-        },
-        {
-          "path": "frontend/src/pages/LaserDentistryDetail.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the LaserDentistryDetail page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the themed hero with decorative laser beam element, benefits section, and booking dialog."
-        },
-        {
-          "path": "frontend/src/pages/PediatricDentistryDetail.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the PediatricDentistryDetail page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the green-themed hero, 'Why Kids Love Us' features grid, and booking dialog."
-        },
-        {
-          "path": "frontend/src/pages/SmileMakeoverDetail.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the SmileMakeoverDetail page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the hero section, before/after slider, included treatments list, and booking dialog."
-        },
-        {
-          "path": "frontend/src/pages/AccessDenied.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the AccessDenied page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the access denied screen layout, styled card, and navigation button."
-        },
-        {
-          "path": "frontend/src/pages/admin/Dashboard.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the admin Dashboard page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the navigation cards for admin sections, clinic status toggle, and logout functionality."
-        },
-        {
-          "path": "frontend/src/pages/admin/Appointments.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the admin Appointments page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the appointments table, status badges, update functionality, and loading/error states."
-        },
-        {
-          "path": "frontend/src/pages/admin/BeforeAfterManager.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the admin BeforeAfterManager page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the image upload interface with drag-and-drop, description input, and progress tracking."
-        },
-        {
-          "path": "frontend/src/pages/admin/ContentManager.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the admin ContentManager page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the review submission form with name, text, and star rating inputs."
-        },
-        {
-          "path": "frontend/src/pages/admin/DoctorScheduler.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the admin DoctorScheduler page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the doctor addition form, doctor list display, and React Query data fetching."
-        },
-        {
-          "path": "frontend/src/pages/admin/ReviewApprover.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the admin ReviewApprover page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the pending reviews list, approve/delete functionality, star rating display, and photo preview."
-        },
-        {
-          "path": "frontend/src/pages/admin/ServiceManager.tsx",
-          "operation": "modify",
-          "description": "Audit and remove any Caffeine AI references from the admin ServiceManager page. Search for 'Caffeine' in text, images, or links and delete all occurrences. Preserve the service editing form with display name, description, featured photo upload, and progress tracking."
+          "description": "Refactor the component's state management and localStorage logic to distinguish between stale data and actual failed submission attempts. On mount, clear any stale localStorage pending appointment entries that would incorrectly trigger the connection error banner. Track submission attempts explicitly so the error/retry banner only appears after a confirmed backend call failure (not on initial load or when localStorage contains old data). Ensure that successful submissions clear the localStorage entry and reset any error/retry state. The Retry button should re-attempt submission using the locally saved data only when a genuine failure has occurred. Do not show the connection issue banner on dialog open unless there is an active, unresolved submission failure."
         }
       ]
     }

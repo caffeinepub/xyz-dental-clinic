@@ -1,12 +1,27 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import BookAppointmentDialog from './BookAppointmentDialog';
 import MagneticButton from './MagneticButton';
-import { useStaggeredTextReveal } from '../hooks/useStaggeredTextReveal';
+import { useGetClinicStatus } from '../hooks/useQueries';
+import { ClinicStatus } from '../backend';
+
+const floatingIcons = [
+  { src: '/assets/generated/tooth-float-icon.dim_96x96.png', alt: 'tooth', top: '15%', left: '5%', delay: '0s' },
+  { src: '/assets/generated/dental-mirror-float-icon.dim_96x96.png', alt: 'mirror', top: '25%', right: '8%', delay: '1.2s' },
+  { src: '/assets/generated/toothbrush-float-icon.dim_96x96.png', alt: 'toothbrush', bottom: '30%', left: '3%', delay: '0.6s' },
+  { src: '/assets/generated/plus-float-icon.dim_96x96.png', alt: 'plus', bottom: '20%', right: '5%', delay: '1.8s' },
+];
+
+const stats = [
+  { value: '5000+', label: 'Happy Patients' },
+  { value: '15+', label: 'Years Experience' },
+  { value: '98%', label: 'Success Rate' },
+  { value: '20+', label: 'Treatments' },
+];
 
 export default function HeroSection() {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const headingText = 'Your Perfect Smile Starts Here';
-  const { ref: headingRef, wordElements } = useStaggeredTextReveal(headingText);
+  const { data: clinicStatus } = useGetClinicStatus();
+  const isClinicOpen = clinicStatus === ClinicStatus.open || clinicStatus === undefined;
 
   return (
     <section
@@ -19,7 +34,7 @@ export default function HeroSection() {
         overflow: 'hidden',
       }}
     >
-      {/* Background image */}
+      {/* Background Image */}
       <div
         style={{
           position: 'absolute',
@@ -40,57 +55,29 @@ export default function HeroSection() {
         }}
       />
 
-      {/* Floating dental icon */}
-      <img
-        src="/assets/generated/tooth-float-icon.dim_96x96.png"
-        alt=""
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: '12%',
-          right: '8%',
-          width: '80px',
-          height: '80px',
-          opacity: 0.55,
-          zIndex: 2,
-          animation: 'floatBob 3.5s ease-in-out infinite',
-          pointerEvents: 'none',
-          filter: 'drop-shadow(0 4px 16px rgba(14,165,233,0.4))',
-        }}
-      />
-      <img
-        src="/assets/generated/dental-mirror-float-icon.dim_96x96.png"
-        alt=""
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          bottom: '18%',
-          left: '6%',
-          width: '64px',
-          height: '64px',
-          opacity: 0.4,
-          zIndex: 2,
-          animation: 'floatBob 4.2s ease-in-out infinite 1s',
-          pointerEvents: 'none',
-          filter: 'drop-shadow(0 4px 12px rgba(6,182,212,0.35))',
-        }}
-      />
-      <img
-        src="/assets/generated/plus-float-icon.dim_96x96.png"
-        alt=""
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: '30%',
-          left: '4%',
-          width: '48px',
-          height: '48px',
-          opacity: 0.3,
-          zIndex: 2,
-          animation: 'floatBob 5s ease-in-out infinite 0.5s',
-          pointerEvents: 'none',
-        }}
-      />
+      {/* Floating Icons */}
+      {floatingIcons.map((icon) => (
+        <img
+          key={icon.alt}
+          src={icon.src}
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            width: '56px',
+            height: '56px',
+            opacity: 0.25,
+            pointerEvents: 'none',
+            zIndex: 2,
+            animation: `floatBob 4s ease-in-out infinite`,
+            animationDelay: icon.delay,
+            top: icon.top,
+            left: (icon as any).left,
+            right: (icon as any).right,
+            bottom: (icon as any).bottom,
+          }}
+        />
+      ))}
 
       {/* Content */}
       <div
@@ -99,7 +86,7 @@ export default function HeroSection() {
           zIndex: 3,
           textAlign: 'center',
           padding: '0 24px',
-          maxWidth: '800px',
+          maxWidth: '860px',
           width: '100%',
         }}
       >
@@ -122,7 +109,6 @@ export default function HeroSection() {
         </div>
 
         <h1
-          ref={headingRef as React.RefObject<HTMLHeadingElement>}
           style={{
             fontSize: 'clamp(36px, 6vw, 72px)',
             fontWeight: 800,
@@ -130,11 +116,10 @@ export default function HeroSection() {
             lineHeight: 1.1,
             marginBottom: '20px',
             letterSpacing: '-0.02em',
+            fontFamily: 'Playfair Display, serif',
           }}
         >
-          {wordElements.map(({ word, style }, i) => (
-            <span key={i} style={style}>{word}</span>
-          ))}
+          Your Perfect Smile Starts Here
         </h1>
 
         <p
@@ -151,25 +136,41 @@ export default function HeroSection() {
         </p>
 
         <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <MagneticButton>
-            <button
-              onClick={() => setDialogOpen(true)}
+          {isClinicOpen ? (
+            <MagneticButton>
+              <button
+                onClick={() => setDialogOpen(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '16px 36px',
+                  fontSize: '16px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  boxShadow: '0 8px 32px rgba(14,165,233,0.4)',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                Book Your Smile Transformation
+              </button>
+            </MagneticButton>
+          ) : (
+            <div
               style={{
-                background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
                 padding: '16px 36px',
+                borderRadius: '8px',
+                background: 'rgba(239,68,68,0.2)',
+                border: '1.5px solid rgba(239,68,68,0.4)',
+                color: '#fca5a5',
                 fontSize: '16px',
                 fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: '0 8px 32px rgba(14,165,233,0.4)',
-                letterSpacing: '0.02em',
               }}
             >
-              Book Now
-            </button>
-          </MagneticButton>
+              🔴 Clinic is Currently Closed
+            </div>
+          )}
 
           <button
             onClick={() => {
@@ -202,14 +203,14 @@ export default function HeroSection() {
             flexWrap: 'wrap',
           }}
         >
-          {[
-            { value: '5000+', label: 'Happy Patients' },
-            { value: '15+', label: 'Years Experience' },
-            { value: '98%', label: 'Success Rate' },
-          ].map(stat => (
+          {stats.map((stat) => (
             <div key={stat.label} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#38bdf8' }}>{stat.value}</div>
-              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', marginTop: '2px' }}>{stat.label}</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#38bdf8', fontFamily: 'Playfair Display, serif' }}>
+                {stat.value}
+              </div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', marginTop: '2px' }}>
+                {stat.label}
+              </div>
             </div>
           ))}
         </div>
@@ -244,7 +245,9 @@ export default function HeroSection() {
         />
       </div>
 
-      <BookAppointmentDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      {isClinicOpen && (
+        <BookAppointmentDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      )}
     </section>
   );
 }

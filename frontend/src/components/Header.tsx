@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import BookAppointmentDialog from './BookAppointmentDialog';
 import MagneticButton from './MagneticButton';
+import { useGetClinicStatus } from '../hooks/useQueries';
+import { ClinicStatus } from '../backend';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const { data: clinicStatus } = useGetClinicStatus();
+  const isClinicOpen = clinicStatus === ClinicStatus.open || clinicStatus === undefined;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -19,6 +24,11 @@ export default function Header() {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleBookNow = () => {
+    if (!isClinicOpen) return;
+    setDialogOpen(true);
+  };
+
   return (
     <>
       <header
@@ -29,9 +39,7 @@ export default function Header() {
           right: 0,
           zIndex: 1000,
           transition: 'all 0.3s ease',
-          background: scrolled
-            ? 'rgba(255,255,255,0.95)'
-            : 'transparent',
+          background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent',
           backdropFilter: scrolled ? 'blur(12px)' : 'none',
           boxShadow: scrolled ? '0 2px 20px rgba(0,0,0,0.08)' : 'none',
           borderBottom: scrolled ? '1px solid rgba(0,0,0,0.06)' : 'none',
@@ -48,7 +56,7 @@ export default function Header() {
             justifyContent: 'space-between',
           }}
         >
-          {/* Logo */}
+          {/* Logo — click to reload */}
           <button
             onClick={() => window.location.reload()}
             style={{
@@ -60,6 +68,7 @@ export default function Header() {
               gap: '10px',
               padding: 0,
             }}
+            aria-label="Reload page"
           >
             <img
               src="/assets/generated/tooth-logo-icon.dim_64x64.png"
@@ -72,9 +81,10 @@ export default function Header() {
                 fontWeight: 800,
                 color: scrolled ? '#0f172a' : '#ffffff',
                 letterSpacing: '-0.02em',
+                fontFamily: 'Playfair Display, serif',
               }}
             >
-              SmileCare
+              SmileCare Dental
             </span>
           </button>
 
@@ -82,10 +92,11 @@ export default function Header() {
           <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }} className="hidden-mobile">
             {[
               { label: 'Services', id: 'services' },
+              { label: 'Gallery', id: 'gallery' },
               { label: 'Doctor', id: 'doctor' },
               { label: 'Testimonials', id: 'testimonials' },
               { label: 'Contact', id: 'contact' },
-            ].map(item => (
+            ].map((item) => (
               <button
                 key={item.id}
                 onClick={() => scrollTo(item.id)}
@@ -105,25 +116,41 @@ export default function Header() {
               </button>
             ))}
 
-            <MagneticButton>
-              <button
-                onClick={() => setDialogOpen(true)}
+            {isClinicOpen ? (
+              <MagneticButton>
+                <button
+                  onClick={handleBookNow}
+                  style={{
+                    background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '10px 24px',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 16px rgba(14,165,233,0.35)',
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  Book Now
+                </button>
+              </MagneticButton>
+            ) : (
+              <span
                 style={{
-                  background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
-                  color: '#fff',
-                  border: 'none',
+                  padding: '10px 20px',
                   borderRadius: '8px',
-                  padding: '10px 24px',
-                  fontSize: '14px',
+                  background: 'rgba(239,68,68,0.1)',
+                  border: '1.5px solid rgba(239,68,68,0.3)',
+                  color: scrolled ? '#dc2626' : '#fca5a5',
+                  fontSize: '13px',
                   fontWeight: 700,
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 16px rgba(14,165,233,0.35)',
-                  letterSpacing: '0.02em',
                 }}
               >
-                Book Now
-              </button>
-            </MagneticButton>
+                🔴 Clinic Closed
+              </span>
+            )}
           </nav>
 
           {/* Mobile hamburger */}
@@ -141,7 +168,7 @@ export default function Header() {
             className="show-mobile"
             aria-label="Toggle menu"
           >
-            {[0, 1, 2].map(i => (
+            {[0, 1, 2].map((i) => (
               <span
                 key={i}
                 style={{
@@ -169,10 +196,11 @@ export default function Header() {
           >
             {[
               { label: 'Services', id: 'services' },
+              { label: 'Gallery', id: 'gallery' },
               { label: 'Doctor', id: 'doctor' },
               { label: 'Testimonials', id: 'testimonials' },
               { label: 'Contact', id: 'contact' },
-            ].map(item => (
+            ].map((item) => (
               <button
                 key={item.id}
                 onClick={() => scrollTo(item.id)}
@@ -193,28 +221,50 @@ export default function Header() {
                 {item.label}
               </button>
             ))}
-            <button
-              onClick={() => { setMobileOpen(false); setDialogOpen(true); }}
-              style={{
-                marginTop: '16px',
-                width: '100%',
-                background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '14px',
-                fontSize: '15px',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              Book Now
-            </button>
+
+            {isClinicOpen ? (
+              <button
+                onClick={() => { setMobileOpen(false); handleBookNow(); }}
+                style={{
+                  marginTop: '16px',
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '14px',
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                Book Now
+              </button>
+            ) : (
+              <div
+                style={{
+                  marginTop: '16px',
+                  width: '100%',
+                  background: '#fef2f2',
+                  border: '1.5px solid #fca5a5',
+                  borderRadius: '8px',
+                  padding: '14px',
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  color: '#dc2626',
+                  textAlign: 'center',
+                }}
+              >
+                🔴 Clinic is Closed
+              </div>
+            )}
           </div>
         )}
       </header>
 
-      <BookAppointmentDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      {isClinicOpen && (
+        <BookAppointmentDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      )}
 
       <style>{`
         @media (max-width: 768px) {

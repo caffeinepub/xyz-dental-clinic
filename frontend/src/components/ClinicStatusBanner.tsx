@@ -16,6 +16,8 @@ export default function ClinicStatusBanner() {
         borderBottom: `2px solid ${isEmergency ? '#fca5a5' : '#fcd34d'}`,
         padding: '0.75rem 1.5rem',
         textAlign: 'center',
+        position: 'relative',
+        zIndex: 999,
       }}
     >
       <p
@@ -23,6 +25,7 @@ export default function ClinicStatusBanner() {
           color: isEmergency ? '#dc2626' : '#92400e',
           fontWeight: 600,
           fontSize: '0.9rem',
+          margin: 0,
         }}
       >
         {isEmergency
