@@ -1,37 +1,70 @@
 {
   "kind": "build_request",
-  "title": "Fix admin panel appointments not loading",
-  "priority": "high",
+  "title": "Remove all Caffeine AI branding from website",
+  "projectName": "Dental Clinic",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the admin panel Appointments page so that appointments load correctly. The root cause is in AdminGuard's sessionStorage checks, auth state passing, or backend authorization validation. Ensure that when an admin is authenticated, the AdminGuard correctly reads 'adminAuth' from sessionStorage, passes valid auth state to child routes, and the backend's role/authorization check for fetching all appointments succeeds without error.",
-      "target": "both",
+      "text": "Remove all references to 'Caffeine AI' from the Footer component — including the name, any logo/icon, and any associated links or attribution text.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-latest"
         ],
         "quotes": [
-          "now solve this new problem"
+          "Website ke footer, header ya kisi bhi section se 'Caffeine AI' ka naam, logo aur links puri tarah delete kar do."
         ]
       },
       "acceptanceCriteria": [
-        "Admin can log in via the hidden admin login modal and be redirected to the admin dashboard without errors.",
-        "Navigating to the admin Appointments page loads and displays all appointments without a login error or empty state caused by auth failure.",
-        "AdminGuard correctly reads 'adminAuth' from sessionStorage and does not redirect authenticated admins to the home page.",
-        "The backend authorization check for fetching all appointments returns data successfully when called by an authenticated admin session.",
-        "No console errors related to authentication or authorization appear when loading the Appointments page as an admin."
+        "The Footer component contains no text, image, or hyperlink mentioning 'Caffeine AI'.",
+        "No 'Powered by', 'Built with', or similar attribution referencing Caffeine AI appears in the footer."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Remove all references to 'Caffeine AI' from the Header component — including the name, any logo/icon, and any associated links.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "Website ke footer, header ya kisi bhi section se 'Caffeine AI' ka naam, logo aur links puri tarah delete kar do."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The Header component contains no text, image, or hyperlink mentioning 'Caffeine AI'.",
+        "Header layout and existing navigation links remain intact after removal."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Audit and remove all references to 'Caffeine AI' (name, logo, links, or attribution) from every other page or section component across the entire frontend — including but not limited to Home, HeroSection, ContactSection, ServicesGrid, DoctorProfile, TestimonialCarousel, and all admin pages.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "Website ke footer, header ya kisi bhi section se 'Caffeine AI' ka naam, logo aur links puri tarah delete kar do."
+        ]
+      },
+      "acceptanceCriteria": [
+        "A search across all frontend source files for the string 'Caffeine' returns zero results.",
+        "No page, section, modal, or dialog displays any Caffeine AI branding, logo image, or link.",
+        "All other existing content and functionality remains unaffected."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files listed in frontend.immutablePaths.",
-    "All Motoko logic must remain in the single backend/main.mo actor file."
+    "Do not alter any other branding, content, or functionality while removing Caffeine AI references.",
+    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
   ],
   "nonGoals": [
-    "Redesigning the admin UI layout or styling.",
-    "Adding new appointment features or fields.",
-    "Changing the admin login credentials or authentication mechanism."
+    "Replacing Caffeine AI branding with any other third-party attribution.",
+    "Redesigning the footer, header, or any section layout beyond removing the Caffeine AI references.",
+    "Any backend changes."
   ],
   "imageRequirements": {
     "required": [],

@@ -1,46 +1,74 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T09:45:56.164Z",
+  "generatedAt": "2026-02-27T09:56:09.276Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
+    "total": 3,
     "implemented": 1,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Fix the admin panel Appointments page so that appointments load correctly. The root cause is in AdminGuard's sessionStorage checks, auth state passing, or backend authorization validation. Ensure that when an admin is authenticated, the AdminGuard correctly reads 'adminAuth' from sessionStorage, passes valid auth state to child routes, and the backend's role/authorization check for fetching all appointments succeeds without error.",
+        "summary": "Remove all references to 'Caffeine AI' from the Footer component — including the name, any logo/icon, and any associated links or attribution text.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/AdminGuard.tsx",
-          "frontend/src/components/HiddenAdminLoginModal.tsx",
-          "frontend/src/pages/admin/Appointments.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/Footer.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/AdminGuard.tsx",
-          "frontend/src/components/HiddenAdminLoginModal.tsx",
-          "frontend/src/pages/admin/Appointments.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/components/Footer.tsx"
         ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Remove all references to 'Caffeine AI' from the Header component — including the name, any logo/icon, and any associated links.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/components/Header.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Audit and remove all references to 'Caffeine AI' (name, logo, links, or attribution) from every other page or section component across the entire frontend — including but not limited to Home, HeroSection, ContactSection, ServicesGrid, DoctorProfile, TestimonialCarousel, and all admin pages.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/components/HeroSection.tsx",
+          "frontend/src/components/ContactSection.tsx",
+          "frontend/src/components/ServicesGrid.tsx",
+          "frontend/src/components/DoctorProfile.tsx",
+          "frontend/src/components/TestimonialCarousel.tsx",
+          "frontend/src/components/BookAppointmentDialog.tsx",
+          "frontend/src/components/HiddenAdminLoginModal.tsx",
+          "frontend/src/components/UserProfileSetup.tsx",
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/pages/ServiceDetail.tsx",
+          "frontend/src/pages/DentalImplantsDetail.tsx",
+          "frontend/src/pages/InvisalignDetail.tsx",
+          "frontend/src/pages/LaserDentistryDetail.tsx",
+          "frontend/src/pages/PediatricDentistryDetail.tsx",
+          "frontend/src/pages/SmileMakeoverDetail.tsx",
+          "frontend/src/pages/AccessDenied.tsx",
+          "frontend/src/pages/admin/Dashboard.tsx",
+          "frontend/src/pages/admin/Appointments.tsx",
+          "frontend/src/pages/admin/BeforeAfterManager.tsx",
+          "frontend/src/pages/admin/ContentManager.tsx",
+          "frontend/src/pages/admin/DoctorScheduler.tsx",
+          "frontend/src/pages/admin/ReviewApprover.tsx",
+          "frontend/src/pages/admin/ServiceManager.tsx"
+        ],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/AdminGuard.tsx",
     "frontend/src/components/Footer.tsx",
-    "frontend/src/components/HiddenAdminLoginModal.tsx",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/admin/Appointments.tsx",
-    "frontend/src/pages/admin/DoctorScheduler.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -1,22 +1,46 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
+  "summary": "Web project with admin panel and appointment management. User wants all references to 'Caffeine AI' (name, logo, links) removed from the website's footer, header, and all sections.",
   "architectural_notes": [],
   "known_issues": [],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-fix-the-admin-panel-appointments-page-so-that-appointments-load-correctly-the-root-cause-is-in-adminguard-s-sessionstorage-checks-auth-state-passing-or-backend-authorization-validation-ensure-that-when-an-admin-is-authenticated-the-adminguard-correctly-reads-adminauth-from-sessionstorage-passes-valid-auth-state-to-child-routes-and-the-backend-s-role-authorization-check-for-fetching-all-appointments-succeeds-without-error",
-      "title": "Fix the admin panel Appointments page so that appointments load correctly. The root cause is in AdminGuard's sessionStorage checks, auth state passing, or backend authorization validation. Ensure that when an admin is authenticated, the AdminGuard correctly reads 'adminAuth' from sessionStorage, passes valid auth state to child routes, and the backend's role/authorization check for fetching all appointments succeeds without error.",
+      "id": "feature-remove-all-references-to-caffeine-ai-from-the-footer-component-including-the-name-any-logo-icon-and-any-associated-links-or-attribution-text",
+      "title": "Remove all references to 'Caffeine AI' from the Footer component — including the name, any logo/icon, and any associated links or attribution text.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Fix admin panel appointments not loading",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Remove all 'Caffeine AI' branding (name, logo, links) from website footer, header, and every section",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Remove all references to 'Caffeine AI' from the Header component — including the name, any logo/icon, and any associated links.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Audit and remove all references to 'Caffeine AI' (name, logo, links, or attribution) from every other page or section component across the entire frontend — including but not limited to Home, HeroSection, ContactSection, ServicesGrid, DoctorProfile, TestimonialCarousel, and all admin pages.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Dental Clinic",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

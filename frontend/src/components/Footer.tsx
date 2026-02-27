@@ -4,7 +4,6 @@ import HiddenAdminLoginModal from './HiddenAdminLoginModal';
 export default function Footer() {
   const [adminModalOpen, setAdminModalOpen] = useState(false);
   const currentYear = new Date().getFullYear();
-  const hostname = typeof window !== 'undefined' ? encodeURIComponent(window.location.hostname) : 'unknown-app';
 
   return (
     <footer style={{ background: '#0a1628', color: '#e2e8f0', padding: '60px 0 0 0', position: 'relative', zIndex: 10 }}>
@@ -77,20 +76,9 @@ export default function Footer() {
 
         {/* Divider */}
         <div style={{ borderTop: '1px solid #1e3a5f', padding: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
             <p style={{ color: '#64748b', fontSize: '13px', margin: 0 }}>
               © {currentYear} XYZ Dental Clinic. All rights reserved.
-            </p>
-            <p style={{ color: '#64748b', fontSize: '13px', margin: 0 }}>
-              Built with ❤️ using{' '}
-              <a
-                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${hostname}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: '#38bdf8', textDecoration: 'none' }}
-              >
-                caffeine.ai
-              </a>
             </p>
           </div>
 
