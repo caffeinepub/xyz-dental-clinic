@@ -1,144 +1,46 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T08:59:44.148Z",
+  "generatedAt": "2026-02-27T09:45:56.164Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 6,
-    "implemented": 6,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Fix the appointment booking form in BookAppointmentDialog.tsx so that form submissions save directly to the backend actor (no external service). On successful submit, display a green checkmark animation with the text 'Appointment Confirmed!' instead of the current error state. Ensure no Internet Identity login prompt or auth barrier appears for patients during booking — the form must be fully accessible to anonymous users.",
+        "summary": "Fix the admin panel Appointments page so that appointments load correctly. The root cause is in AdminGuard's sessionStorage checks, auth state passing, or backend authorization validation. Ensure that when an admin is authenticated, the AdminGuard correctly reads 'adminAuth' from sessionStorage, passes valid auth state to child routes, and the backend's role/authorization check for fetching all appointments succeeds without error.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/BookAppointmentDialog.tsx",
+          "frontend/src/components/AdminGuard.tsx",
+          "frontend/src/components/HiddenAdminLoginModal.tsx",
+          "frontend/src/pages/admin/Appointments.tsx",
           "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/BookAppointmentDialog.tsx",
+          "frontend/src/components/AdminGuard.tsx",
+          "frontend/src/components/HiddenAdminLoginModal.tsx",
+          "frontend/src/pages/admin/Appointments.tsx",
           "frontend/src/hooks/useQueries.ts"
-        ]
-      },
-      {
-        "id": "REQ-2",
-        "summary": "Add a floating animation to the Hero section: a dental icon or doctor image should continuously float up and down (bob effect) when the page loads. The animation should be smooth and loop indefinitely.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/HeroSection.tsx",
-          "frontend/src/index.css"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/HeroSection.tsx",
-          "frontend/src/index.css"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Make all 'Book Now' buttons magnetic: when the user's mouse cursor moves near a 'Book Now' button, the button should subtly translate toward the cursor, creating a magnetic attraction effect. The button should return to its original position when the cursor moves away.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/MagneticButton.tsx",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/components/HeroSection.tsx",
-          "frontend/src/pages/DentalImplantsDetail.tsx",
-          "frontend/src/pages/InvisalignDetail.tsx",
-          "frontend/src/pages/LaserDentistryDetail.tsx",
-          "frontend/src/pages/PediatricDentistryDetail.tsx",
-          "frontend/src/pages/SmileMakeoverDetail.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/MagneticButton.tsx",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/components/HeroSection.tsx",
-          "frontend/src/pages/DentalImplantsDetail.tsx",
-          "frontend/src/pages/InvisalignDetail.tsx",
-          "frontend/src/pages/LaserDentistryDetail.tsx",
-          "frontend/src/pages/PediatricDentistryDetail.tsx",
-          "frontend/src/pages/SmileMakeoverDetail.tsx"
-        ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Add a staggered text reveal animation to all major section headings: each word in the heading should animate in one by one from below (bounce/slide up), creating a staggered entrance effect when the section scrolls into view.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useStaggeredTextReveal.ts",
-          "frontend/src/components/HeroSection.tsx",
-          "frontend/src/components/ServicesGrid.tsx",
-          "frontend/src/components/DoctorProfile.tsx",
-          "frontend/src/components/TestimonialCarousel.tsx",
-          "frontend/src/components/ContactSection.tsx",
-          "frontend/src/index.css"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useStaggeredTextReveal.ts",
-          "frontend/src/components/HeroSection.tsx",
-          "frontend/src/components/ServicesGrid.tsx",
-          "frontend/src/components/DoctorProfile.tsx",
-          "frontend/src/components/TestimonialCarousel.tsx",
-          "frontend/src/components/ContactSection.tsx",
-          "frontend/src/index.css"
-        ]
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Replace the static white background with a dynamic liquid blue gradient background. The gradient should animate continuously and create a wave/fluid effect that responds to mouse movement across the page.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/LiquidGradientBackground.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/index.css"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/LiquidGradientBackground.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/index.css"
-        ]
-      },
-      {
-        "id": "REQ-6",
-        "summary": "Add a scroll-triggered progress indicator: a thin animated line (progress bar) fixed at the top of the page that fills from left to right as the user scrolls down, indicating how much of the page content remains.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/ScrollProgressBar.tsx",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/ScrollProgressBar.tsx",
-          "frontend/src/App.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/components/BookAppointmentDialog.tsx",
-    "frontend/src/components/ContactSection.tsx",
-    "frontend/src/components/DoctorProfile.tsx",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/components/HeroSection.tsx",
-    "frontend/src/components/LiquidGradientBackground.tsx",
-    "frontend/src/components/MagneticButton.tsx",
-    "frontend/src/components/ScrollProgressBar.tsx",
-    "frontend/src/components/ServicesGrid.tsx",
-    "frontend/src/components/TestimonialCarousel.tsx",
+    "frontend/src/components/AdminGuard.tsx",
+    "frontend/src/components/Footer.tsx",
+    "frontend/src/components/HiddenAdminLoginModal.tsx",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/hooks/useStaggeredTextReveal.ts",
-    "frontend/src/index.css",
-    "frontend/src/pages/DentalImplantsDetail.tsx",
-    "frontend/src/pages/InvisalignDetail.tsx",
-    "frontend/src/pages/LaserDentistryDetail.tsx",
-    "frontend/src/pages/PediatricDentistryDetail.tsx",
-    "frontend/src/pages/ServiceDetail.tsx",
-    "frontend/src/pages/SmileMakeoverDetail.tsx",
+    "frontend/src/pages/admin/Appointments.tsx",
+    "frontend/src/pages/admin/DoctorScheduler.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

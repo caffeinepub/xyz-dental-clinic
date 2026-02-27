@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HiddenAdminLoginModal } from './HiddenAdminLoginModal';
+import HiddenAdminLoginModal from './HiddenAdminLoginModal';
 
 export default function Footer() {
   const [adminModalOpen, setAdminModalOpen] = useState(false);
@@ -122,7 +122,6 @@ export default function Footer() {
                 alt="Admin"
                 style={{ width: '28px', height: '28px', display: 'block' }}
                 onError={e => {
-                  // Fallback to emoji if image fails
                   const parent = (e.currentTarget as HTMLImageElement).parentElement;
                   if (parent) {
                     parent.innerHTML = '<span style="font-size:22px;display:block;">🦷</span>';
@@ -134,7 +133,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <HiddenAdminLoginModal open={adminModalOpen} onOpenChange={setAdminModalOpen} />
+      <HiddenAdminLoginModal open={adminModalOpen} onClose={() => setAdminModalOpen(false)} />
     </footer>
   );
 }

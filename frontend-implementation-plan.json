@@ -1,193 +1,38 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix Appointment Booking & Add Premium Animations",
+  "title": "Fix admin panel appointments not loading",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Fix appointment booking to save to backend without auth and show success animation",
+      "summary": "Fix AdminGuard authentication flow and admin appointments loading",
       "acceptanceCriteria": [
-        "Patient can fill and submit the booking form without any login or identity prompt",
-        "On successful submission, a green animated checkmark is shown with the text 'Appointment Confirmed!'",
-        "The appointment is saved to the backend and visible in the Admin Appointments panel",
-        "No 'Failed' error message appears on form submission under normal conditions"
+        "Admin can log in via the hidden admin login modal and be redirected to the admin dashboard without errors.",
+        "Navigating to the admin Appointments page loads and displays all appointments without a login error or empty state caused by auth failure.",
+        "AdminGuard correctly reads 'adminAuth' from sessionStorage and does not redirect authenticated admins to the home page.",
+        "The backend authorization check for fetching all appointments returns data successfully when called by an authenticated admin session.",
+        "No console errors related to authentication or authorization appear when loading the Appointments page as an admin."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/BookAppointmentDialog.tsx",
+          "path": "frontend/src/components/AdminGuard.tsx",
           "operation": "modify",
-          "description": "Replace form submission logic to use the backend actor's bookAppointment method directly via useBookAppointment hook. Remove any external service calls. On successful mutation, display a green checkmark animation (using Lucide's CheckCircle icon with scale and fade-in keyframes) along with 'Appointment Confirmed!' text. Ensure the dialog opens and submits without requiring Internet Identity authentication—the backend bookAppointment method must accept anonymous callers."
+          "description": "Fix the AdminGuard component to properly handle the admin authentication flow. Ensure that the sessionStorage check for 'adminAuth' correctly identifies authenticated admin sessions and passes valid auth state to child routes. Remove any race conditions in the useEffect that might cause premature redirects. Ensure the loading state properly waits for both sessionStorage verification and any async auth checks before rendering children or redirecting. The guard must allow authenticated admins to access protected routes without being redirected to the home page."
+        },
+        {
+          "path": "frontend/src/components/HiddenAdminLoginModal.tsx",
+          "operation": "modify",
+          "description": "Review and ensure the admin login modal correctly stores the 'adminAuth' state in sessionStorage upon successful credential validation. Verify that the stored auth state format matches what AdminGuard expects to read. Ensure the navigation to the admin dashboard occurs after sessionStorage has been successfully updated, preventing any timing issues where AdminGuard checks before the auth state is persisted."
+        },
+        {
+          "path": "frontend/src/pages/admin/Appointments.tsx",
+          "operation": "modify",
+          "description": "Ensure the Appointments page correctly handles the authenticated admin state passed from AdminGuard. Verify that the page's useQuery hook for fetching all appointments properly depends on the authenticated actor and does not attempt to call the backend before authentication is confirmed. Add error boundary handling to catch and display authorization errors gracefully. Ensure the page shows a proper loading state while appointments are being fetched and displays meaningful error messages if the backend returns authorization failures."
         },
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Review and ensure the useBookAppointment mutation hook calls actor.bookAppointment with the correct parameters (patientName, contactInfo, preferredDate as Time bigint, serviceType). Verify that no authentication wrapper prevents anonymous calls. The hook should return success/error states that BookAppointmentDialog can consume to trigger the success animation."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Add floating bob animation to Hero section dental icon or doctor image",
-      "acceptanceCriteria": [
-        "A dental icon or doctor image is visible in the Hero section",
-        "The element continuously animates up and down in a smooth bobbing motion on page load",
-        "Animation loops indefinitely without interruption"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/HeroSection.tsx",
-          "operation": "modify",
-          "description": "Add a decorative dental icon or doctor image element inside the Hero section. Reference the existing generated asset frontend/public/assets/generated/dental-mirror-float-icon.dim_96x96.png or frontend/public/assets/generated/tooth-float-icon.dim_96x96.png. Apply a CSS animation (define @keyframes float-bob with translateY oscillation) that creates a smooth up-and-down bobbing effect. Set animation-iteration-count to infinite and animation-timing-function to ease-in-out for a natural float. Position the element absolutely or as an overlay within the hero container."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Define a new @keyframes float-bob animation in the global stylesheet with translateY values that create a smooth vertical bobbing motion (e.g., 0% and 100% at translateY(0), 50% at translateY(-20px)). Ensure the animation duration is around 3-4 seconds for a gentle float effect. This animation will be referenced by HeroSection.tsx."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Make all 'Book Now' buttons magnetic with cursor attraction effect",
-      "acceptanceCriteria": [
-        "All 'Book Now' buttons respond to nearby mouse movement by translating toward the cursor",
-        "The effect is smooth and proportional to cursor proximity",
-        "Buttons return to their original position when the cursor moves away"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/MagneticButton.tsx",
-          "operation": "create",
-          "description": "Create a reusable MagneticButton component that wraps any button element. Use a React ref and onMouseMove/onMouseLeave event handlers to track the cursor position relative to the button's bounding rect. Calculate the distance and direction from the button center to the cursor, then apply a CSS transform (translateX and translateY) proportional to the proximity. Use a transition for smooth movement. On mouse leave, reset the transform to (0, 0). Export this component for use in Header, HeroSection, and service detail pages."
-        },
-        {
-          "path": "frontend/src/components/Header.tsx",
-          "operation": "modify",
-          "description": "Wrap the 'Book Now' button in the Header navigation with the new MagneticButton component to enable the magnetic cursor attraction effect."
-        },
-        {
-          "path": "frontend/src/components/HeroSection.tsx",
-          "operation": "modify",
-          "description": "Wrap the 'Book Now' CTA button in the Hero section with the MagneticButton component to apply the magnetic effect."
-        },
-        {
-          "path": "frontend/src/pages/DentalImplantsDetail.tsx",
-          "operation": "modify",
-          "description": "Wrap any 'Book Now' button on this service detail page with the MagneticButton component."
-        },
-        {
-          "path": "frontend/src/pages/InvisalignDetail.tsx",
-          "operation": "modify",
-          "description": "Wrap any 'Book Now' button on this service detail page with the MagneticButton component."
-        },
-        {
-          "path": "frontend/src/pages/LaserDentistryDetail.tsx",
-          "operation": "modify",
-          "description": "Wrap any 'Book Now' button on this service detail page with the MagneticButton component."
-        },
-        {
-          "path": "frontend/src/pages/PediatricDentistryDetail.tsx",
-          "operation": "modify",
-          "description": "Wrap any 'Book Now' button on this service detail page with the MagneticButton component."
-        },
-        {
-          "path": "frontend/src/pages/SmileMakeoverDetail.tsx",
-          "operation": "modify",
-          "description": "Wrap any 'Book Now' button on this service detail page with the MagneticButton component."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Add staggered word-by-word reveal animation to major section headings",
-      "acceptanceCriteria": [
-        "Major section headings animate word-by-word on scroll into view",
-        "Each word slides/bounces up from below with a staggered delay",
-        "Animation triggers once when the heading enters the viewport"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useStaggeredTextReveal.ts",
-          "operation": "create",
-          "description": "Create a custom React hook that splits a heading text into individual words, wraps each in a span, and applies a staggered slide-up or bounce-up animation when the parent element enters the viewport using IntersectionObserver. The hook should return a ref and an array of word elements with inline styles or className that include animation-delay based on word index. The animation should trigger once (via a state flag) and use CSS transform translateY and opacity for the reveal effect."
-        },
-        {
-          "path": "frontend/src/components/HeroSection.tsx",
-          "operation": "modify",
-          "description": "Apply the useStaggeredTextReveal hook to the main headline element to animate each word with a staggered bounce-up effect when the Hero section loads."
-        },
-        {
-          "path": "frontend/src/components/ServicesGrid.tsx",
-          "operation": "modify",
-          "description": "Apply the useStaggeredTextReveal hook to the 'Our Premium Services' heading to animate each word with a staggered slide-up effect when the section scrolls into view."
-        },
-        {
-          "path": "frontend/src/components/DoctorProfile.tsx",
-          "operation": "modify",
-          "description": "Apply the useStaggeredTextReveal hook to the 'Meet Dr. Priya Sharma' heading to animate each word with a staggered reveal effect when the section enters the viewport."
-        },
-        {
-          "path": "frontend/src/components/TestimonialCarousel.tsx",
-          "operation": "modify",
-          "description": "Apply the useStaggeredTextReveal hook to the 'Patient Testimonials' heading to animate each word with a staggered bounce effect on scroll into view."
-        },
-        {
-          "path": "frontend/src/components/ContactSection.tsx",
-          "operation": "modify",
-          "description": "Apply the useStaggeredTextReveal hook to the 'Contact Us' heading to animate each word with a staggered slide-up reveal on scroll into view."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add @keyframes definitions for slide-up-reveal and bounce-up-reveal animations used by the staggered text hook. Include translateY and opacity transitions for a smooth entrance effect."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Replace static white background with dynamic liquid blue gradient responsive to mouse movement",
-      "acceptanceCriteria": [
-        "The page background displays an animated liquid blue gradient instead of a plain white background",
-        "Moving the mouse across the page causes a subtle wave/fluid distortion in the gradient",
-        "The animation runs smoothly without impacting page performance significantly"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/LiquidGradientBackground.tsx",
-          "operation": "create",
-          "description": "Create a full-viewport fixed background component that renders a canvas or CSS-based animated liquid blue gradient. Use mouse move event listeners to shift gradient stop positions or apply CSS filter distortions (e.g., hue-rotate or blur with transform) based on cursor coordinates. Implement the gradient with CSS linear-gradient or radial-gradient using multiple blue shades (e.g., teal, royal-blue, cyan) and animate the gradient angle or stop positions using requestAnimationFrame for smooth continuous motion. On mouse move, adjust gradient parameters to create a subtle wave/fluid effect. Optimize performance by throttling mouse events and using CSS transforms instead of repaints where possible."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Import and render the LiquidGradientBackground component at the root level of the App component, positioned behind all page content using a fixed z-index layer. Ensure it does not interfere with interactive elements."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Remove or override any existing solid white background styles on the body or root elements. Ensure the liquid gradient background is visible and not covered by opaque backgrounds. Define CSS utility classes for gradient animation if using pure CSS approach (e.g., @keyframes liquid-wave with background-position or filter changes)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Add scroll-triggered progress bar at top of page",
-      "acceptanceCriteria": [
-        "A thin progress bar is fixed at the top of the page",
-        "The bar fills proportionally as the user scrolls down the page",
-        "The bar is empty at the top and full at the bottom of the page",
-        "The animation is smooth and updates in real time as the user scrolls"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/ScrollProgressBar.tsx",
-          "operation": "modify",
-          "description": "Review and enhance the existing ScrollProgressBar component to ensure it calculates scroll progress as (scrollTop / (scrollHeight - clientHeight)) * 100 and updates the bar width in real time using a scroll event listener. Ensure the bar is styled with a gradient fill (e.g., teal to royal-blue) and positioned fixed at the top with z-index above other content. Verify smooth animation using CSS transition on width or transform scaleX."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Ensure the ScrollProgressBar component is rendered at the root level of the App, visible on all pages, fixed at the top of the viewport."
+          "description": "Review the useGetAllAppointments query hook to ensure it properly handles admin authentication state. Verify that the query is enabled only when an authenticated admin actor is available. Ensure the hook correctly processes backend authorization errors and provides clear error states that the UI can display. Add retry logic that respects authentication failures and does not infinitely retry on authorization errors."
         }
       ]
     }

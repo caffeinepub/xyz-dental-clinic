@@ -1,33 +1,46 @@
-import React, { ReactNode } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
 
 interface AdminGuardProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-// Check if admin is logged in via hardcoded credentials stored in sessionStorage
-function isAdminAuthenticated(): boolean {
+export function isAdminAuthenticated(): boolean {
   return sessionStorage.getItem('adminAuth') === 'true';
 }
 
 export default function AdminGuard({ children }: AdminGuardProps) {
   const navigate = useNavigate();
+  const { identity, isInitializing } = useInternetIdentity();
+  const [checked, setChecked] = useState(false);
 
-  if (!isAdminAuthenticated()) {
-    // Redirect to home if not authenticated
-    setTimeout(() => navigate({ to: '/' }), 0);
+  useEffect(() => {
+    // Wait for Internet Identity to finish initializing before checking auth
+    if (isInitializing) return;
+
+    const hasSessionAuth = sessionStorage.getItem('adminAuth') === 'true';
+    const hasIdentity = !!identity;
+
+    if (hasSessionAuth && hasIdentity) {
+      // Fully authenticated admin
+      setChecked(true);
+    } else if (hasSessionAuth && !hasIdentity) {
+      // Session flag exists but no II identity — clear stale session and redirect
+      sessionStorage.removeItem('adminAuth');
+      navigate({ to: '/' });
+    } else {
+      // No admin session at all
+      navigate({ to: '/' });
+    }
+  }, [isInitializing, identity, navigate]);
+
+  if (!checked) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
-        <div style={{ textAlign: 'center', padding: '40px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</div>
-          <h2 style={{ color: '#0f172a', fontSize: '24px', fontWeight: 700, marginBottom: '8px' }}>Access Denied</h2>
-          <p style={{ color: '#64748b', marginBottom: '24px' }}>Please log in as admin to access this area.</p>
-          <button
-            onClick={() => navigate({ to: '/' })}
-            style={{ background: 'linear-gradient(135deg, #0ea5e9, #06b6d4)', color: '#fff', border: 'none', borderRadius: '25px', padding: '12px 28px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}
-          >
-            Back to Home
-          </button>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-gray-500">Verifying admin access...</p>
         </div>
       </div>
     );

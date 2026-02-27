@@ -140,7 +140,7 @@ export const idlService = IDL.Service({
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'bookAppointment' : IDL.Func(
       [IDL.Text, IDL.Text, Time, IDL.Text],
-      [Appointment],
+      [IDL.Bool],
       [],
     ),
   'deleteReview' : IDL.Func([IDL.Nat], [], []),
@@ -309,7 +309,7 @@ export const idlFactory = ({ IDL }) => {
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'bookAppointment' : IDL.Func(
         [IDL.Text, IDL.Text, Time, IDL.Text],
-        [Appointment],
+        [IDL.Bool],
         [],
       ),
     'deleteReview' : IDL.Func([IDL.Nat], [], []),

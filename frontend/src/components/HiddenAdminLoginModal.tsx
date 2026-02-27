@@ -1,160 +1,152 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useNavigate } from '@tanstack/react-router';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import { Loader2, ShieldCheck } from 'lucide-react';
+
+interface HiddenAdminLoginModalProps {
+  open: boolean;
+  onClose: () => void;
+}
 
 const ADMIN_USERNAME = '6352174912';
 const ADMIN_PASSWORD = '63521';
 
-interface HiddenAdminLoginModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+type Step = 'credentials' | 'ii-login' | 'success';
 
-export function HiddenAdminLoginModal({ open, onOpenChange }: HiddenAdminLoginModalProps) {
+export default function HiddenAdminLoginModal({ open, onClose }: HiddenAdminLoginModalProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState<Step>('credentials');
+  const { login, loginStatus, identity } = useInternetIdentity();
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    await new Promise(r => setTimeout(r, 400));
-
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+  // When identity becomes available after II login, complete admin auth
+  useEffect(() => {
+    if (step === 'ii-login' && identity) {
       sessionStorage.setItem('adminAuth', 'true');
-      setLoading(false);
-      onOpenChange(false);
+      setStep('success');
+      setTimeout(() => {
+        onClose();
+        navigate({ to: '/admin/dashboard' });
+      }, 800);
+    }
+  }, [identity, step, navigate, onClose]);
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!open) {
       setUsername('');
       setPassword('');
-      navigate({ to: '/admin/dashboard' });
+      setError('');
+      setStep('credentials');
+    }
+  }, [open]);
+
+  const handleCredentialSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      // If already logged in with II, skip II step
+      if (identity) {
+        sessionStorage.setItem('adminAuth', 'true');
+        setStep('success');
+        setTimeout(() => {
+          onClose();
+          navigate({ to: '/admin/dashboard' });
+        }, 800);
+        return;
+      }
+      // Proceed to II login
+      setStep('ii-login');
+      try {
+        await login();
+      } catch (err: any) {
+        console.error('II login error:', err);
+        setError('Login failed. Please try again.');
+        setStep('credentials');
+      }
     } else {
-      setError('Invalid username or password. Please try again.');
-      setLoading(false);
+      setError('Invalid credentials. Please try again.');
     }
   };
 
-  const handleClose = () => {
-    setUsername('');
-    setPassword('');
-    setError('');
-    onOpenChange(false);
-  };
+  const isLoggingIn = loginStatus === 'logging-in';
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent style={{ maxWidth: '400px', background: '#fff', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '32px' }}>
+    <Dialog open={open} onOpenChange={(o) => { if (!o && step !== 'ii-login') onClose(); }}>
+      <DialogContent className="sm:max-w-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
         <DialogHeader>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-            <div style={{ width: '64px', height: '64px', background: 'linear-gradient(135deg, #0ea5e9, #06b6d4)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(14,165,233,0.3)' }}>
-              <span style={{ fontSize: '32px' }}>🦷</span>
-            </div>
-          </div>
-          <DialogTitle style={{ textAlign: 'center', fontSize: '22px', fontWeight: 700, color: '#0f172a' }}>
+          <DialogTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+            <img src="/assets/generated/tooth-logo-icon.dim_64x64.png" alt="tooth" className="w-6 h-6" />
             Admin Access
           </DialogTitle>
-          <DialogDescription style={{ textAlign: 'center', color: '#64748b', fontSize: '14px' }}>
-            Enter your credentials to access the admin dashboard.
-          </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleLogin} style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-              Username
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              placeholder="Enter username"
-              required
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                border: '1.5px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '15px',
-                color: '#0f172a',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-                boxSizing: 'border-box',
-              }}
-              onFocus={e => (e.currentTarget.style.borderColor = '#0ea5e9')}
-              onBlur={e => (e.currentTarget.style.borderColor = '#d1d5db')}
-            />
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="Enter password"
-              required
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                border: '1.5px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '15px',
-                color: '#0f172a',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-                boxSizing: 'border-box',
-              }}
-              onFocus={e => (e.currentTarget.style.borderColor = '#0ea5e9')}
-              onBlur={e => (e.currentTarget.style.borderColor = '#d1d5db')}
-            />
-          </div>
-
-          {error && (
-            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 14px', color: '#dc2626', fontSize: '13px' }}>
-              {error}
+        {step === 'credentials' && (
+          <form onSubmit={handleCredentialSubmit} className="space-y-4 mt-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Username
+              </label>
+              <Input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter username"
+                autoComplete="off"
+                className="bg-gray-50 dark:bg-gray-800"
+              />
             </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              background: loading ? '#94a3b8' : 'linear-gradient(135deg, #0ea5e9, #06b6d4)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '10px',
-              padding: '12px',
-              fontSize: '15px',
-              fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-            }}
-          >
-            {loading ? (
-              <>
-                <span style={{ width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />
-                Logging in...
-              </>
-            ) : (
-              'Login'
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Password
+              </label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
+                autoComplete="off"
+                className="bg-gray-50 dark:bg-gray-800"
+              />
+            </div>
+            {error && (
+              <p className="text-sm text-red-500">{error}</p>
             )}
-          </button>
-        </form>
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+              Continue
+            </Button>
+          </form>
+        )}
+
+        {step === 'ii-login' && (
+          <div className="flex flex-col items-center gap-4 py-6">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+              {isLoggingIn
+                ? 'Waiting for Internet Identity authentication...'
+                : 'Connecting to Internet Identity...'}
+            </p>
+            <p className="text-xs text-gray-400 text-center">
+              Please complete the login in the popup window.
+            </p>
+            {error && <p className="text-sm text-red-500">{error}</p>}
+          </div>
+        )}
+
+        {step === 'success' && (
+          <div className="flex flex-col items-center gap-4 py-6">
+            <ShieldCheck className="w-10 h-10 text-green-500" />
+            <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+              Admin access granted! Redirecting...
+            </p>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

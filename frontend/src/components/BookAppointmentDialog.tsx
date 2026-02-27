@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { CheckCircle, Loader2, X } from 'lucide-react';
+import { CheckCircle, Loader2 } from 'lucide-react';
 import { useBookAppointment } from '../hooks/useQueries';
+import { useActor } from '../hooks/useActor';
 
 interface BookAppointmentDialogProps {
   open: boolean;
@@ -27,29 +28,36 @@ export default function BookAppointmentDialog({ open, onOpenChange, defaultServi
   const [serviceType, setServiceType] = useState(defaultService || '');
   const [showSuccess, setShowSuccess] = useState(false);
 
+  const { actor, isFetching: actorLoading } = useActor();
   const bookAppointment = useBookAppointment();
+
+  const isActorReady = !!actor && !actorLoading;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!patientName || !contactInfo || !preferredDate || !serviceType) return;
+    if (!isActorReady) return;
 
+    // Convert date string to nanoseconds (bigint)
     const dateMs = new Date(preferredDate).getTime();
-    const dateNs = BigInt(dateMs) * BigInt(1_000_000);
+    const dateNs = BigInt(Math.floor(dateMs)) * BigInt(1_000_000);
 
     try {
-      await bookAppointment.mutateAsync({
+      const result = await bookAppointment.mutateAsync({
         patientName,
         contactInfo,
         preferredDate: dateNs,
         serviceType,
       });
-      setShowSuccess(true);
-      setPatientName('');
-      setContactInfo('');
-      setPreferredDate('');
-      setServiceType(defaultService || '');
-    } catch (err) {
-      // error handled below
+      if (result) {
+        setShowSuccess(true);
+        setPatientName('');
+        setContactInfo('');
+        setPreferredDate('');
+        setServiceType(defaultService || '');
+      }
+    } catch (_err) {
+      // error is shown via bookAppointment.isError
     }
   };
 
@@ -57,6 +65,14 @@ export default function BookAppointmentDialog({ open, onOpenChange, defaultServi
     setShowSuccess(false);
     bookAppointment.reset();
     onOpenChange(false);
+  };
+
+  const getErrorMessage = () => {
+    if (!bookAppointment.error) return 'Something went wrong. Please try again.';
+    const msg = (bookAppointment.error as Error).message || '';
+    if (msg.includes('initializing')) return 'Service is still loading. Please wait a moment and try again.';
+    if (msg.includes('Actor not available')) return 'Connection not ready. Please try again.';
+    return 'Something went wrong. Please try again.';
   };
 
   return (
@@ -258,15 +274,34 @@ export default function BookAppointmentDialog({ open, onOpenChange, defaultServi
                     fontSize: '13px',
                   }}
                 >
-                  Something went wrong. Please try again.
+                  {getErrorMessage()}
+                </div>
+              )}
+
+              {actorLoading && !bookAppointment.isPending && (
+                <div
+                  style={{
+                    background: '#eff6ff',
+                    border: '1px solid #bfdbfe',
+                    borderRadius: '8px',
+                    padding: '10px 14px',
+                    color: '#1d4ed8',
+                    fontSize: '13px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <Loader2 size={14} style={{ animation: 'spin 1s linear infinite', flexShrink: 0 }} />
+                  Connecting to service, please wait...
                 </div>
               )}
 
               <button
                 type="submit"
-                disabled={bookAppointment.isPending}
+                disabled={bookAppointment.isPending || actorLoading}
                 style={{
-                  background: bookAppointment.isPending
+                  background: (bookAppointment.isPending || actorLoading)
                     ? '#94a3b8'
                     : 'linear-gradient(135deg, #0ea5e9, #0284c7)',
                   color: '#fff',
@@ -275,7 +310,7 @@ export default function BookAppointmentDialog({ open, onOpenChange, defaultServi
                   padding: '13px',
                   fontSize: '15px',
                   fontWeight: 600,
-                  cursor: bookAppointment.isPending ? 'not-allowed' : 'pointer',
+                  cursor: (bookAppointment.isPending || actorLoading) ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -288,6 +323,11 @@ export default function BookAppointmentDialog({ open, onOpenChange, defaultServi
                   <>
                     <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
                     Booking...
+                  </>
+                ) : actorLoading ? (
+                  <>
+                    <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                    Loading...
                   </>
                 ) : (
                   'Book Now'

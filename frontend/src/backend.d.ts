@@ -94,7 +94,7 @@ export interface backendInterface {
     addReview(reviewInput: ReviewInput): Promise<void>;
     approveReview(reviewId: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    bookAppointment(patientName: string, contactInfo: string, preferredDate: Time, serviceType: string): Promise<Appointment>;
+    bookAppointment(patientName: string, contactInfo: string, preferredDate: Time, serviceType: string): Promise<boolean>;
     deleteReview(reviewId: bigint): Promise<void>;
     getAllAppointments(): Promise<Array<Appointment>>;
     getAllBeforeAfterPairs(): Promise<Array<BeforeAfterPair>>;

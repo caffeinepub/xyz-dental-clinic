@@ -3,16 +3,15 @@ import Map "mo:core/Map";
 import Array "mo:core/Array";
 import List "mo:core/List";
 import Set "mo:core/Set";
-import Time "mo:core/Time";
-import Order "mo:core/Order";
+import Nat "mo:core/Nat";
 import Text "mo:core/Text";
+import Time "mo:core/Time";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
-
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
-import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import MixinAuthorization "authorization/MixinAuthorization";
 
 actor {
   type AppointmentStatus = {
@@ -46,7 +45,11 @@ actor {
   };
 
   module Appointment {
-    public func compare(a : Appointment, b : Appointment) : Order.Order {
+    public func compare(a : Appointment, b : Appointment) : {
+      #less;
+      #equal;
+      #greater;
+    } {
       Nat.compare(a.id, b.id);
     };
   };
@@ -99,6 +102,7 @@ actor {
   var nextDoctorId = 1;
   var nextBeforeAfterId = 1;
 
+  // Persistent maps for stable storage
   let appointments = Map.empty<Nat, Appointment>();
   let reviews = Map.empty<Nat, Review>();
   let doctors = Map.empty<Nat, Doctor>();
@@ -138,13 +142,13 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Unauthenticated appointment booking
-  public shared func bookAppointment(
+  // Unauthenticated appointment booking now returns just success boolean
+  public shared ({ caller }) func bookAppointment(
     patientName : Text,
     contactInfo : Text,
     preferredDate : Time.Time,
     serviceType : Text,
-  ) : async Appointment {
+  ) : async Bool {
     let newAppointment : Appointment = {
       id = nextAppointmentId;
       patientName;
@@ -156,7 +160,7 @@ actor {
     };
     appointments.add(nextAppointmentId, newAppointment);
     nextAppointmentId += 1;
-    newAppointment;
+    true;
   };
 
   public shared ({ caller }) func updateAppointmentStatus(appointmentId : Nat, newStatus : AppointmentStatus) : async () {

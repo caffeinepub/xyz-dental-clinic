@@ -16,7 +16,7 @@ export default function DoctorScheduler() {
       return;
     }
     try {
-      await addDoctor.mutateAsync({ name: form.name, specialty: form.specialty });
+      await addDoctor.mutateAsync({ name: form.name, specialty: form.specialty, availability: [] });
       toast.success('Doctor added successfully!');
       setForm({ name: '', specialty: '' });
     } catch {

@@ -117,7 +117,7 @@ export interface _SERVICE {
   'addReview' : ActorMethod<[ReviewInput], undefined>,
   'approveReview' : ActorMethod<[bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'bookAppointment' : ActorMethod<[string, string, Time, string], Appointment>,
+  'bookAppointment' : ActorMethod<[string, string, Time, string], boolean>,
   'deleteReview' : ActorMethod<[bigint], undefined>,
   'getAllAppointments' : ActorMethod<[], Array<Appointment>>,
   'getAllBeforeAfterPairs' : ActorMethod<[], Array<BeforeAfterPair>>,
