@@ -1,212 +1,130 @@
-import { useState } from 'react';
+import React from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useGetAllAppointments, useGetClinicStatus, useSetClinicStatus } from '../../hooks/useQueries';
-import { ClinicStatus, AppointmentStatus } from '../../backend';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-function formatDate(timestamp: bigint): string {
-  const ms = Number(timestamp) / 1_000_000;
-  return new Date(ms).toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
-
-function StatusBadge({ status }: { status: AppointmentStatus }) {
-  const variants: Record<AppointmentStatus, string> = {
-    [AppointmentStatus.pending]: 'bg-yellow-100 text-yellow-800',
-    [AppointmentStatus.confirmed]: 'bg-blue-100 text-blue-800',
-    [AppointmentStatus.completed]: 'bg-green-100 text-green-800',
-    [AppointmentStatus.cancelled]: 'bg-red-100 text-red-800',
-  };
-  return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${variants[status]}`}>
-      {status}
-    </span>
-  );
-}
+import { useGetClinicStatus, useSetClinicStatus } from '../../hooks/useQueries';
+import { ClinicStatus } from '../../backend';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { data: appointments, isLoading: apptLoading } = useGetAllAppointments();
-  const { data: clinicStatus } = useGetClinicStatus();
+  const { data: clinicStatus, isLoading: statusLoading } = useGetClinicStatus();
   const setClinicStatus = useSetClinicStatus();
 
-  const handleStatusChange = async (status: ClinicStatus) => {
-    try {
-      await setClinicStatus.mutateAsync(status);
-    } catch (err) {
-      console.error('Failed to update clinic status:', err);
-    }
+  const handleLogout = () => {
+    sessionStorage.removeItem('adminAuth');
+    navigate({ to: '/' });
   };
 
-  const statusConfig = {
-    [ClinicStatus.open]: { label: 'Open', color: 'bg-green-500', next: ClinicStatus.closed },
-    [ClinicStatus.closed]: { label: 'Closed', color: 'bg-red-500', next: ClinicStatus.emergency },
-    [ClinicStatus.emergency]: { label: 'Emergency', color: 'bg-orange-500', next: ClinicStatus.open },
+  const handleStatusChange = (status: ClinicStatus) => {
+    setClinicStatus.mutate(status);
   };
 
-  const current = clinicStatus ? statusConfig[clinicStatus] : statusConfig[ClinicStatus.open];
+  const navCards = [
+    { title: 'Appointments', icon: '📅', desc: 'View and manage all patient bookings', path: '/admin/appointments', color: '#0ea5e9' },
+    { title: 'Services CMS', icon: '⚙️', desc: 'Edit service text and photos', path: '/admin/services', color: '#8b5cf6' },
+    { title: 'Reviews', icon: '⭐', desc: 'Approve or reject patient reviews', path: '/admin/reviews', color: '#f59e0b' },
+    { title: 'Before & After', icon: '📸', desc: 'Manage gallery pairs', path: '/admin/before-after', color: '#10b981' },
+    { title: 'Doctors', icon: '👨‍⚕️', desc: 'Add and manage doctors', path: '/admin/doctors', color: '#06b6d4' },
+    { title: 'Content', icon: '📝', desc: 'Add patient reviews', path: '/admin/content', color: '#ec4899' },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+    <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: 'Inter, sans-serif' }}>
+      {/* Top Bar */}
+      <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)', padding: '20px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #0ea5e9, #06b6d4)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>🦷</div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-800 font-playfair">Admin Dashboard</h1>
-            <p className="text-slate-500 mt-1">XYZ Dental Clinic Management</p>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: '18px' }}>Admin Dashboard</div>
+            <div style={{ color: '#94a3b8', fontSize: '12px' }}>XYZ Dental Clinic</div>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => navigate({ to: '/' })}
-            className="text-slate-600"
-          >
-            ← Back to Site
-          </Button>
         </div>
+        <button
+          onClick={handleLogout}
+          style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', padding: '8px 18px', fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s' }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
+        >
+          Logout
+        </button>
+      </div>
 
-        {/* Clinic Status Card */}
-        <div className="glass-card rounded-2xl p-6 mb-6 shadow-md">
-          <h2 className="text-lg font-semibold text-slate-800 mb-4">Clinic Status</h2>
-          <div className="flex items-center gap-4 flex-wrap">
-            <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded-full ${current.color} animate-pulse`} />
-              <span className="font-semibold text-slate-700">Currently: {current.label}</span>
-            </div>
-            <div className="flex gap-2">
-              {Object.entries(statusConfig).map(([status, config]) => (
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 24px' }}>
+        {/* Clinic Status Toggle */}
+        <div style={{ background: '#fff', borderRadius: '16px', padding: '28px', marginBottom: '32px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>🏥 Clinic Status</h2>
+          <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>Control the public-facing clinic open/closed status.</p>
+
+          {statusLoading ? (
+            <div style={{ color: '#94a3b8', fontSize: '14px' }}>Loading status...</div>
+          ) : (
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              {[
+                { value: ClinicStatus.open, label: '✅ Open', color: '#10b981', bg: '#f0fdf4', border: '#86efac' },
+                { value: ClinicStatus.closed, label: '🔴 Closed', color: '#ef4444', bg: '#fef2f2', border: '#fca5a5' },
+                { value: ClinicStatus.emergency, label: '⚠️ Emergency', color: '#f59e0b', bg: '#fffbeb', border: '#fcd34d' },
+              ].map(opt => (
                 <button
-                  key={status}
-                  onClick={() => handleStatusChange(status as ClinicStatus)}
-                  disabled={setClinicStatus.isPending || clinicStatus === status}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    clinicStatus === status
-                      ? `${config.color} text-white`
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  } disabled:opacity-50`}
+                  key={opt.value}
+                  onClick={() => handleStatusChange(opt.value)}
+                  disabled={setClinicStatus.isPending}
+                  style={{
+                    padding: '12px 24px',
+                    borderRadius: '10px',
+                    border: `2px solid ${clinicStatus === opt.value ? opt.color : '#e2e8f0'}`,
+                    background: clinicStatus === opt.value ? opt.bg : '#fff',
+                    color: clinicStatus === opt.value ? opt.color : '#64748b',
+                    fontSize: '14px',
+                    fontWeight: clinicStatus === opt.value ? 700 : 500,
+                    cursor: setClinicStatus.isPending ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s',
+                    opacity: setClinicStatus.isPending ? 0.7 : 1,
+                  }}
                 >
-                  {config.label}
+                  {opt.label}
+                  {clinicStatus === opt.value && ' ✓'}
                 </button>
               ))}
             </div>
-          </div>
+          )}
+
+          {setClinicStatus.isPending && (
+            <p style={{ color: '#0ea5e9', fontSize: '13px', marginTop: '12px' }}>Updating status...</p>
+          )}
         </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="appointments">
-          <TabsList className="mb-6">
-            <TabsTrigger value="appointments">📋 Appointments</TabsTrigger>
-            <TabsTrigger value="services">🦷 Service Manager</TabsTrigger>
-            <TabsTrigger value="reviews">⭐ Reviews</TabsTrigger>
-            <TabsTrigger value="doctors">👨‍⚕️ Doctors</TabsTrigger>
-          </TabsList>
-
-          {/* Appointments Tab */}
-          <TabsContent value="appointments">
-            <div className="glass-card rounded-2xl p-6 shadow-md">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-slate-800">All Appointments</h2>
-                <span className="text-slate-500 text-sm">
-                  {appointments?.length ?? 0} total
-                </span>
-              </div>
-
-              {apptLoading ? (
-                <div className="text-center py-12 text-slate-400">Loading appointments...</div>
-              ) : !appointments || appointments.length === 0 ? (
-                <div className="text-center py-12 text-slate-400">
-                  <div className="text-4xl mb-3">📋</div>
-                  <p>No appointments yet</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Patient Name</TableHead>
-                        <TableHead>Phone Number</TableHead>
-                        <TableHead>Service</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {appointments.map((appt) => (
-                        <TableRow key={String(appt.id)}>
-                          <TableCell className="font-medium">{appt.patientName}</TableCell>
-                          <TableCell>{appt.contactInfo}</TableCell>
-                          <TableCell>{appt.serviceType}</TableCell>
-                          <TableCell>{formatDate(appt.preferredDate)}</TableCell>
-                          <TableCell><StatusBadge status={appt.status} /></TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-
-          {/* Services Tab */}
-          <TabsContent value="services">
-            <div className="glass-card rounded-2xl p-6 shadow-md">
-              <h2 className="text-lg font-semibold text-slate-800 mb-4">Service Manager</h2>
-              <p className="text-slate-500 text-sm mb-4">
-                Edit service details and photos for all 5 premium services.
-              </p>
-              <Button
-                onClick={() => navigate({ to: '/admin/service-manager' })}
-                className="bg-teal-600 hover:bg-teal-700 text-white rounded-full"
-              >
-                Open Service Manager →
-              </Button>
-            </div>
-          </TabsContent>
-
-          {/* Reviews Tab */}
-          <TabsContent value="reviews">
-            <div className="glass-card rounded-2xl p-6 shadow-md">
-              <h2 className="text-lg font-semibold text-slate-800 mb-4">Review Approver</h2>
-              <p className="text-slate-500 text-sm mb-4">
-                Approve or reject pending patient reviews.
-              </p>
-              <Button
-                onClick={() => navigate({ to: '/admin/review-approver' })}
-                className="bg-teal-600 hover:bg-teal-700 text-white rounded-full"
-              >
-                Open Review Approver →
-              </Button>
-            </div>
-          </TabsContent>
-
-          {/* Doctors Tab */}
-          <TabsContent value="doctors">
-            <div className="glass-card rounded-2xl p-6 shadow-md">
-              <h2 className="text-lg font-semibold text-slate-800 mb-4">Doctor Management</h2>
-              <p className="text-slate-500 text-sm mb-4">
-                Add and manage doctors and their schedules.
-              </p>
-              <Button
-                onClick={() => navigate({ to: '/admin/doctors' })}
-                className="bg-teal-600 hover:bg-teal-700 text-white rounded-full"
-              >
-                Open Doctor Scheduler →
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
+        {/* Navigation Cards */}
+        <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '20px' }}>Quick Access</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+          {navCards.map(card => (
+            <button
+              key={card.title}
+              onClick={() => navigate({ to: card.path })}
+              style={{
+                background: '#fff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '14px',
+                padding: '24px',
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'all 0.25s',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-4px)';
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 12px 32px rgba(0,0,0,0.1)`;
+                (e.currentTarget as HTMLButtonElement).style.borderColor = card.color;
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = '#e2e8f0';
+              }}
+            >
+              <div style={{ fontSize: '32px', marginBottom: '12px' }}>{card.icon}</div>
+              <div style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>{card.title}</div>
+              <div style={{ fontSize: '13px', color: '#64748b' }}>{card.desc}</div>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

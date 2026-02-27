@@ -1,37 +1,34 @@
+import React from 'react';
 import { useGetClinicStatus } from '../hooks/useQueries';
-import { AlertTriangle, XCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ClinicStatus } from '../backend';
 
 export default function ClinicStatusBanner() {
-  const { data: clinicStatus } = useGetClinicStatus();
+  const { data: status } = useGetClinicStatus();
 
-  if (!clinicStatus || clinicStatus === 'open') {
-    return null;
-  }
+  if (!status || status === ClinicStatus.open) return null;
 
-  const isEmergency = clinicStatus === 'emergency';
-  const isClosed = clinicStatus === 'closed';
+  const isEmergency = status === ClinicStatus.emergency;
 
   return (
-    <Alert
-      variant="destructive"
-      className={`rounded-none border-x-0 border-t-0 ${
-        isEmergency ? 'bg-red-50 dark:bg-red-950/20 border-red-500' : 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-500'
-      }`}
+    <div
+      style={{
+        backgroundColor: isEmergency ? '#fef2f2' : '#fffbeb',
+        borderBottom: `2px solid ${isEmergency ? '#fca5a5' : '#fcd34d'}`,
+        padding: '0.75rem 1.5rem',
+        textAlign: 'center',
+      }}
     >
-      {isEmergency ? (
-        <AlertTriangle className="h-5 w-5" />
-      ) : (
-        <XCircle className="h-5 w-5" />
-      )}
-      <AlertTitle className="font-bold">
-        {isEmergency ? 'Emergency Notice' : 'Clinic Closed'}
-      </AlertTitle>
-      <AlertDescription>
+      <p
+        style={{
+          color: isEmergency ? '#dc2626' : '#92400e',
+          fontWeight: 600,
+          fontSize: '0.9rem',
+        }}
+      >
         {isEmergency
-          ? 'We are currently handling an emergency. Please call us for urgent matters.'
-          : 'Our clinic is currently closed. Please check back during business hours.'}
-      </AlertDescription>
-    </Alert>
+          ? '🚨 Emergency Only — Please call +91 63521 74912 for urgent dental care'
+          : '🔒 Clinic Currently Closed — We will reopen soon. Call us for appointments.'}
+      </p>
+    </div>
   );
 }

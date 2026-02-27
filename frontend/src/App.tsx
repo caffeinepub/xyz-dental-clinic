@@ -1,63 +1,54 @@
+import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
+import { createRouter, RouterProvider, createRootRoute, createRoute, Outlet } from '@tanstack/react-router';
 import { ThemeProvider } from 'next-themes';
+import Home from './pages/Home';
+import AccessDenied from './pages/AccessDenied';
+import ServiceDetail from './pages/ServiceDetail';
+import DentalImplantsDetail from './pages/DentalImplantsDetail';
+import InvisalignDetail from './pages/InvisalignDetail';
+import LaserDentistryDetail from './pages/LaserDentistryDetail';
+import PediatricDentistryDetail from './pages/PediatricDentistryDetail';
+import SmileMakeoverDetail from './pages/SmileMakeoverDetail';
+import Dashboard from './pages/admin/Dashboard';
+import Appointments from './pages/admin/Appointments';
+import ContentManager from './pages/admin/ContentManager';
+import DoctorScheduler from './pages/admin/DoctorScheduler';
+import ServiceManager from './pages/admin/ServiceManager';
+import BeforeAfterManager from './pages/admin/BeforeAfterManager';
+import ReviewApprover from './pages/admin/ReviewApprover';
+import AdminGuard from './components/AdminGuard';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import ScrollProgressBar from './components/ScrollProgressBar';
+import LiquidGradientBackground from './components/LiquidGradientBackground';
 import { Toaster } from '@/components/ui/sonner';
-import ScrollProgressBar from '@/components/ScrollProgressBar';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import Home from '@/pages/Home';
-import ServiceDetail from '@/pages/ServiceDetail';
-import AccessDenied from '@/pages/AccessDenied';
-import Dashboard from '@/pages/admin/Dashboard';
-import Appointments from '@/pages/admin/Appointments';
-import ContentManager from '@/pages/admin/ContentManager';
-import DoctorScheduler from '@/pages/admin/DoctorScheduler';
-import BeforeAfterManager from '@/pages/admin/BeforeAfterManager';
-import ServiceManager from '@/pages/admin/ServiceManager';
-import ReviewApprover from '@/pages/admin/ReviewApprover';
-import DentalImplantsDetail from '@/pages/DentalImplantsDetail';
-import InvisalignDetail from '@/pages/InvisalignDetail';
-import LaserDentistryDetail from '@/pages/LaserDentistryDetail';
-import PediatricDentistryDetail from '@/pages/PediatricDentistryDetail';
-import SmileMakeoverDetail from '@/pages/SmileMakeoverDetail';
-import AdminGuard from '@/components/AdminGuard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      retry: 1,
-    },
+    queries: { retry: 1, staleTime: 30_000 },
   },
 });
 
-// Layout with Header and Footer
 function Layout() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <ScrollProgressBar />
+    <>
       <Header />
-      <main className="flex-1">
-        <Outlet />
-      </main>
+      <Outlet />
       <Footer />
-    </div>
+    </>
   );
 }
 
-// Admin layout (no public header/footer)
 function AdminLayout() {
   return (
     <AdminGuard>
-      <div className="min-h-screen">
-        <Outlet />
-      </div>
+      <Outlet />
     </AdminGuard>
   );
 }
 
-// Routes
-const rootRoute = createRootRoute();
+const rootRoute = createRootRoute({ component: Outlet });
 
 const layoutRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -69,6 +60,12 @@ const homeRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: '/',
   component: Home,
+});
+
+const accessDeniedRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: '/access-denied',
+  component: AccessDenied,
 });
 
 const dentalImplantsRoute = createRoute({
@@ -89,7 +86,7 @@ const laserDentistryRoute = createRoute({
   component: LaserDentistryDetail,
 });
 
-const pediatricDentistryRoute = createRoute({
+const pediatricRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: '/services/pediatric-dentistry',
   component: PediatricDentistryDetail,
@@ -107,80 +104,73 @@ const serviceDetailRoute = createRoute({
   component: ServiceDetail,
 });
 
-const accessDeniedRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/access-denied',
-  component: AccessDenied,
-});
-
 const adminLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
-  id: 'admin-layout',
-  path: '/admin',
+  id: 'admin',
   component: AdminLayout,
 });
 
 const adminDashboardRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: '/dashboard',
+  path: '/admin/dashboard',
   component: Dashboard,
 });
 
 const adminAppointmentsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: '/appointments',
+  path: '/admin/appointments',
   component: Appointments,
 });
 
 const adminContentRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: '/content',
+  path: '/admin/content',
   component: ContentManager,
 });
 
-const adminDoctorRoute = createRoute({
+const adminDoctorsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: '/doctors',
+  path: '/admin/doctors',
   component: DoctorScheduler,
+});
+
+const adminServicesRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: '/admin/services',
+  component: ServiceManager,
 });
 
 const adminBeforeAfterRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: '/before-after',
+  path: '/admin/before-after',
   component: BeforeAfterManager,
 });
 
-const adminServiceManagerRoute = createRoute({
+const adminReviewsRoute = createRoute({
   getParentRoute: () => adminLayoutRoute,
-  path: '/service-manager',
-  component: ServiceManager,
-});
-
-const adminReviewApproverRoute = createRoute({
-  getParentRoute: () => adminLayoutRoute,
-  path: '/review-approver',
+  path: '/admin/reviews',
   component: ReviewApprover,
 });
 
 const routeTree = rootRoute.addChildren([
   layoutRoute.addChildren([
     homeRoute,
+    accessDeniedRoute,
     dentalImplantsRoute,
     invisalignRoute,
     laserDentistryRoute,
-    pediatricDentistryRoute,
+    pediatricRoute,
     smileMakeoverRoute,
     serviceDetailRoute,
   ]),
-  accessDeniedRoute,
   adminLayoutRoute.addChildren([
     adminDashboardRoute,
     adminAppointmentsRoute,
     adminContentRoute,
-    adminDoctorRoute,
+    adminDoctorsRoute,
+    adminServicesRoute,
     adminBeforeAfterRoute,
-    adminServiceManagerRoute,
-    adminReviewApproverRoute,
+    adminReviewsRoute,
   ]),
 ]);
 
@@ -196,6 +186,8 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+        <LiquidGradientBackground />
+        <ScrollProgressBar />
         <RouterProvider router={router} />
         <Toaster />
       </ThemeProvider>

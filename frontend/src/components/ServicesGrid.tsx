@@ -1,186 +1,110 @@
-import { useState } from 'react';
+import React from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useGetAllServices } from '../hooks/useQueries';
+import { useStaggeredTextReveal } from '../hooks/useStaggeredTextReveal';
 
-interface ServiceCard {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  path: string;
-  color: string;
-  accentColor: string;
-}
+const SERVICE_ICONS: Record<string, string> = {
+  'dental-implants': '/assets/generated/icon-implants.dim_256x256.png',
+  'invisalign': '/assets/generated/icon-braces.dim_256x256.png',
+  'laser-dentistry': '/assets/generated/laser-dentistry-card.dim_600x400.png',
+  'pediatric-dentistry': '/assets/generated/pediatric-dentistry-icon.dim_600x400.png',
+  'smile-makeover': '/assets/generated/magic-wand-sparkle.dim_300x200.png',
+};
 
-const premiumServices: ServiceCard[] = [
-  {
-    id: 'dental-implants',
-    title: 'Dental Implants',
-    description: 'Permanent tooth replacement with titanium implants that look and feel natural.',
-    icon: '🦷',
-    path: '/services/dental-implants',
-    color: 'from-blue-50 to-teal-50',
-    accentColor: 'teal',
-  },
-  {
-    id: 'invisalign',
-    title: 'Invisalign',
-    description: 'Clear aligners for a straighter smile without traditional metal braces.',
-    icon: '😁',
-    path: '/services/invisalign',
-    color: 'from-purple-50 to-blue-50',
-    accentColor: 'purple',
-  },
-  {
-    id: 'pediatric-dentistry',
-    title: 'Kids Dentistry',
-    description: 'Gentle, fun dental care designed specifically for children of all ages.',
-    icon: '👶',
-    path: '/services/pediatric-dentistry',
-    color: 'from-yellow-50 to-orange-50',
-    accentColor: 'orange',
-  },
-  {
-    id: 'smile-makeover',
-    title: 'Smile Makeover',
-    description: 'Complete smile transformation combining multiple cosmetic procedures.',
-    icon: '✨',
-    path: '/services/smile-makeover',
-    color: 'from-pink-50 to-rose-50',
-    accentColor: 'pink',
-  },
-  {
-    id: 'laser-dentistry',
-    title: 'Laser Dentistry',
-    description: 'Advanced laser technology for precise, comfortable dental treatments.',
-    icon: '⚡',
-    path: '/services/laser-dentistry',
-    color: 'from-green-50 to-teal-50',
-    accentColor: 'green',
-  },
+const STATIC_SERVICES = [
+  { id: 'dental-implants', displayName: 'Dental Implants', description: 'Permanent tooth replacement with natural-looking implants.' },
+  { id: 'invisalign', displayName: 'Invisalign', description: 'Clear aligners for a straighter smile without metal braces.' },
+  { id: 'laser-dentistry', displayName: 'Laser Dentistry', description: 'Painless, precise treatments using advanced laser technology.' },
+  { id: 'pediatric-dentistry', displayName: 'Pediatric Dentistry', description: 'Gentle, fun dental care designed especially for children.' },
+  { id: 'smile-makeover', displayName: 'Smile Makeover', description: 'Complete smile transformation combining multiple treatments.' },
 ];
 
-const standardServices = [
-  { icon: '🔬', title: 'General Checkup', description: 'Comprehensive oral health examination and cleaning.' },
-  { icon: '🪥', title: 'Teeth Whitening', description: 'Professional whitening for a brighter, confident smile.' },
-  { icon: '🦴', title: 'Root Canal', description: 'Pain-free root canal treatment to save your natural tooth.' },
-  { icon: '🛡️', title: 'Dental Crown', description: 'Custom crowns to restore damaged or weakened teeth.' },
-];
-
-function PremiumServiceCard({ service }: { service: ServiceCard }) {
-  const navigate = useNavigate();
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <div
-      ref={ref}
-      onClick={() => navigate({ to: service.path })}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className={`
-        relative overflow-hidden rounded-2xl p-6 cursor-pointer
-        bg-gradient-to-br ${service.color}
-        border border-white/60 shadow-md
-        transition-all duration-300
-        ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
-      `}
-      style={{
-        transform: isVisible
-          ? hovered
-            ? 'translateY(-8px)'
-            : 'translateY(0px)'
-          : 'translateY(32px)',
-        boxShadow: hovered
-          ? '0 20px 40px rgba(13, 148, 136, 0.25), 0 0 0 1px rgba(13, 148, 136, 0.1)'
-          : '0 4px 16px rgba(0,0,0,0.08)',
-        transition: 'all 0.3s ease',
-      }}
-    >
-      {/* Animated background glow on hover */}
-      <div
-        className="absolute inset-0 rounded-2xl transition-opacity duration-300"
-        style={{
-          background: 'radial-gradient(circle at 50% 50%, rgba(13,148,136,0.08) 0%, transparent 70%)',
-          opacity: hovered ? 1 : 0,
-        }}
-      />
-
-      <div className="relative z-10">
-        <div className="text-4xl mb-3">{service.icon}</div>
-        <h3 className="text-lg font-bold text-slate-800 mb-2 font-playfair">{service.title}</h3>
-        <p className="text-slate-600 text-sm leading-relaxed mb-4">{service.description}</p>
-        <span className="inline-flex items-center gap-1 text-teal-600 text-sm font-semibold hover:gap-2 transition-all">
-          Learn More <span>→</span>
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function StandardServiceCard({ service }: { service: typeof standardServices[0] }) {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <div
-      ref={ref}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className={`
-        bg-white rounded-xl p-5 border border-slate-100
-        transition-all duration-300
-        ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
-      `}
-      style={{
-        transform: isVisible
-          ? hovered ? 'translateY(-4px)' : 'translateY(0px)'
-          : 'translateY(32px)',
-        boxShadow: hovered
-          ? '0 12px 24px rgba(13, 148, 136, 0.15)'
-          : '0 2px 8px rgba(0,0,0,0.06)',
-        transition: 'all 0.3s ease',
-      }}
-    >
-      <div className="text-3xl mb-2">{service.icon}</div>
-      <h3 className="font-semibold text-slate-800 mb-1">{service.title}</h3>
-      <p className="text-slate-500 text-sm">{service.description}</p>
-    </div>
-  );
-}
+const GLOW_COLORS: Record<string, string> = {
+  'dental-implants': 'rgba(14,165,233,0.35)',
+  'invisalign': 'rgba(6,182,212,0.35)',
+  'laser-dentistry': 'rgba(239,68,68,0.25)',
+  'pediatric-dentistry': 'rgba(34,197,94,0.25)',
+  'smile-makeover': 'rgba(168,85,247,0.25)',
+};
 
 export default function ServicesGrid() {
-  const { ref: titleRef, isVisible: titleVisible } = useScrollReveal<HTMLDivElement>();
+  const navigate = useNavigate();
+  const { data: backendServices } = useGetAllServices();
+  const headingText = 'Our Premium Services';
+  const { ref: headingRef, wordElements } = useStaggeredTextReveal(headingText);
+
+  const services = (backendServices && backendServices.length > 0) ? backendServices : STATIC_SERVICES;
 
   return (
-    <section id="services" className="py-20 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Section Title */}
-        <div
-          ref={titleRef}
-          className={`text-center mb-14 transition-all duration-700 ${
-            titleVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
-        >
-          <h2 className="text-4xl font-bold text-slate-800 font-playfair mb-4">
-            Our Premium Services
+    <section id="services" style={{ padding: '100px 24px', position: 'relative' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+          <h2
+            ref={headingRef as React.RefObject<HTMLHeadingElement>}
+            style={{
+              fontSize: 'clamp(28px, 4vw, 48px)',
+              fontWeight: 800,
+              color: '#0f172a',
+              marginBottom: '16px',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            {wordElements.map(({ word, style }, i) => (
+              <span key={i} style={style}>{word}</span>
+            ))}
           </h2>
-          <p className="text-slate-500 text-lg max-w-2xl mx-auto">
-            World-class dental treatments delivered with precision, care, and the latest technology.
+          <p style={{ color: '#64748b', fontSize: '17px', maxWidth: '500px', margin: '0 auto' }}>
+            Advanced treatments tailored to give you the smile you deserve.
           </p>
         </div>
 
-        {/* Premium Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {premiumServices.map((service) => (
-            <PremiumServiceCard key={service.id} service={service} />
-          ))}
-        </div>
-
-        {/* Standard Services */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {standardServices.map((service) => (
-            <StandardServiceCard key={service.title} service={service} />
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '24px',
+          }}
+        >
+          {services.map(service => (
+            <div
+              key={service.id}
+              onClick={() => navigate({ to: `/services/${service.id}` })}
+              style={{
+                background: 'rgba(255,255,255,0.85)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(14,165,233,0.15)',
+                borderRadius: '16px',
+                padding: '28px 24px',
+                cursor: 'pointer',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-10px)';
+                (e.currentTarget as HTMLDivElement).style.boxShadow = `0 20px 40px ${GLOW_COLORS[service.id] || 'rgba(14,165,233,0.25)'}`;
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+                (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(0,0,0,0.06)';
+              }}
+            >
+              <div style={{ marginBottom: '16px' }}>
+                <img
+                  src={SERVICE_ICONS[service.id] || '/assets/generated/tooth-logo-icon.dim_64x64.png'}
+                  alt={service.displayName}
+                  style={{ width: '56px', height: '56px', objectFit: 'contain', borderRadius: '12px' }}
+                />
+              </div>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                {service.displayName}
+              </h3>
+              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6 }}>
+                {service.description}
+              </p>
+              <div style={{ marginTop: '16px', color: '#0ea5e9', fontSize: '13px', fontWeight: 600 }}>
+                Learn More →
+              </div>
+            </div>
           ))}
         </div>
       </div>

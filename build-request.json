@@ -1,194 +1,134 @@
 {
   "kind": "build_request",
-  "title": "Fix booking form design, confirm existing features, and enforce site-wide polish",
+  "title": "Fix Appointment Booking & Add Premium Animations",
   "projectName": "XYZ Dental Clinic",
-  "priority": "normal",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-72",
-      "text": "In BookAppointmentDialog, apply a solid pure white (#FFFFFF) background to the entire form/dialog container with a soft drop shadow (e.g., box-shadow: 0 8px 32px rgba(0,0,0,0.12)) so the form appears lifted and distinct from the animated mesh gradient background behind it. Remove any transparency or backdrop-filter on the dialog container itself.",
-      "target": "frontend",
+      "id": "REQ-1",
+      "text": "Fix the appointment booking form in BookAppointmentDialog.tsx so that form submissions save directly to the backend actor (no external service). On successful submit, display a green checkmark animation with the text 'Appointment Confirmed!' instead of the current error state. Ensure no Internet Identity login prompt or auth barrier appears for patients during booking — the form must be fully accessible to anonymous users.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-1"
         ],
         "quotes": [
-          "Solid White Background: Appointment booking form ka section ab transparent nahi hoga. Use Pure White (#FFFFFF) background do, jisme halki si Soft Shadow (Drop Shadow) ho taaki wo background se alag aur utha hua dikhe."
+          "Form directly backend mein save hoga (no external service needed)",
+          "Submit hote hi Green Checkmark animation + 'Appointment Confirmed!' message",
+          "Koi login barrier nahi patients ke liye"
         ]
       },
       "acceptanceCriteria": [
-        "BookAppointmentDialog container has a pure white (#FFFFFF) background color.",
-        "A soft drop shadow is visible around the dialog container.",
-        "The dialog does not appear transparent or show the gradient through it.",
-        "The dialog visually looks elevated and separate from the page background."
+        "Patient can fill and submit the booking form without any login or identity prompt",
+        "On successful submission, a green animated checkmark is shown with the text 'Appointment Confirmed!'",
+        "The appointment is saved to the backend and visible in the Admin Appointments panel",
+        "No 'Failed' error message appears on form submission under normal conditions"
       ]
     },
     {
-      "id": "REQ-73",
-      "text": "In BookAppointmentDialog, style all input fields (Patient Name, Phone Number, Service dropdown, Preferred Date) with a light grey border (e.g., #D1D5DB) by default. On focus, each input must display a teal-blue glow (box-shadow and border-color using the site's teal accent #0D9488). Use a CSS transition of ~200ms for the focus effect.",
+      "id": "REQ-2",
+      "text": "Add a floating animation to the Hero section: a dental icon or doctor image should continuously float up and down (bob effect) when the page loads. The animation should be smooth and loop indefinitely.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-1"
         ],
         "quotes": [
-          "Input Fields: Saare boxes (Name, Phone, etc.) ke borders light grey hon aur click karne par 'Teal Blue' color mein glow karein."
+          "Hero section mein ek dental icon ya doctor ki image dhire-dhire hawa mein 'float' (upar-neeche) karni chahiye"
         ]
       },
       "acceptanceCriteria": [
-        "All input fields in the booking dialog have a light grey border in their default state.",
-        "Clicking or tabbing into any input field changes the border color to teal (#0D9488) and adds a teal glow shadow.",
-        "The focus transition is smooth (~200ms).",
-        "The glow disappears when the field loses focus."
+        "A dental icon or doctor image is visible in the Hero section",
+        "The element continuously animates up and down in a smooth bobbing motion on page load",
+        "Animation loops indefinitely without interruption"
       ]
     },
     {
-      "id": "REQ-74",
-      "text": "In BookAppointmentDialog, ensure all text inside the form (labels, placeholder text, input values, helper text) uses a high-contrast dark color (e.g., #111827 or #1F2937) against the white form background. Remove any light, muted, or low-opacity text styles applied to form labels or content.",
+      "id": "REQ-3",
+      "text": "Make all 'Book Now' buttons magnetic: when the user's mouse cursor moves near a 'Book Now' button, the button should subtly translate toward the cursor, creating a magnetic attraction effect. The button should return to its original position when the cursor moves away.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-1"
         ],
         "quotes": [
-          "Text Visibility: Form ke andar ka text ekdum dark aur saaf (High Contrast) hona chahiye."
+          "Saare 'Book Now' buttons magnetic hone chahiye—jab mouse paas jaye, toh button uski taraf kheecha chala aaye"
         ]
       },
       "acceptanceCriteria": [
-        "All labels inside BookAppointmentDialog use a dark color (#111827 or equivalent).",
-        "Input placeholder text and entered values are clearly visible with high contrast.",
-        "No form text is rendered in a light grey or low-opacity style that could be hard to read on white."
+        "All 'Book Now' buttons respond to nearby mouse movement by translating toward the cursor",
+        "The effect is smooth and proportional to cursor proximity",
+        "Buttons return to their original position when the cursor moves away"
       ]
     },
     {
-      "id": "REQ-75",
-      "text": "Confirm and enforce that the Footer component contains a small (28–36px) visible tooth SVG icon using teal/royal-blue accent colors at the very bottom of the footer. A single click on this tooth icon must open the HiddenAdminLoginModal. The tooth icon must remain semi-transparent but visible. Credentials: username '6352174912', password '63521'.",
+      "id": "REQ-4",
+      "text": "Add a staggered text reveal animation to all major section headings: each word in the heading should animate in one by one from below (bounce/slide up), creating a staggered entrance effect when the section scrolls into view.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-1"
         ],
         "quotes": [
-          "Secret Entry: Footer ke sabse niche ek Tooth Logo hoga. Us par click karte hi login khulega.",
-          "Credentials: User: 6352174912 | Pass: 63521"
+          "Heading ke words ek-ek karke 'bounce' hokar niche se upar aayein"
         ]
       },
       "acceptanceCriteria": [
-        "A small tooth SVG icon (28–36px) is visible at the bottom of the Footer.",
-        "The icon uses teal or royal-blue accent color and is semi-transparent.",
-        "Single-clicking the icon opens the HiddenAdminLoginModal.",
-        "Entering username '6352174912' and password '63521' successfully navigates to the admin dashboard.",
-        "No other visible admin link or button exists on the public site."
+        "Major section headings animate word-by-word on scroll into view",
+        "Each word slides/bounces up from below with a staggered delay",
+        "Animation triggers once when the heading enters the viewport"
       ]
     },
     {
-      "id": "REQ-76",
-      "text": "Confirm and enforce that clicking the 'XYZ Dental Clinic' brand name in Header.tsx calls window.location.reload(). No router navigation should occur on the brand name click. The visual styling of the brand name must remain unchanged.",
+      "id": "REQ-5",
+      "text": "Replace the static white background with a dynamic liquid blue gradient background. The gradient should animate continuously and create a wave/fluid effect that responds to mouse movement across the page.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-1"
         ],
         "quotes": [
-          "Refresh Feature: Header mein 'XYZ Clinic' name par click karte hi website Refresh honi chahiye."
+          "White screen ki jagah piche ek Liquid Blue Gradient chalta rahe jo mouse move karne par 'wave' banaye"
         ]
       },
       "acceptanceCriteria": [
-        "Clicking 'XYZ Dental Clinic' in the header triggers a full page reload.",
-        "No router navigation (e.g., navigate('/')) occurs on the brand name click.",
-        "The brand name appearance (font, color, size) is unchanged."
+        "The page background displays an animated liquid blue gradient instead of a plain white background",
+        "Moving the mouse across the page causes a subtle wave/fluid distortion in the gradient",
+        "The animation runs smoothly without impacting page performance significantly"
       ]
     },
     {
-      "id": "REQ-77",
-      "text": "Confirm and enforce that the CustomCursor component renders nothing and no cursor: none CSS rule is applied to body or html. The browser's native OS cursor must be active across the entire site. Remove any remaining cursor override CSS from index.css or any component stylesheets.",
+      "id": "REQ-6",
+      "text": "Add a scroll-triggered progress indicator: a thin animated line (progress bar) fixed at the top of the page that fills from left to right as the user scrolls down, indicating how much of the page content remains.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-1"
         ],
         "quotes": [
-          "Standard Cursor: Kisi bhi tarah ka extra circle ya cursor follower nahi chahiye."
+          "Jaise-jaise user scroll kare, ek animated line chale jo dikhaye ki kitni website bachi hai"
         ]
       },
       "acceptanceCriteria": [
-        "No custom cursor circle, trail, or follower element is rendered anywhere on the page.",
-        "The browser's native OS cursor is visible and fully functional across the entire site.",
-        "No CSS rule sets cursor: none on body, html, or any global selector.",
-        "CustomCursor component is either empty or not rendered."
-      ]
-    },
-    {
-      "id": "REQ-78",
-      "text": "Confirm and enforce scroll-triggered reveal animations site-wide: all major sections (ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider gallery, ContactSection, and service detail page sections) must fade in and slide up (translateY from ~30px to 0, opacity 0 to 1) when they scroll into the viewport. Use IntersectionObserver (via the existing useScrollReveal hook or equivalent) to trigger each section's animation once per page load.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-3"
-        ],
-        "quotes": [
-          "Smooth Reveal: Website ke saare sections (Services, Reviews, Before/After) niche se upar ki taraf 'Fade-in' hokar aane chahiye."
-        ]
-      },
-      "acceptanceCriteria": [
-        "ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider gallery, and ContactSection all fade in and slide up on scroll entry.",
-        "Each animation triggers once per page load via IntersectionObserver.",
-        "Service detail page sections also have the same scroll-reveal animation.",
-        "Sections that have already entered the viewport do not re-animate on scroll back."
-      ]
-    },
-    {
-      "id": "REQ-79",
-      "text": "Confirm and enforce the animated mesh gradient background throughout the entire site (all public and admin pages). The gradient must subtly shift between very light shades of white, pale silver, and soft blue over a 15–20 second continuous CSS animation loop. This must be applied at the root layout level (App.tsx or index.css body/html) so it appears behind all page content.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-3"
-        ],
-        "quotes": [
-          "Background: White space ko bharne ke liye piche ek bahut halka Moving Gradient chalta rahega."
-        ]
-      },
-      "acceptanceCriteria": [
-        "An animated mesh gradient is visible behind all page content on every public and admin page.",
-        "The gradient cycles between very light white, pale silver, and soft blue shades.",
-        "The animation loop is 15–20 seconds and runs continuously.",
-        "The background animation is applied at the root layout level and does not need to be added per-component."
-      ]
-    },
-    {
-      "id": "REQ-80",
-      "text": "Confirm the interactive Before/After drag slider (BeforeAfterSlider component) is prominently displayed in a dedicated 'Results Gallery' section on the Home page. The slider must support both mouse drag and touch drag to reveal the before (left) and after (right) dental treatment images. Use backend-stored before/after pairs if available, otherwise fall back to static example pairs. The section must be clearly labeled.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-3"
-        ],
-        "quotes": [
-          "Interactive Slider: Before/After images ke liye drag karne wala slider zaruri hai."
-        ]
-      },
-      "acceptanceCriteria": [
-        "A 'Results Gallery' or equivalently labeled section appears on the Home page featuring the BeforeAfterSlider.",
-        "Users can click and drag (or touch drag on mobile) the divider handle to reveal before/left and after/right images.",
-        "The slider uses backend-stored before/after pairs if available, or falls back to static dental treatment image pairs.",
-        "The section is clearly labeled and visible without excessive scrolling."
+        "A thin progress bar is fixed at the top of the page",
+        "The bar fills proportionally as the user scrolls down the page",
+        "The bar is empty at the top and full at the bottom of the page",
+        "The animation is smooth and updates in real time as the user scrolls"
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files listed in frontend.immutablePaths.",
-    "All Motoko logic must remain in backend/main.mo.",
-    "Admin credentials must remain: username '6352174912', password '63521'.",
-    "The booking form must remain frictionless — no Internet Identity or authentication required.",
-    "The animated mesh gradient background must not be removed or replaced."
+    "All existing admin panel features (Appointments, Before/After Manager, Reviews, etc.) must remain intact",
+    "Admin login via footer tooth icon must continue to work",
+    "Appointment booking must use the existing backend actor — no external services like Formspree or EmailJS",
+    "Internet Identity login must NOT be required for patients to book appointments",
+    "Immutable frontend paths (hooks, main.tsx, ui components) must not be modified"
   ],
   "nonGoals": [
-    "Adding any new backend data models or API endpoints.",
-    "Changing the admin dashboard layout or capabilities beyond what is specified.",
-    "Adding new service cards or pages.",
-    "Modifying the scroll-progress bar component.",
-    "Changing any authentication or Internet Identity logic."
+    "Integrating third-party form services (Formspree, EmailJS)",
+    "Changing the admin authentication mechanism",
+    "Adding new backend data models beyond what is needed for appointment saving",
+    "Modifying the Before/After Slider or Testimonial Carousel"
   ],
   "imageRequirements": {
     "required": [],

@@ -1,21 +1,18 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import BookAppointmentDialog from '../components/BookAppointmentDialog';
 import { useGetService } from '../hooks/useQueries';
-import { useScrollReveal } from '../hooks/useScrollReveal';
 
 export default function ServiceDetail() {
-  // Use the full nested route path matching the router tree: /layout/services/$serviceId
-  const { serviceId } = useParams({ from: '/layout/services/$serviceId' });
+  const { serviceId } = useParams({ strict: false });
   const navigate = useNavigate();
   const [bookingOpen, setBookingOpen] = useState(false);
-  const { data: service, isLoading } = useGetService(serviceId);
-  const { ref, isVisible } = useScrollReveal<HTMLElement>(0.05);
+  const { data: service, isLoading } = useGetService(serviceId ?? '');
 
   const displayName =
     service?.displayName ||
-    serviceId
+    (serviceId ?? '')
       .replace(/-/g, ' ')
       .replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -23,59 +20,111 @@ export default function ServiceDetail() {
     service?.description || 'Professional dental care tailored to your needs.';
 
   return (
-    <div className="min-h-screen">
-      <section
-        ref={ref}
-        className={`py-20 px-4 transition-all duration-700 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}
-      >
-        <div className="max-w-4xl mx-auto">
+    <div style={{ minHeight: '100vh', paddingTop: '80px' }}>
+      <section style={{ padding: '60px 24px' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <button
             onClick={() => navigate({ to: '/' })}
-            className="flex items-center gap-2 text-teal-600 hover:text-teal-800 mb-8 transition-colors"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#0ea5e9',
+              fontSize: '15px',
+              fontWeight: 600,
+              marginBottom: '32px',
+              padding: 0,
+            }}
           >
             <ArrowLeft size={18} /> Back to Home
           </button>
 
           {isLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin" />
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  border: '4px solid rgba(14,165,233,0.2)',
+                  borderTopColor: '#0ea5e9',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                }}
+              />
             </div>
           ) : (
-            <div className="glass rounded-3xl p-8 md:p-12">
+            <div
+              style={{
+                background: 'rgba(255,255,255,0.88)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(14,165,233,0.15)',
+                borderRadius: '20px',
+                padding: '48px',
+                boxShadow: '0 8px 40px rgba(0,0,0,0.08)',
+              }}
+            >
               {service?.featuredPhoto && (
-                <div className="rounded-2xl overflow-hidden mb-8 shadow-lg">
+                <div style={{ borderRadius: '14px', overflow: 'hidden', marginBottom: '32px' }}>
                   <img
                     src={service.featuredPhoto.getDirectURL()}
                     alt={displayName}
-                    className="w-full h-64 object-cover"
+                    style={{ width: '100%', height: '280px', objectFit: 'cover', display: 'block' }}
                   />
                 </div>
               )}
 
-              <h1 className="text-4xl font-playfair font-bold text-teal-700 mb-4">
+              <h1
+                style={{
+                  fontSize: 'clamp(28px, 4vw, 44px)',
+                  fontWeight: 800,
+                  color: '#0f172a',
+                  marginBottom: '16px',
+                  letterSpacing: '-0.02em',
+                }}
+              >
                 {displayName}
               </h1>
-              <p className="text-slate-600 text-lg leading-relaxed mb-8">{description}</p>
+              <p style={{ color: '#64748b', fontSize: '17px', lineHeight: 1.7, marginBottom: '36px' }}>
+                {description}
+              </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                {[
-                  'Expert Care',
-                  'Modern Equipment',
-                  'Comfortable Experience',
-                  'Affordable Pricing',
-                ].map((feature) => (
-                  <div key={feature} className="flex items-center gap-3">
-                    <CheckCircle size={18} className="text-teal-500 flex-shrink-0" />
-                    <span className="text-slate-700">{feature}</span>
-                  </div>
-                ))}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '16px',
+                  marginBottom: '36px',
+                }}
+              >
+                {['Expert Care', 'Modern Equipment', 'Comfortable Experience', 'Affordable Pricing'].map(
+                  (feature) => (
+                    <div
+                      key={feature}
+                      style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
+                    >
+                      <CheckCircle size={18} color="#0ea5e9" style={{ flexShrink: 0 }} />
+                      <span style={{ color: '#374151', fontSize: '14px', fontWeight: 500 }}>{feature}</span>
+                    </div>
+                  )
+                )}
               </div>
 
               <button
                 onClick={() => setBookingOpen(true)}
-                className="book-appointment-btn"
+                style={{
+                  background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '14px 36px',
+                  fontSize: '16px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  boxShadow: '0 6px 24px rgba(14,165,233,0.35)',
+                }}
               >
                 Book Appointment
               </button>

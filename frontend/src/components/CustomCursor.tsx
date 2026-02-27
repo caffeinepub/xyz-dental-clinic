@@ -1,4 +1,6 @@
-// Custom cursor is disabled — native OS cursor is used site-wide.
+import React from 'react';
+
+// Custom cursor is disabled — using native OS cursor
 export default function CustomCursor() {
   return null;
 }

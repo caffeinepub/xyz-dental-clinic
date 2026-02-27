@@ -1,105 +1,147 @@
+import React, { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, Clock, CheckCircle, XCircle, Phone, User, Calendar } from 'lucide-react';
 import { useGetAllAppointments, useUpdateAppointmentStatus } from '../../hooks/useQueries';
 import { AppointmentStatus } from '../../backend';
 
-const statusColors: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-700',
-  confirmed: 'bg-blue-100 text-blue-700',
-  completed: 'bg-green-100 text-green-700',
-  cancelled: 'bg-red-100 text-red-700',
-};
-
 export default function Appointments() {
   const navigate = useNavigate();
-  const { data: appointments, isLoading } = useGetAllAppointments();
-  const { mutate: updateStatus } = useUpdateAppointmentStatus();
+  const { data: appointments, isLoading, error } = useGetAllAppointments();
+  const updateStatus = useUpdateAppointmentStatus();
+  const [filter, setFilter] = useState<string>('all');
 
-  const formatDate = (ns: bigint) => {
-    const ms = Number(ns) / 1_000_000;
-    return new Date(ms).toLocaleDateString('en-IN', {
-      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
-    });
+  const filtered = appointments?.filter(a => filter === 'all' || a.status === filter) ?? [];
+
+  const formatDate = (ts: bigint) => {
+    try {
+      return new Date(Number(ts) / 1_000_000).toLocaleDateString('en-IN', {
+        day: '2-digit', month: 'short', year: 'numeric',
+      });
+    } catch {
+      return 'N/A';
+    }
+  };
+
+  const statusColors: Record<string, { bg: string; color: string }> = {
+    pending: { bg: '#fffbeb', color: '#d97706' },
+    confirmed: { bg: '#f0fdf4', color: '#16a34a' },
+    completed: { bg: '#eff6ff', color: '#2563eb' },
+    cancelled: { bg: '#fef2f2', color: '#dc2626' },
   };
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate({ to: '/admin/dashboard' })}
-            className="flex items-center gap-2 text-gray-500 hover:text-royal-blue transition-colors"
-          >
-            <ArrowLeft size={18} /> Dashboard
-          </button>
-          <h1 className="text-3xl font-playfair font-bold text-royal-blue">Appointments</h1>
+    <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: 'Inter, sans-serif' }}>
+      {/* Header */}
+      <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)', padding: '20px 32px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <button
+          onClick={() => navigate({ to: '/admin/dashboard' })}
+          style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', padding: '8px 14px', fontSize: '13px', cursor: 'pointer' }}
+        >
+          ← Back
+        </button>
+        <div>
+          <div style={{ color: '#fff', fontWeight: 700, fontSize: '18px' }}>📅 Appointments</div>
+          <div style={{ color: '#94a3b8', fontSize: '12px' }}>All patient bookings</div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '32px 24px' }}>
+        {/* Filter Buttons */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '24px', flexWrap: 'wrap' }}>
+          {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              style={{
+                padding: '8px 18px',
+                borderRadius: '20px',
+                border: filter === f ? '2px solid #0ea5e9' : '2px solid #e2e8f0',
+                background: filter === f ? '#0ea5e9' : '#fff',
+                color: filter === f ? '#fff' : '#64748b',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                textTransform: 'capitalize',
+              }}
+            >
+              {f}
+            </button>
+          ))}
         </div>
 
-        {isLoading ? (
-          <div className="flex justify-center py-20">
-            <div className="w-10 h-10 border-4 border-royal-blue border-t-transparent rounded-full animate-spin" />
+        {isLoading && (
+          <div style={{ textAlign: 'center', padding: '60px', color: '#64748b' }}>
+            <div style={{ fontSize: '32px', marginBottom: '12px' }}>⏳</div>
+            Loading appointments...
           </div>
-        ) : !appointments || appointments.length === 0 ? (
-          <div className="glass-card rounded-2xl p-12 text-center">
-            <Calendar size={48} className="text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">No appointments yet.</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {appointments.map((apt) => (
-              <div key={String(apt.id)} className="glass-card rounded-2xl p-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <User size={16} className="text-royal-blue" />
-                      <span className="font-bold text-gray-800">{apt.patientName}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[apt.status] || 'bg-gray-100 text-gray-600'}`}>
-                        {apt.status}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Phone size={14} className="text-teal" />
-                      <span>{apt.contactInfo}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Clock size={14} className="text-teal" />
-                      <span>{apt.serviceType}</span>
-                      <span className="text-gray-400">•</span>
-                      <span>{formatDate(apt.preferredDate)}</span>
-                    </div>
-                  </div>
+        )}
 
-                  <div className="flex gap-2 flex-shrink-0">
-                    {apt.status === AppointmentStatus.pending && (
-                      <>
-                        <button
-                          onClick={() => updateStatus({ appointmentId: apt.id, newStatus: AppointmentStatus.confirmed })}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg transition-colors"
-                        >
-                          <CheckCircle size={14} /> Confirm
-                        </button>
-                        <button
-                          onClick={() => updateStatus({ appointmentId: apt.id, newStatus: AppointmentStatus.cancelled })}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-colors"
-                        >
-                          <XCircle size={14} /> Cancel
-                        </button>
-                      </>
-                    )}
-                    {apt.status === AppointmentStatus.confirmed && (
+        {error && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', padding: '20px', color: '#dc2626', textAlign: 'center' }}>
+            Failed to load appointments. Please ensure you are logged in as admin.
+          </div>
+        )}
+
+        {!isLoading && !error && filtered.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
+            <div style={{ fontSize: '48px', marginBottom: '12px' }}>📭</div>
+            <p>No appointments found.</p>
+          </div>
+        )}
+
+        {!isLoading && filtered.length > 0 && (
+          <div style={{ background: '#fff', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
+            {/* Table Header */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr', gap: '0', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', padding: '14px 20px' }}>
+              {['Patient Name', 'Phone Number', 'Service', 'Date', 'Status'].map(h => (
+                <div key={h} style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</div>
+              ))}
+            </div>
+
+            {/* Table Rows */}
+            {filtered.map((appt, idx) => {
+              const sc = statusColors[appt.status] || { bg: '#f8fafc', color: '#64748b' };
+              return (
+                <div
+                  key={String(appt.id)}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+                    gap: '0',
+                    padding: '16px 20px',
+                    borderBottom: idx < filtered.length - 1 ? '1px solid #f1f5f9' : 'none',
+                    alignItems: 'center',
+                    transition: 'background 0.15s',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                >
+                  <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '14px' }}>{appt.patientName}</div>
+                  <div style={{ color: '#374151', fontSize: '14px' }}>{appt.contactInfo}</div>
+                  <div style={{ color: '#374151', fontSize: '14px' }}>{appt.serviceType}</div>
+                  <div style={{ color: '#374151', fontSize: '14px' }}>{formatDate(appt.preferredDate)}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ background: sc.bg, color: sc.color, padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 600, textTransform: 'capitalize' }}>
+                      {appt.status}
+                    </span>
+                    {appt.status === AppointmentStatus.pending && (
                       <button
-                        onClick={() => updateStatus({ appointmentId: apt.id, newStatus: AppointmentStatus.completed })}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-colors"
+                        onClick={() => updateStatus.mutate({ appointmentId: appt.id, newStatus: AppointmentStatus.confirmed })}
+                        disabled={updateStatus.isPending}
+                        style={{ background: '#0ea5e9', color: '#fff', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}
                       >
-                        <CheckCircle size={14} /> Complete
+                        Confirm
                       </button>
                     )}
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
+
+        <p style={{ color: '#94a3b8', fontSize: '13px', marginTop: '16px', textAlign: 'right' }}>
+          Total: {filtered.length} appointment{filtered.length !== 1 ? 's' : ''}
+        </p>
       </div>
     </div>
   );

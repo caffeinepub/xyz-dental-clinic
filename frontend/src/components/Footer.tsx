@@ -1,117 +1,140 @@
-import { useState } from 'react';
-import HiddenAdminLoginModal from './HiddenAdminLoginModal';
+import React, { useState } from 'react';
+import { HiddenAdminLoginModal } from './HiddenAdminLoginModal';
 
 export default function Footer() {
   const [adminModalOpen, setAdminModalOpen] = useState(false);
-
   const currentYear = new Date().getFullYear();
-  const appId = encodeURIComponent(
-    typeof window !== 'undefined' ? window.location.hostname : 'xyz-dental-clinic'
-  );
+  const hostname = typeof window !== 'undefined' ? encodeURIComponent(window.location.hostname) : 'unknown-app';
 
   return (
-    <footer className="bg-gray-900 text-gray-300 pt-12 pb-6">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Main footer content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+    <footer style={{ background: '#0a1628', color: '#e2e8f0', padding: '60px 0 0 0', position: 'relative', zIndex: 10 }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '40px', paddingBottom: '40px' }}>
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <img
-                src="/assets/generated/tooth-logo-footer.dim_48x48.png"
-                alt="XYZ Dental Clinic"
-                className="w-8 h-8 object-contain"
-              />
-              <span className="text-white font-bold text-lg">XYZ Dental Clinic</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+              <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #0ea5e9, #06b6d4)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: '20px' }}>🦷</span>
+              </div>
+              <span style={{ fontSize: '20px', fontWeight: 700, color: '#fff' }}>XYZ Dental Clinic</span>
             </div>
-            <p className="text-sm text-gray-400 leading-relaxed">
-              Your trusted partner for a healthy, beautiful smile. Advanced dental care with a gentle touch.
+            <p style={{ color: '#94a3b8', lineHeight: '1.7', fontSize: '14px' }}>
+              Providing exceptional dental care with a gentle touch. Your smile is our passion and priority.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-white font-semibold mb-3 text-sm uppercase tracking-wider">
-              Quick Links
-            </h3>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#services" className="hover:text-teal-400 transition-colors">Services</a></li>
-              <li><a href="#doctor" className="hover:text-teal-400 transition-colors">Our Doctor</a></li>
-              <li><a href="#reviews" className="hover:text-teal-400 transition-colors">Reviews</a></li>
-              <li><a href="#contact" className="hover:text-teal-400 transition-colors">Contact</a></li>
+            <h4 style={{ color: '#fff', fontWeight: 600, marginBottom: '16px', fontSize: '16px' }}>Quick Links</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {['Home', 'Services', 'About', 'Contact'].map(link => (
+                <li key={link}>
+                  <a href="#" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '14px', transition: 'color 0.2s' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#38bdf8')}
+                    onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}>
+                    {link}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Services */}
+          <div>
+            <h4 style={{ color: '#fff', fontWeight: 600, marginBottom: '16px', fontSize: '16px' }}>Our Services</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {['Dental Implants', 'Invisalign', 'Kids Dentistry', 'Smile Makeover', 'Laser Dentistry'].map(service => (
+                <li key={service}>
+                  <span style={{ color: '#94a3b8', fontSize: '14px' }}>{service}</span>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="text-white font-semibold mb-3 text-sm uppercase tracking-wider">
-              Contact Us
-            </h3>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li>📞 +91 63521 74912</li>
-              <li>📍 123 Dental Street, City</li>
-              <li>🕐 Mon–Sat: 9 AM – 7 PM</li>
-            </ul>
+            <h4 style={{ color: '#fff', fontWeight: 600, marginBottom: '16px', fontSize: '16px' }}>Contact Us</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                <span style={{ color: '#38bdf8', fontSize: '16px', marginTop: '2px' }}>📍</span>
+                <span style={{ color: '#94a3b8', fontSize: '14px' }}>123 Dental Street, Health City, HC 12345</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#38bdf8', fontSize: '16px' }}>📞</span>
+                <span style={{ color: '#94a3b8', fontSize: '14px' }}>+91 63521 74912</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#38bdf8', fontSize: '16px' }}>✉️</span>
+                <span style={{ color: '#94a3b8', fontSize: '14px' }}>info@xyzdentalclinic.com</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#38bdf8', fontSize: '16px' }}>🕐</span>
+                <span style={{ color: '#94a3b8', fontSize: '14px' }}>Mon–Sat: 9AM – 7PM</span>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-700 pt-6">
-          <div className="flex flex-col items-center gap-3 text-center">
-            <p className="text-xs text-gray-500">
+        <div style={{ borderTop: '1px solid #1e3a5f', padding: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '8px' }}>
+            <p style={{ color: '#64748b', fontSize: '13px', margin: 0 }}>
               © {currentYear} XYZ Dental Clinic. All rights reserved.
             </p>
-            <p className="text-xs text-gray-500">
-              Built with{' '}
-              <span className="text-red-400">♥</span>{' '}
-              using{' '}
+            <p style={{ color: '#64748b', fontSize: '13px', margin: 0 }}>
+              Built with ❤️ using{' '}
               <a
-                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${appId}`}
+                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${hostname}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-teal-400 hover:text-teal-300 transition-colors"
+                style={{ color: '#38bdf8', textDecoration: 'none' }}
               >
                 caffeine.ai
               </a>
             </p>
+          </div>
 
-            {/* Secret tooth icon trigger for admin login */}
+          {/* Tooth Logo Admin Trigger */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
             <button
               onClick={() => setAdminModalOpen(true)}
-              className="mt-2 opacity-30 hover:opacity-60 transition-opacity duration-300 focus:outline-none"
-              aria-label="Admin access"
-              title=""
+              title="Admin Access"
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px',
+                opacity: 0.3,
+                transition: 'opacity 0.3s, transform 0.3s',
+                borderRadius: '50%',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.opacity = '0.8';
+                (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.15)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.opacity = '0.3';
+                (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+              }}
             >
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 64 64"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M32 4C22 4 14 11 14 20c0 5 2 9 4 13l4 18c1 4 4 6 6 6h8c2 0 5-2 6-6l4-18c2-4 4-8 4-13 0-9-8-16-18-16z"
-                  fill="#0d9488"
-                  stroke="#0d9488"
-                  strokeWidth="1"
-                />
-                <path
-                  d="M24 20c0-4 3-7 8-7s8 3 8 7"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-              </svg>
+              <img
+                src="/assets/generated/tooth-logo-footer.dim_48x48.png"
+                alt="Admin"
+                style={{ width: '28px', height: '28px', display: 'block' }}
+                onError={e => {
+                  // Fallback to emoji if image fails
+                  const parent = (e.currentTarget as HTMLImageElement).parentElement;
+                  if (parent) {
+                    parent.innerHTML = '<span style="font-size:22px;display:block;">🦷</span>';
+                  }
+                }}
+              />
             </button>
           </div>
         </div>
       </div>
 
-      <HiddenAdminLoginModal
-        open={adminModalOpen}
-        onOpenChange={setAdminModalOpen}
-      />
+      <HiddenAdminLoginModal open={adminModalOpen} onOpenChange={setAdminModalOpen} />
     </footer>
   );
 }

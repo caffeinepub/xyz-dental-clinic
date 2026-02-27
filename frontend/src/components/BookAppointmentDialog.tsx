@@ -1,12 +1,7 @@
-import { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import { useBookAppointment } from '@/hooks/useQueries';
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { CheckCircle, Loader2, X } from 'lucide-react';
+import { useBookAppointment } from '../hooks/useQueries';
 
 interface BookAppointmentDialogProps {
   open: boolean;
@@ -22,188 +17,284 @@ const SERVICES = [
   'Smile Makeover',
   'Teeth Whitening',
   'Root Canal',
-  'Braces',
   'General Checkup',
-  'Other',
 ];
 
-export default function BookAppointmentDialog({
-  open,
-  onOpenChange,
-  defaultService = '',
-}: BookAppointmentDialogProps) {
+export default function BookAppointmentDialog({ open, onOpenChange, defaultService }: BookAppointmentDialogProps) {
   const [patientName, setPatientName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [service, setService] = useState(defaultService);
+  const [contactInfo, setContactInfo] = useState('');
   const [preferredDate, setPreferredDate] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [serviceType, setServiceType] = useState(defaultService || '');
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const bookAppointment = useBookAppointment();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!patientName || !phone || !service || !preferredDate) return;
+    if (!patientName || !contactInfo || !preferredDate || !serviceType) return;
 
     const dateMs = new Date(preferredDate).getTime();
-    const dateNs = BigInt(dateMs) * 1_000_000n;
+    const dateNs = BigInt(dateMs) * BigInt(1_000_000);
 
-    await bookAppointment.mutateAsync({
-      patientName,
-      contactInfo: phone,
-      preferredDate: dateNs,
-      serviceType: service,
-    });
-
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
+    try {
+      await bookAppointment.mutateAsync({
+        patientName,
+        contactInfo,
+        preferredDate: dateNs,
+        serviceType,
+      });
+      setShowSuccess(true);
       setPatientName('');
-      setPhone('');
-      setService(defaultService);
+      setContactInfo('');
       setPreferredDate('');
-      onOpenChange(false);
-    }, 2000);
+      setServiceType(defaultService || '');
+    } catch (err) {
+      // error handled below
+    }
   };
 
-  const inputClass =
-    'w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-sm font-medium transition-all duration-200 outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-500/30 focus:shadow-[0_0_0_3px_rgba(13,148,136,0.15)]';
-
-  const labelClass = 'block text-sm font-semibold text-gray-800 mb-1.5';
+  const handleClose = () => {
+    setShowSuccess(false);
+    bookAppointment.reset();
+    onOpenChange(false);
+  };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-md w-full"
         style={{
           background: '#ffffff',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08)',
-          border: '1px solid #e5e7eb',
+          border: '2px solid #000',
+          borderRadius: '16px',
+          maxWidth: '480px',
+          width: '95vw',
+          padding: '32px',
         }}
       >
-        <DialogHeader>
-          <DialogTitle
-            style={{ color: '#111827', fontWeight: 700, fontSize: '1.25rem' }}
-          >
-            Book an Appointment
-          </DialogTitle>
-          <DialogDescription style={{ color: '#4b5563', fontSize: '0.875rem' }}>
-            Fill in your details and we'll confirm your appointment shortly.
-          </DialogDescription>
-        </DialogHeader>
-
-        {submitted ? (
-          <div className="py-8 text-center">
-            <div className="text-4xl mb-3">✅</div>
-            <p className="text-lg font-semibold text-gray-900">
-              Appointment Booked!
+        {showSuccess ? (
+          <div style={{ textAlign: 'center', padding: '24px 0' }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                marginBottom: '20px',
+                animation: 'successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+              }}
+            >
+              <CheckCircle size={44} color="#fff" strokeWidth={2.5} />
+            </div>
+            <h2
+              style={{
+                fontSize: '24px',
+                fontWeight: 700,
+                color: '#059669',
+                marginBottom: '8px',
+                animation: 'fadeSlideUp 0.4s ease 0.2s both',
+              }}
+            >
+              Appointment Confirmed!
+            </h2>
+            <p
+              style={{
+                color: '#6b7280',
+                fontSize: '15px',
+                marginBottom: '28px',
+                animation: 'fadeSlideUp 0.4s ease 0.35s both',
+              }}
+            >
+              We've received your booking request. Our team will contact you shortly to confirm your appointment.
             </p>
-            <p className="text-sm text-gray-600 mt-1">
-              We'll contact you soon to confirm.
-            </p>
+            <button
+              onClick={handleClose}
+              style={{
+                background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '12px 32px',
+                fontSize: '15px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                animation: 'fadeSlideUp 0.4s ease 0.5s both',
+              }}
+            >
+              Close
+            </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-            <div>
-              <label className={labelClass} htmlFor="patient-name">
-                Patient Name
-              </label>
-              <input
-                id="patient-name"
-                type="text"
-                className={inputClass}
-                placeholder="Enter your full name"
-                value={patientName}
-                onChange={(e) => setPatientName(e.target.value)}
-                required
-              />
-            </div>
-
-            <div>
-              <label className={labelClass} htmlFor="phone">
-                Phone Number
-              </label>
-              <input
-                id="phone"
-                type="tel"
-                className={inputClass}
-                placeholder="Enter your phone number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-            </div>
-
-            <div>
-              <label className={labelClass} htmlFor="service">
-                Service
-              </label>
-              <select
-                id="service"
-                className={inputClass}
-                value={service}
-                onChange={(e) => setService(e.target.value)}
-                required
-                style={{ appearance: 'auto' }}
+          <>
+            <DialogHeader>
+              <DialogTitle
+                style={{
+                  fontSize: '22px',
+                  fontWeight: 700,
+                  color: '#0f172a',
+                  marginBottom: '4px',
+                }}
               >
-                <option value="" disabled>
-                  Select a service
-                </option>
-                {SERVICES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </div>
+                Book an Appointment
+              </DialogTitle>
+              <DialogDescription style={{ color: '#64748b', fontSize: '14px' }}>
+                Fill in your details and we'll confirm your appointment shortly.
+              </DialogDescription>
+            </DialogHeader>
 
-            <div>
-              <label className={labelClass} htmlFor="preferred-date">
-                Preferred Date
-              </label>
-              <input
-                id="preferred-date"
-                type="date"
-                className={inputClass}
-                value={preferredDate}
-                onChange={(e) => setPreferredDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
-                required
-              />
-            </div>
+            <form onSubmit={handleSubmit} style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  value={patientName}
+                  onChange={e => setPatientName(e.target.value)}
+                  placeholder="Enter your full name"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    border: '1.5px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                  onBlur={e => (e.target.style.borderColor = '#d1d5db')}
+                />
+              </div>
 
-            <button
-              type="submit"
-              disabled={bookAppointment.isPending}
-              className="book-appointment-btn w-full mt-2"
-            >
-              {bookAppointment.isPending ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg
-                    className="animate-spin h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v8z"
-                    />
-                  </svg>
-                  Booking...
-                </span>
-              ) : (
-                'Book Appointment'
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                  Phone / Email *
+                </label>
+                <input
+                  type="text"
+                  value={contactInfo}
+                  onChange={e => setContactInfo(e.target.value)}
+                  placeholder="Phone number or email"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    border: '1.5px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                  onBlur={e => (e.target.style.borderColor = '#d1d5db')}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                  Preferred Date *
+                </label>
+                <input
+                  type="date"
+                  value={preferredDate}
+                  onChange={e => setPreferredDate(e.target.value)}
+                  required
+                  min={new Date().toISOString().split('T')[0]}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    border: '1.5px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                  onBlur={e => (e.target.style.borderColor = '#d1d5db')}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                  Service *
+                </label>
+                <select
+                  value={serviceType}
+                  onChange={e => setServiceType(e.target.value)}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    border: '1.5px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    background: '#fff',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value="">Select a service</option>
+                  {SERVICES.map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              {bookAppointment.isError && (
+                <div
+                  style={{
+                    background: '#fef2f2',
+                    border: '1px solid #fca5a5',
+                    borderRadius: '8px',
+                    padding: '10px 14px',
+                    color: '#dc2626',
+                    fontSize: '13px',
+                  }}
+                >
+                  Something went wrong. Please try again.
+                </div>
               )}
-            </button>
-          </form>
+
+              <button
+                type="submit"
+                disabled={bookAppointment.isPending}
+                style={{
+                  background: bookAppointment.isPending
+                    ? '#94a3b8'
+                    : 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '13px',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  cursor: bookAppointment.isPending ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginTop: '4px',
+                  transition: 'background 0.2s',
+                }}
+              >
+                {bookAppointment.isPending ? (
+                  <>
+                    <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                    Booking...
+                  </>
+                ) : (
+                  'Book Now'
+                )}
+              </button>
+            </form>
+          </>
         )}
       </DialogContent>
     </Dialog>

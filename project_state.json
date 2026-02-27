@@ -1,587 +1,58 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 19,
-  "summary": "Premium dental clinic website with smooth GSAP animations, before/after sliders, patient reviews, hidden admin panel (small elegant tooth logo in footer, single-click triggers login), 5 premium services (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry), animated mesh gradient background (soft blue & silver), glassmorphism card design on scroll, scroll-progress bar, floating dental element parallax corners, interactive service card glow effects, NO custom cursor follower (removed), clinic name in header triggers page reload on click, and frictionless appointment booking (Name + Phone only, no login)",
+  "projectStateVersion": 3,
+  "summary": "Dental clinic website with appointment booking (form-based, no login required, with success animation), premium animations (floating hero, magnetic buttons, staggered text reveal, liquid blue gradient background, scroll progress line), and Admin Panel.",
   "architectural_notes": [
-    "Color palette: Minimalist White, Deep Royal Blue, and Teal for boutique high-end feel",
-    "Design theme: Modern, clean, medical-professional yet high-tech",
-    "Animation library: Consider Framer Motion or GSAP for scroll-triggered and parallax effects",
-    "Lottie animations for dental procedure visualizations",
-    "Admin panel needs authentication and role-based access control",
-    "Glassmorphism card style: backdrop-filter blur with semi-transparent backgrounds so mesh gradient shows through",
-    "Appointment booking is zero-friction: no login, no OTP, no account creation. Only Name, Phone, Service, Date fields required.",
-    "Custom cursor follower circle removed; site uses default system cursor.",
-    "Admin access trigger updated: small elegant tooth logo in footer (visible but subtle), single-click opens login modal. All previous invisible hit-box / double-click triggers are removed.",
-    "BookAppointmentDialog form section must use pure white (#FFFFFF) background with soft drop-shadow to lift it from the gradient background; input fields use light grey borders with teal-blue focus glow; all form text must be high-contrast dark."
+    "Appointment booking form saves directly to backend with no external service dependency and no login required for patients"
   ],
   "known_issues": [],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-create-micro-interactions-for-buttons-with-hover-effects-including-smooth-glow-and-scale-up-animations",
-      "title": "Create micro-interactions for buttons with hover effects including smooth glow and scale-up animations",
+      "id": "feature-fix-the-appointment-booking-form-in-bookappointmentdialog-tsx-so-that-form-submissions-save-directly-to-the-backend-actor-no-external-service-on-successful-submit-display-a-green-checkmark-animation-with-the-text-appointment-confirmed-instead-of-the-current-error-state-ensure-no-internet-identity-login-prompt-or-auth-barrier-appears-for-patients-during-booking-the-form-must-be-fully-accessible-to-anonymous-users",
+      "title": "Fix the appointment booking form in BookAppointmentDialog.tsx so that form submissions save directly to the backend actor (no external service). On successful submit, display a green checkmark animation with the text 'Appointment Confirmed!' instead of the current error state. Ensure no Internet Identity login prompt or auth barrier appears for patients during booking — the form must be fully accessible to anonymous users.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-floating-animation-to-the-hero-section-a-dental-icon-or-doctor-image-should-continuously-float-up-and-down-bob-effect-when-the-page-loads-the-animation-should-be-smooth-and-loop-indefinitely",
+      "title": "Add a floating animation to the Hero section: a dental icon or doctor image should continuously float up and down (bob effect) when the page loads. The animation should be smooth and loop indefinitely.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-all-book-now-buttons-magnetic-when-the-user-s-mouse-cursor-moves-near-a-book-now-button-the-button-should-subtly-translate-toward-the-cursor-creating-a-magnetic-attraction-effect-the-button-should-return-to-its-original-position-when-the-cursor-moves-away",
+      "title": "Make all 'Book Now' buttons magnetic: when the user's mouse cursor moves near a 'Book Now' button, the button should subtly translate toward the cursor, creating a magnetic attraction effect. The button should return to its original position when the cursor moves away.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-create-hero-section-with-high-quality-image-slider-or-static-hero-image-featuring-dental-work-with-prominent-book-appointment-call-to-action-button",
-      "title": "Create hero section with high-quality image slider or static hero image featuring dental work with prominent 'Book Appointment' call-to-action button",
+      "id": "feature-add-a-staggered-text-reveal-animation-to-all-major-section-headings-each-word-in-the-heading-should-animate-in-one-by-one-from-below-bounce-slide-up-creating-a-staggered-entrance-effect-when-the-section-scrolls-into-view",
+      "title": "Add a staggered text reveal animation to all major section headings: each word in the heading should animate in one by one from below (bounce/slide up), creating a staggered entrance effect when the section scrolls into view.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-static-white-background-with-a-dynamic-liquid-blue-gradient-background-the-gradient-should-animate-continuously-and-create-a-wave-fluid-effect-that-responds-to-mouse-movement-across-the-page",
+      "title": "Replace the static white background with a dynamic liquid blue gradient background. The gradient should animate continuously and create a wave/fluid effect that responds to mouse movement across the page.",
       "reqIds": [
         "REQ-5"
       ],
       "version": 1
     },
     {
-      "id": "feature-build-interactive-before-after-slider-component-where-users-can-drag-to-compare-treatment-results-with-left-showing-before-and-right-showing-after",
-      "title": "Build interactive before/after slider component where users can drag to compare treatment results with left showing before and right showing after",
+      "id": "feature-add-a-scroll-triggered-progress-indicator-a-thin-animated-line-progress-bar-fixed-at-the-top-of-the-page-that-fills-from-left-to-right-as-the-user-scrolls-down-indicating-how-much-of-the-page-content-remains",
+      "title": "Add a scroll-triggered progress indicator: a thin animated line (progress bar) fixed at the top of the page that fills from left to right as the user scrolls down, indicating how much of the page content remains.",
       "reqIds": [
         "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-services-grid-displaying-dental-services-root-canal-braces-whitening-etc-with-animated-icons-and-links-to-detail-pages-for-each-service",
-      "title": "Create services grid displaying dental services (Root Canal, Braces, Whitening, etc.) with animated icons and links to detail pages for each service",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-build-doctor-profile-section-with-photo-smooth-entry-animation-and-details-including-expertise-and-education-credentials",
-      "title": "Build doctor profile section with photo, smooth entry animation, and details including expertise and education credentials",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-auto-sliding-testimonial-carousel-section-for-patient-reviews-with-manual-navigation-controls",
-      "title": "Create auto-sliding testimonial carousel section for patient reviews with manual navigation controls",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-live-contact-features-including-whatsapp-chat-button-embedded-google-maps-location-and-clickable-phone-number",
-      "title": "Add live contact features including WhatsApp chat button, embedded Google Maps location, and clickable phone number",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-build-admin-dashboard-page-with-clinic-status-toggle-displaying-real-time-banner-on-public-site-when-status-is-emergency-or-closed",
-      "title": "Build admin dashboard page with clinic status toggle displaying real-time banner on public site when status is Emergency or Closed",
-      "reqIds": [
-        "REQ-15"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-appointment-manager-interface-in-admin-panel-displaying-all-bookings-with-filtering-by-date-and-status-allowing-status-updates",
-      "title": "Create appointment manager interface in admin panel displaying all bookings with filtering by date and status, allowing status updates",
-      "reqIds": [
-        "REQ-16"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-build-content-management-interface-in-admin-panel-for-uploading-photos-reviews-and-before-after-images-without-requiring-code-changes",
-      "title": "Build content management interface in admin panel for uploading photos, reviews, and before-after images without requiring code changes",
-      "reqIds": [
-        "REQ-17"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-doctor-availability-scheduler-interface-in-admin-panel-allowing-modification-of-doctor-schedules-with-date-pickers-and-time-range-selectors",
-      "title": "Create doctor availability scheduler interface in admin panel allowing modification of doctor schedules with date pickers and time range selectors",
-      "reqIds": [
-        "REQ-18"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-authentication-system-restricting-admin-panel-access-to-authorized-users-only",
-      "title": "Implement authentication system restricting admin panel access to authorized users only",
-      "reqIds": [
-        "REQ-19"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-apply-minimalist-white-deep-royal-blue-and-teal-color-palette-throughout-the-website-creating-a-boutique-high-end-medical-professional-aesthetic",
-      "title": "Apply minimalist white, deep royal blue, and teal color palette throughout the website creating a boutique, high-end medical-professional aesthetic",
-      "reqIds": [
-        "REQ-20"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-render-all-generated-images-as-static-assets-in-frontend-public-assets-generated-directory",
-      "title": "Render all generated images as static assets in frontend/public/assets/generated directory",
-      "reqIds": [
-        "REQ-21"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-hidden-admin-access-via-triple-click-on-the-footer-copyright-logo-clicking-the-copyright-text-logo-three-times-in-quick-succession-opens-a-login-popup-modal-the-modal-accepts-username-6352174912-and-password-63521-authenticates-locally-and-on-success-navigates-to-the-admin-dashboard-no-admin-link-should-be-visible-anywhere-in-the-public-ui",
-      "title": "Implement hidden admin access via triple-click on the footer copyright logo. Clicking the copyright text/logo three times in quick succession opens a login popup modal. The modal accepts username '6352174912' and password '63521', authenticates locally, and on success navigates to the admin dashboard. No admin link should be visible anywhere in the public UI.",
-      "reqIds": [
-        "REQ-22"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-dental-implants-as-a-new-premium-service-card-in-the-services-section-the-card-must-feature-a-3d-animated-model-using-three-js-react-three-fiber-or-css-3d-transforms-that-illustrates-how-a-dental-implant-is-fixed-into-the-jaw-triggered-on-hover-or-card-entry",
-      "title": "Add 'Dental Implants' as a new premium service card in the Services section. The card must feature a 3D animated model (using Three.js / React Three Fiber or CSS 3D transforms) that illustrates how a dental implant is fixed into the jaw, triggered on hover or card entry.",
-      "reqIds": [
-        "REQ-23"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-invisalign-invisible-braces-as-a-new-premium-service-card-include-a-slide-to-compare-feature-embedded-in-or-linked-from-the-card-showing-teeth-gradually-aligning-using-the-existing-beforeafterslider-component-pattern-with-before-misaligned-teeth-and-after-aligned-teeth-images",
-      "title": "Add 'Invisalign (Invisible Braces)' as a new premium service card. Include a slide-to-compare feature embedded in or linked from the card showing teeth gradually aligning, using the existing BeforeAfterSlider component pattern with before=misaligned teeth and after=aligned teeth images.",
-      "reqIds": [
-        "REQ-24"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-pediatric-dentistry-kids-as-a-new-premium-service-card-the-card-and-its-section-must-feature-playful-floating-bubble-animations-css-keyframe-bubbles-rising-in-the-background-to-create-a-child-friendly-fun-visual-atmosphere",
-      "title": "Add 'Pediatric Dentistry (Kids)' as a new premium service card. The card and its section must feature playful floating bubble animations (CSS keyframe bubbles rising in the background) to create a child-friendly, fun visual atmosphere.",
-      "reqIds": [
-        "REQ-25"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-smile-makeover-as-a-new-premium-service-card-the-card-and-its-detail-page-must-heavily-feature-before-after-comparison-sliders-using-the-existing-beforeafterslider-component-showing-multiple-smile-transformation-examples",
-      "title": "Add 'Smile Makeover' as a new premium service card. The card and its detail page must heavily feature Before/After comparison sliders using the existing BeforeAfterSlider component, showing multiple smile transformation examples.",
-      "reqIds": [
-        "REQ-26"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-laser-dentistry-as-a-new-premium-service-card-the-card-must-feature-a-glowing-animated-laser-beam-effect-css-animation-with-teal-blue-glow-sweeping-across-the-card-that-highlights-the-service-card-on-hover-or-on-scroll-entry",
-      "title": "Add 'Laser Dentistry' as a new premium service card. The card must feature a glowing animated laser beam effect (CSS animation with teal/blue glow sweeping across the card) that highlights the service card on hover or on scroll entry.",
-      "reqIds": [
-        "REQ-27"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-a-custom-cursor-interaction-as-the-user-moves-their-mouse-across-the-page-a-subtle-semi-transparent-water-ripple-or-medical-cross-shadow-trail-follows-the-cursor-with-a-slight-delay-the-effect-must-be-faint-and-not-obstruct-any-clickable-elements-or-text",
-      "title": "Implement a custom cursor interaction: as the user moves their mouse across the page, a subtle semi-transparent 'water ripple' or 'medical cross' shadow/trail follows the cursor with a slight delay. The effect must be faint and not obstruct any clickable elements or text.",
-      "reqIds": [
-        "REQ-28"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-plain-white-background-with-a-slow-moving-animated-mesh-gradient-background-throughout-the-site-the-gradient-should-subtly-shift-between-very-light-shades-of-white-pale-teal-and-pale-royal-blue-over-a-15-20-second-loop-creating-depth-without-distracting-from-content",
-      "title": "Replace the plain white background with a slow-moving animated mesh gradient background throughout the site. The gradient should subtly shift between very light shades of white, pale teal, and pale royal-blue over a 15-20 second loop, creating depth without distracting from content.",
-      "reqIds": [
-        "REQ-29"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-a-text-scramble-effect-on-major-section-headings-throughout-the-site-when-a-heading-scrolls-into-the-viewport-it-briefly-displays-random-letters-that-rapidly-resolve-into-the-correct-final-heading-text-cyberpunk-style-but-at-a-professional-measured-speed-use-an-intersectionobserver-to-trigger-the-effect-once-per-heading-per-page-load",
-      "title": "Implement a text scramble effect on major section headings throughout the site. When a heading scrolls into the viewport, it briefly displays random letters that rapidly resolve into the correct final heading text (cyberpunk-style but at a professional, measured speed). Use an IntersectionObserver to trigger the effect once per heading per page load.",
-      "reqIds": [
-        "REQ-30"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-existing-static-list-style-testimonial-display-with-an-infinite-auto-scrolling-carousel-marquee-style-that-shows-patient-review-cards-floating-horizontally-the-carousel-must-pause-scrolling-when-the-user-hovers-over-it-and-resume-on-mouse-out-use-data-from-the-existing-reviews-backend-query",
-      "title": "Replace the existing static/list-style testimonial display with an infinite auto-scrolling carousel (marquee-style) that shows patient review cards floating horizontally. The carousel must pause scrolling when the user hovers over it, and resume on mouse-out. Use data from the existing reviews backend query.",
-      "reqIds": [
-        "REQ-31"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-service-manager-section-to-the-admin-panel-that-allows-the-admin-to-edit-the-display-name-description-text-and-upload-replace-the-featured-photo-for-each-of-the-5-premium-services-dental-implants-invisalign-pediatric-dentistry-kids-smile-makeover-and-laser-dentistry-changes-must-be-persisted-in-the-backend-and-reflected-on-the-public-facing-service-cards-and-detail-pages",
-      "title": "Add a 'Service Manager' section to the admin panel that allows the admin to edit the display name, description text, and upload/replace the featured photo for each of the 5 premium services: Dental Implants, Invisalign, Pediatric Dentistry (Kids), Smile Makeover, and Laser Dentistry. Changes must be persisted in the backend and reflected on the public-facing service cards and detail pages.",
-      "reqIds": [
-        "REQ-32"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-a-review-approver-workflow-patient-submitted-reviews-must-be-held-in-a-pending-state-and-only-appear-on-the-public-website-after-an-admin-explicitly-approves-them-in-the-admin-panel-the-admin-panel-must-display-all-pending-reviews-with-approve-and-reject-actions",
-      "title": "Implement a Review Approver workflow: patient-submitted reviews must be held in a 'pending' state and only appear on the public website after an admin explicitly approves them in the admin panel. The admin panel must display all pending reviews with Approve and Reject actions.",
-      "reqIds": [
-        "REQ-33"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-apply-a-glassmorphism-design-treatment-to-all-service-cards-testimonial-cards-doctor-profile-card-and-admin-panel-content-cards-use-a-frosted-blurred-glass-background-backdrop-filter-blur-semi-transparent-white-teal-background-so-the-animated-mesh-gradient-background-shows-softly-through-the-card-surfaces",
-      "title": "Apply a glassmorphism design treatment to all service cards, testimonial cards, doctor profile card, and admin panel content cards: use a frosted/blurred glass background (backdrop-filter: blur, semi-transparent white/teal background) so the animated mesh gradient background shows softly through the card surfaces.",
-      "reqIds": [
-        "REQ-34"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-scroll-progress-indicator-a-thin-3-4px-horizontal-bar-fixed-at-the-very-top-of-the-viewport-above-the-sticky-header-that-fills-from-left-to-right-as-the-user-scrolls-down-the-page-using-the-site-s-teal-or-royal-blue-accent-color-and-resets-to-empty-when-the-user-returns-to-the-top",
-      "title": "Add a scroll-progress indicator: a thin (3–4px) horizontal bar fixed at the very top of the viewport (above the sticky header) that fills from left to right as the user scrolls down the page, using the site's teal or royal-blue accent color, and resets to empty when the user returns to the top.",
-      "reqIds": [
-        "REQ-35"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-floating-dental-element-decorations-in-the-corners-and-edges-of-the-page-small-64-96px-semi-transparent-png-images-of-dental-icons-tooth-dental-mirror-toothbrush-plus-cross-that-gently-float-and-apply-a-subtle-parallax-offset-as-the-user-scrolls-creating-depth-without-obstructing-any-content",
-      "title": "Add floating dental element decorations in the corners and edges of the page: small (64–96px) semi-transparent PNG images of dental icons (tooth, dental mirror, toothbrush, plus/cross) that gently float and apply a subtle parallax offset as the user scrolls, creating depth without obstructing any content.",
-      "reqIds": [
-        "REQ-36"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-enhance-the-existing-custom-cursor-so-that-when-the-mouse-hovers-over-any-service-card-in-the-services-section-the-cursor-icon-changes-to-a-dental-themed-icon-tooth-or-medical-plus-cross-svg-the-cursor-must-revert-to-the-standard-custom-cursor-when-moving-off-service-cards-this-is-a-magnetic-context-sensitive-cursor-enhancement-on-top-of-the-existing-customcursor-component",
-      "title": "Enhance the existing custom cursor so that when the mouse hovers over any service card in the Services section, the cursor icon changes to a dental-themed icon (tooth or medical plus/cross SVG). The cursor must revert to the standard custom cursor when moving off service cards. This is a magnetic/context-sensitive cursor enhancement on top of the existing CustomCursor component.",
-      "reqIds": [
-        "REQ-37"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-render-all-new-floating-dental-element-images-as-static-assets-in-the-frontend-public-assets-generated-directory",
-      "title": "Render all new floating dental element images as static assets in the frontend/public/assets/generated directory.",
-      "reqIds": [
-        "REQ-38"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-second-hidden-admin-access-trigger-place-an-invisible-1-1px-clickable-element-at-the-very-bottom-of-the-footer-below-all-visible-content-clicking-it-should-open-the-existing-hiddenadminloginmodal-additionally-implement-a-long-press-3-second-hold-on-the-site-logo-in-the-header-that-also-opens-the-same-hiddenadminloginmodal-both-triggers-must-work-alongside-the-existing-triple-click-trigger-on-the-footer-copyright-text-no-visible-indicator-should-be-present-for-any-trigger",
-      "title": "Add a second hidden admin access trigger: place an invisible 1×1px clickable element at the very bottom of the footer (below all visible content). Clicking it should open the existing HiddenAdminLoginModal. Additionally, implement a long-press (3-second hold) on the site logo in the Header that also opens the same HiddenAdminLoginModal. Both triggers must work alongside the existing triple-click trigger on the footer copyright text. No visible indicator should be present for any trigger.",
-      "reqIds": [
-        "REQ-39"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-an-appointments-table-to-the-admin-dashboard-page-or-enhance-the-existing-appointments-admin-page-that-displays-all-booked-appointments-in-a-real-time-table-with-columns-patient-name-phone-number-service-and-date-time-the-table-must-auto-refresh-using-react-query-polling-so-new-bookings-appear-without-a-page-reload",
-      "title": "Add an Appointments table to the admin Dashboard page (or enhance the existing Appointments admin page) that displays all booked appointments in a real-time table with columns: Patient Name, Phone Number, Service, and Date/Time. The table must auto-refresh using React Query polling so new bookings appear without a page reload.",
-      "reqIds": [
-        "REQ-40"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-prominent-main-switch-toggle-on-the-admin-dashboard-page-for-the-clinic-open-closed-state-when-switched-to-off-closed-a-full-screen-or-prominent-modal-popup-appears-on-the-public-facing-website-saying-we-are-currently-closed-please-check-back-later-the-popup-must-be-dismissible-but-reappear-on-each-new-page-visit-while-the-clinic-is-closed-when-the-admin-sets-status-back-to-on-open-the-popup-disappears",
-      "title": "Add a prominent 'Main Switch' toggle on the admin Dashboard page for the clinic open/closed state. When switched to OFF (Closed), a full-screen or prominent modal popup appears on the public-facing website saying 'We are currently closed. Please check back later.' The popup must be dismissible but reappear on each new page visit while the clinic is closed. When the admin sets status back to ON (Open), the popup disappears.",
-      "reqIds": [
-        "REQ-41"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-enhance-the-existing-service-manager-admin-page-to-allow-uploading-replacing-the-featured-photo-for-all-5-premium-services-dental-implants-invisalign-pediatric-dentistry-smile-makeover-laser-dentistry-and-editing-their-display-name-and-description-text-changes-must-persist-in-the-backend-and-be-immediately-reflected-on-the-public-facing-service-cards-and-detail-pages",
-      "title": "Enhance the existing Service Manager admin page to allow uploading/replacing the featured photo for all 5 premium services (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry) and editing their display name and description text. Changes must persist in the backend and be immediately reflected on the public-facing service cards and detail pages.",
-      "reqIds": [
-        "REQ-42"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-before-after-manager-section-to-the-admin-panel-that-allows-uploading-new-before-after-photo-pairs-to-the-gallery-each-upload-should-accept-a-before-image-and-an-after-image-store-them-in-the-backend-and-make-them-available-to-the-public-facing-beforeafterslider-components",
-      "title": "Add a 'Before/After Manager' section to the admin panel that allows uploading new before/after photo pairs to the gallery. Each upload should accept a 'before' image and an 'after' image, store them in the backend, and make them available to the public-facing BeforeAfterSlider components.",
-      "reqIds": [
-        "REQ-43"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-enhance-the-existing-review-approver-admin-page-to-also-include-a-delete-reject-action-for-pending-reviews-approved-reviews-appear-publicly-rejected-reviews-are-permanently-removed-the-existing-approve-workflow-must-remain-intact",
-      "title": "Enhance the existing Review Approver admin page to also include a Delete/Reject action for pending reviews. Approved reviews appear publicly; rejected reviews are permanently removed. The existing approve workflow must remain intact.",
-      "reqIds": [
-        "REQ-44"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-animated-background-particles-throughout-the-site-small-floating-medical-dental-shapes-tooth-outlines-plus-crosses-sparkles-that-drift-slowly-upward-or-in-random-directions-like-bubbles-in-slow-motion-the-particles-must-be-purely-decorative-rendered-behind-all-content-and-must-not-interfere-with-any-clickable-elements-or-text-readability-use-css-keyframe-animations-or-a-lightweight-canvas-approach",
-      "title": "Implement animated background particles throughout the site: small floating medical/dental shapes (tooth outlines, plus crosses, sparkles) that drift slowly upward or in random directions like bubbles in slow motion. The particles must be purely decorative, rendered behind all content, and must not interfere with any clickable elements or text readability. Use CSS keyframe animations or a lightweight canvas approach.",
-      "reqIds": [
-        "REQ-45"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-scroll-triggered-reveal-animations-when-text-sections-scroll-into-the-viewport-each-line-or-heading-appears-letter-by-letter-typewriter-effect-when-images-scroll-into-view-they-start-slightly-scaled-down-scale-0-85-and-zoom-in-to-their-natural-size-while-fading-in-use-intersectionobserver-to-trigger-these-effects-once-per-element-per-page-load",
-      "title": "Implement scroll-triggered reveal animations: when text sections scroll into the viewport, each line or heading appears letter-by-letter (typewriter effect); when images scroll into view, they start slightly scaled down (scale 0.85) and zoom in to their natural size while fading in. Use IntersectionObserver to trigger these effects once per element per page load.",
-      "reqIds": [
-        "REQ-46"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-enhance-the-5-premium-service-cards-with-the-following-specific-interactive-animations-1-dental-implants-card-hovering-rotates-the-existing-3d-implant-model-continuously-2-invisalign-card-an-embedded-mini-before-after-slider-shows-teeth-gradually-aligning-on-hover-or-drag-3-pediatric-dentistry-card-animated-cartoon-tooth-or-character-visually-smiles-mouth-curves-up-using-css-keyframes-on-card-entry-4-smile-makeover-card-on-hover-a-magic-wand-sparkle-glow-sweep-effect-brightens-and-transforms-the-card-s-before-state-image-to-the-after-state-5-laser-dentistry-card-a-glowing-teal-blue-scan-line-sweeps-horizontally-across-the-card-on-hover-or-scroll-entry",
-      "title": "Enhance the 5 premium service cards with the following specific interactive animations: (1) Dental Implants card: hovering rotates the existing 3D implant model continuously. (2) Invisalign card: an embedded mini before/after slider shows teeth gradually aligning on hover or drag. (3) Pediatric Dentistry card: animated cartoon tooth or character visually 'smiles' (mouth curves up) using CSS keyframes on card entry. (4) Smile Makeover card: on hover, a 'magic wand' sparkle/glow sweep effect brightens and transforms the card's before-state image to the after-state. (5) Laser Dentistry card: a glowing teal/blue scan line sweeps horizontally across the card on hover or scroll entry.",
-      "reqIds": [
-        "REQ-47"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-enhance-the-existing-custom-cursor-follower-so-that-a-small-semi-transparent-circle-follows-the-mouse-across-the-entire-page-with-a-slight-lag-when-the-cursor-hovers-over-any-link-button-or-interactive-element-the-circle-smoothly-expands-and-displays-the-text-view-inside-it-when-the-cursor-moves-off-interactive-elements-the-circle-shrinks-back-to-its-default-small-state-and-the-view-text-disappears",
-      "title": "Enhance the existing custom cursor follower so that a small semi-transparent circle follows the mouse across the entire page with a slight lag. When the cursor hovers over any link, button, or interactive element, the circle smoothly expands and displays the text 'View' inside it. When the cursor moves off interactive elements, the circle shrinks back to its default small state and the 'View' text disappears.",
-      "reqIds": [
-        "REQ-48"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-existing-bookappointmentdialog-component-with-a-fully-frictionless-booking-form-remove-any-internet-identity-login-requirement-or-auth-gated-logic-from-the-booking-flow-the-form-must-contain-exactly-four-fields-patient-name-text-input-phone-number-tel-input-service-dropdown-select-populated-with-available-services-and-preferred-date-date-picker-on-successful-submission-display-an-inline-thank-you-your-appointment-has-been-booked-we-will-contact-you-shortly-confirmation-message-inside-the-dialog-no-redirect-no-login-prompt-the-book-now-button-must-be-immediately-accessible-without-any-authentication-step",
-      "title": "Replace the existing BookAppointmentDialog component with a fully frictionless booking form. Remove any Internet Identity login requirement or auth-gated logic from the booking flow. The form must contain exactly four fields: Patient Name (text input), Phone Number (tel input), Service (dropdown select populated with available services), and Preferred Date (date picker). On successful submission, display an inline 'Thank You! Your appointment has been booked. We will contact you shortly.' confirmation message inside the dialog — no redirect, no login prompt. The 'Book Now' button must be immediately accessible without any authentication step.",
-      "reqIds": [
-        "REQ-50"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-audit-all-public-facing-pages-home-herosection-service-detail-pages-dentalimplantsdetail-invisaligndetail-laserdentistrydetail-pediatricdentistrydetail-smilemakeoverdetail-servicedetail-and-remove-any-logic-that-gates-the-book-appointment-button-or-booking-dialog-behind-an-authentication-check-or-login-state-every-book-appointment-book-now-button-on-the-public-site-must-open-the-frictionless-booking-form-directly",
-      "title": "Audit all public-facing pages (Home, HeroSection, service detail pages: DentalImplantsDetail, InvisalignDetail, LaserDentistryDetail, PediatricDentistryDetail, SmileMakeoverDetail, ServiceDetail) and remove any logic that gates the 'Book Appointment' button or booking dialog behind an authentication check or login state. Every 'Book Appointment' / 'Book Now' button on the public site must open the frictionless booking form directly.",
-      "reqIds": [
-        "REQ-51"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-all-existing-hidden-admin-access-triggers-triple-click-on-footer-copyright-invisible-footer-dot-logo-long-press-with-a-single-new-trigger-an-invisible-50-50px-hit-box-fixed-in-the-bottom-right-corner-of-every-page-position-fixed-bottom-0-right-0-z-index-above-all-content-a-double-click-or-double-tap-on-touch-devices-on-this-invisible-box-must-open-the-existing-hiddenadminloginmodal-all-previously-implemented-hidden-triggers-triple-click-footer-copyright-1-1px-footer-dot-3-second-logo-long-press-must-be-removed-no-visible-indicator-tooltip-or-outline-must-exist-for-the-new-trigger-credentials-remain-username-6352174912-password-63521",
-      "title": "Replace all existing hidden admin access triggers (triple-click on footer copyright, invisible footer dot, logo long-press) with a single new trigger: an invisible 50×50px hit-box fixed in the bottom-right corner of every page (position: fixed, bottom: 0, right: 0, z-index above all content). A double-click (or double-tap on touch devices) on this invisible box must open the existing HiddenAdminLoginModal. All previously implemented hidden triggers (triple-click footer copyright, 1×1px footer dot, 3-second logo long-press) must be removed. No visible indicator, tooltip, or outline must exist for the new trigger. Credentials remain: username '6352174912', password '63521'.",
-      "reqIds": [
-        "REQ-52"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-remove-the-custom-cursor-follower-component-entirely-from-the-site-delete-or-disable-the-customcursor-component-and-its-cursorcontext-provider-so-that-no-custom-cursor-circle-trail-view-text-expansion-or-dental-icon-cursor-override-appears-anywhere-the-browser-s-default-system-cursor-must-be-used-across-the-entire-site-remove-all-cursor-related-css-overrides-cursor-none-on-body-html-so-the-native-os-cursor-is-fully-restored",
-      "title": "Remove the custom cursor follower component entirely from the site. Delete or disable the CustomCursor component and its CursorContext provider so that no custom cursor circle, trail, 'View' text expansion, or dental-icon cursor override appears anywhere. The browser's default system cursor must be used across the entire site. Remove all cursor-related CSS overrides (cursor: none on body/html) so the native OS cursor is fully restored.",
-      "reqIds": [
-        "REQ-53"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-make-the-xyz-dental-clinic-brand-name-text-logo-in-the-header-trigger-a-full-page-reload-when-clicked-attach-an-onclick-handler-to-the-brand-name-element-in-header-tsx-that-calls-window-location-reload-the-brand-name-must-still-be-visually-styled-as-before-it-should-not-appear-as-a-standard-navigation-link-no-underline-on-hover-unless-already-styled-that-way-this-behavior-replaces-any-existing-router-navigation-on-the-brand-name",
-      "title": "Make the 'XYZ Dental Clinic' brand name text/logo in the Header trigger a full page reload when clicked. Attach an onClick handler to the brand name element in Header.tsx that calls window.location.reload(). The brand name must still be visually styled as before; it should not appear as a standard navigation link (no underline on hover unless already styled that way). This behavior replaces any existing router navigation on the brand name.",
-      "reqIds": [
-        "REQ-54"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-audit-and-ensure-the-bookappointmentdialog-booking-form-is-fully-frictionless-with-no-authentication-requirement-the-form-must-contain-exactly-patient-name-text-input-and-phone-number-tel-input-as-the-minimum-required-fields-if-service-and-date-fields-already-exist-in-the-current-implementation-they-may-remain-remove-any-remaining-internet-identity-login-prompt-auth-check-or-disabled-state-tied-to-authentication-status-from-the-booking-dialog-and-every-book-appointment-book-now-button-across-all-public-pages-home-herosection-dentalimplantsdetail-invisaligndetail-laserdentistrydetail-pediatricdentistrydetail-smilemakeoverdetail-servicedetail-on-successful-form-submission-show-an-inline-confirmation-message-thank-you-your-appointment-has-been-booked-we-will-contact-you-shortly-no-redirect-no-login-prompt",
-      "title": "Audit and ensure the BookAppointmentDialog booking form is fully frictionless with no authentication requirement. The form must contain exactly: Patient Name (text input) and Phone Number (tel input) as the minimum required fields. If service and date fields already exist in the current implementation, they may remain. Remove any remaining Internet Identity login prompt, auth check, or disabled state tied to authentication status from the booking dialog and every 'Book Appointment' / 'Book Now' button across all public pages (Home, HeroSection, DentalImplantsDetail, InvisalignDetail, LaserDentistryDetail, PediatricDentistryDetail, SmileMakeoverDetail, ServiceDetail). On successful form submission, show an inline confirmation message: 'Thank You! Your appointment has been booked. We will contact you shortly.' — no redirect, no login prompt.",
-      "reqIds": [
-        "REQ-55"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-plain-white-static-background-with-a-slow-moving-animated-mesh-gradient-background-throughout-the-entire-site-the-gradient-must-subtly-shift-between-very-light-shades-of-white-pale-silver-and-soft-blue-over-a-15-20-second-loop-the-animation-must-run-continuously-and-create-visual-depth-without-distracting-from-content-apply-this-to-the-root-layout-so-it-appears-on-all-pages-including-admin-pages",
-      "title": "Replace the plain white/static background with a slow-moving animated mesh gradient background throughout the entire site. The gradient must subtly shift between very light shades of white, pale silver, and soft blue over a 15–20 second loop. The animation must run continuously and create visual depth without distracting from content. Apply this to the root layout so it appears on all pages including admin pages.",
-      "reqIds": [
-        "REQ-57"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-apply-glassmorphism-scroll-fade-in-transitions-to-all-major-page-sections-when-each-section-scrolls-into-the-viewport-it-must-fade-in-with-a-frosted-blurred-glass-appearance-backdrop-filter-blur-semi-transparent-white-or-teal-tinted-background-use-intersectionobserver-to-trigger-the-reveal-once-per-section-per-page-load-this-applies-to-servicesgrid-doctorprofile-testimonialcarousel-beforeafterslider-gallery-contactsection-and-each-section-on-service-detail-pages",
-      "title": "Apply glassmorphism scroll-fade-in transitions to all major page sections. When each section scrolls into the viewport, it must fade in with a frosted/blurred glass appearance (backdrop-filter: blur, semi-transparent white or teal-tinted background). Use IntersectionObserver to trigger the reveal once per section per page load. This applies to: ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider gallery, ContactSection, and each section on service detail pages.",
-      "reqIds": [
-        "REQ-58"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-the-interactive-before-after-drag-slider-beforeafterslider-component-is-prominently-featured-in-the-public-gallery-results-section-on-the-home-page-the-slider-must-be-fully-functional-users-can-click-and-drag-the-divider-handle-to-reveal-the-before-image-on-the-left-and-after-image-on-the-right-use-existing-before-after-image-data-from-the-backend-or-static-fallback-pairs-if-none-are-stored-the-slider-must-be-touch-friendly-for-mobile-users",
-      "title": "Ensure the interactive Before/After drag slider (BeforeAfterSlider component) is prominently featured in the public gallery/results section on the Home page. The slider must be fully functional: users can click and drag the divider handle to reveal the before image on the left and after image on the right. Use existing before/after image data from the backend (or static fallback pairs if none are stored). The slider must be touch-friendly for mobile users.",
-      "reqIds": [
-        "REQ-59"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-soft-glow-hover-effect-to-all-5-premium-service-cards-dental-implants-invisalign-pediatric-dentistry-smile-makeover-laser-dentistry-in-the-servicesgrid-on-mouse-hover-each-card-must-emit-a-gentle-radial-or-box-shadow-glow-using-the-site-s-teal-or-royal-blue-accent-color-the-glow-must-transition-smoothly-in-and-out-css-transition-300ms-this-is-in-addition-to-any-existing-card-specific-animations-3d-rotation-scan-line-etc",
-      "title": "Add a soft glow hover effect to all 5 premium service cards (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry) in the ServicesGrid. On mouse hover, each card must emit a gentle radial or box-shadow glow using the site's teal or royal-blue accent color. The glow must transition smoothly in and out (CSS transition, ~300ms). This is in addition to any existing card-specific animations (3D rotation, scan line, etc.).",
-      "reqIds": [
-        "REQ-60"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-the-admin-dashboard-is-accessible-only-through-the-new-bottom-right-corner-double-click-hidden-trigger-and-displays-all-three-required-admin-capabilities-1-all-appointment-leads-table-with-patient-name-phone-number-service-and-date-time-columns-with-auto-refresh-polling-2-clinic-status-main-switch-toggle-open-closed-emergency-that-controls-the-public-facing-status-banner-and-closed-modal-3-service-manager-cms-to-edit-display-name-description-and-featured-photo-for-all-5-premium-services-dental-implants-invisalign-pediatric-dentistry-smile-makeover-laser-dentistry-no-visible-admin-button-or-link-must-exist-anywhere-on-the-public-site",
-      "title": "Ensure the admin dashboard is accessible only through the new bottom-right corner double-click hidden trigger and displays all three required admin capabilities: (1) All appointment leads table with Patient Name, Phone Number, Service, and Date/Time columns with auto-refresh polling; (2) Clinic Status Main Switch toggle (Open/Closed/Emergency) that controls the public-facing status banner and closed modal; (3) Service Manager CMS to edit display name, description, and featured photo for all 5 premium services (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry). No visible admin button or link must exist anywhere on the public site.",
-      "reqIds": [
-        "REQ-61"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-current-invisible-bottom-right-corner-double-click-admin-trigger-with-a-small-elegant-tooth-svg-logo-placed-visibly-in-the-footer-component-at-the-very-bottom-of-the-page-a-single-click-on-this-tooth-logo-must-open-the-existing-hiddenadminloginmodal-the-tooth-icon-should-be-styled-as-a-small-28-36px-semi-transparent-but-visible-dental-tooth-icon-using-the-site-s-teal-royal-blue-accent-colors-remove-the-existing-hiddenadmintrigger-invisible-hit-box-component-from-app-tsx-and-footer-credentials-remain-username-6352174912-password-63521",
-      "title": "Replace the current invisible bottom-right corner double-click admin trigger with a small, elegant tooth SVG logo placed visibly in the Footer component (at the very bottom of the page). A single click on this tooth logo must open the existing HiddenAdminLoginModal. The tooth icon should be styled as a small (28–36px), semi-transparent but visible dental tooth icon using the site's teal/royal-blue accent colors. Remove the existing HiddenAdminTrigger invisible hit-box component from App.tsx and Footer. Credentials remain: username '6352174912', password '63521'.",
-      "reqIds": [
-        "REQ-62"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-the-admin-dashboard-page-consolidates-and-displays-all-three-required-admin-capabilities-in-a-single-accessible-view-1-appointments-table-with-columns-patient-name-phone-number-service-and-date-time-with-auto-refresh-polling-via-react-query-refetchinterval-10-seconds-2-clinic-status-toggle-open-closed-emergency-that-controls-the-public-facing-clinicstatusbanner-and-the-closed-modal-popup-3-service-manager-cms-section-allowing-the-admin-to-edit-display-name-description-text-and-upload-replace-the-featured-photo-for-each-of-the-5-premium-services-dental-implants-invisalign-pediatric-dentistry-smile-makeover-laser-dentistry-all-changes-must-persist-in-the-backend-and-be-reflected-immediately-on-public-facing-pages",
-      "title": "Ensure the Admin Dashboard page consolidates and displays all three required admin capabilities in a single accessible view: (1) Appointments table with columns Patient Name, Phone Number, Service, and Date/Time with auto-refresh polling via React Query (refetchInterval ≤ 10 seconds); (2) Clinic Status toggle (Open / Closed / Emergency) that controls the public-facing ClinicStatusBanner and the closed modal popup; (3) Service Manager CMS section allowing the admin to edit display name, description text, and upload/replace the featured photo for each of the 5 premium services (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry). All changes must persist in the backend and be reflected immediately on public-facing pages.",
-      "reqIds": [
-        "REQ-63"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-audit-and-confirm-that-the-bookappointmentdialog-is-fully-frictionless-no-internet-identity-login-prompt-no-auth-check-no-disabled-state-tied-to-authentication-the-form-must-contain-at-minimum-patient-name-text-input-and-phone-number-tel-input-service-dropdown-and-preferred-date-date-picker-fields-may-remain-if-already-present-on-successful-submission-display-an-inline-confirmation-thank-you-your-appointment-has-been-booked-we-will-contact-you-shortly-inside-the-dialog-with-no-redirect-every-book-appointment-book-now-button-across-all-public-pages-home-herosection-dentalimplantsdetail-invisaligndetail-laserdentistrydetail-pediatricdentistrydetail-smilemakeoverdetail-servicedetail-must-open-this-form-immediately-without-any-authentication-step",
-      "title": "Audit and confirm that the BookAppointmentDialog is fully frictionless — no Internet Identity login prompt, no auth check, no disabled state tied to authentication. The form must contain at minimum: Patient Name (text input) and Phone Number (tel input). Service (dropdown) and Preferred Date (date picker) fields may remain if already present. On successful submission, display an inline confirmation: 'Thank You! Your appointment has been booked. We will contact you shortly.' inside the dialog with no redirect. Every 'Book Appointment' / 'Book Now' button across all public pages (Home, HeroSection, DentalImplantsDetail, InvisalignDetail, LaserDentistryDetail, PediatricDentistryDetail, SmileMakeoverDetail, ServiceDetail) must open this form immediately without any authentication step.",
-      "reqIds": [
-        "REQ-64"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-confirm-the-xyz-dental-clinic-brand-name-in-the-header-triggers-window-location-reload-on-click-ensure-no-router-navigation-occurs-on-the-brand-name-element-the-visual-styling-of-the-brand-name-must-remain-unchanged-no-underline-on-hover-added-by-this-change",
-      "title": "Confirm the 'XYZ Dental Clinic' brand name in the Header triggers window.location.reload() on click. Ensure no router navigation occurs on the brand name element. The visual styling of the brand name must remain unchanged (no underline on hover added by this change).",
-      "reqIds": [
-        "REQ-65"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-confirm-that-the-custom-cursor-follower-circle-trail-view-text-expansion-is-fully-removed-from-the-site-customcursor-component-must-be-disabled-or-empty-cursorcontext-must-not-inject-any-cursor-overrides-and-no-css-rule-sets-cursor-none-on-body-or-html-the-browser-s-native-os-cursor-must-be-active-across-the-entire-site",
-      "title": "Confirm that the custom cursor follower (circle, trail, 'View' text expansion) is fully removed from the site. CustomCursor component must be disabled or empty, CursorContext must not inject any cursor overrides, and no CSS rule sets cursor: none on body or html. The browser's native OS cursor must be active across the entire site.",
-      "reqIds": [
-        "REQ-66"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-confirm-and-enforce-the-animated-mesh-gradient-background-throughout-the-entire-site-all-public-and-admin-pages-the-gradient-must-shift-subtly-between-very-light-white-pale-silver-and-soft-blue-shades-over-a-15-20-second-continuous-css-animation-loop-this-must-be-applied-at-the-root-layout-level-app-tsx-or-index-css-body-html-so-it-appears-behind-all-page-content",
-      "title": "Confirm and enforce the animated mesh gradient background throughout the entire site (all public and admin pages). The gradient must shift subtly between very light white, pale silver, and soft blue shades over a 15–20 second continuous CSS animation loop. This must be applied at the root layout level (App.tsx or index.css body/html) so it appears behind all page content.",
-      "reqIds": [
-        "REQ-67"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-confirm-and-enforce-scroll-triggered-reveal-animations-site-wide-text-sections-headings-and-paragraphs-must-fade-in-and-slide-up-when-they-enter-the-viewport-images-must-start-at-scale-0-85-with-opacity-0-and-zoom-in-to-natural-size-with-fade-in-use-intersectionobserver-via-existing-usescrollreveal-hook-or-equivalent-to-trigger-each-element-s-animation-once-per-page-load-apply-to-all-major-sections-servicesgrid-doctorprofile-testimonialcarousel-beforeafterslider-gallery-contactsection-and-service-detail-page-sections",
-      "title": "Confirm and enforce scroll-triggered reveal animations site-wide: text sections (headings and paragraphs) must fade in and slide up when they enter the viewport; images must start at scale(0.85) with opacity 0 and zoom in to natural size with fade-in. Use IntersectionObserver (via existing useScrollReveal hook or equivalent) to trigger each element's animation once per page load. Apply to all major sections: ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider gallery, ContactSection, and service detail page sections.",
-      "reqIds": [
-        "REQ-68"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-confirm-the-interactive-before-after-drag-slider-beforeafterslider-component-is-prominently-displayed-in-a-dedicated-results-gallery-section-on-the-home-page-the-slider-must-support-mouse-drag-and-touch-drag-to-reveal-before-left-and-after-right-dental-treatment-images-use-backend-stored-before-after-pairs-if-available-otherwise-fall-back-to-static-example-pairs-the-slider-section-must-be-visible-without-scrolling-too-far-and-be-clearly-labeled",
-      "title": "Confirm the interactive Before/After drag slider (BeforeAfterSlider component) is prominently displayed in a dedicated 'Results Gallery' section on the Home page. The slider must support mouse drag and touch drag to reveal before (left) and after (right) dental treatment images. Use backend-stored before/after pairs if available, otherwise fall back to static example pairs. The slider section must be visible without scrolling too far and be clearly labeled.",
-      "reqIds": [
-        "REQ-69"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-confirm-and-enforce-the-soft-glow-hover-effect-on-all-5-premium-service-cards-dental-implants-invisalign-pediatric-dentistry-smile-makeover-laser-dentistry-in-the-servicesgrid-on-mouse-hover-each-card-must-lift-slightly-translatey-6px-to-8px-and-emit-a-gentle-box-shadow-glow-using-the-site-s-teal-or-royal-blue-accent-color-the-lift-and-glow-must-transition-smoothly-in-and-out-with-a-css-transition-of-approximately-300ms-this-effect-must-coexist-with-each-card-s-existing-specific-animation-3d-rotation-scan-line-etc",
-      "title": "Confirm and enforce the soft glow hover effect on all 5 premium service cards (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry) in the ServicesGrid. On mouse hover, each card must lift slightly (translateY(-6px) to -8px) and emit a gentle box-shadow glow using the site's teal or royal-blue accent color. The lift and glow must transition smoothly in and out with a CSS transition of approximately 300ms. This effect must coexist with each card's existing specific animation (3D rotation, scan line, etc.).",
-      "reqIds": [
-        "REQ-70"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-in-the-bookappointmentdialog-component-style-the-submit-book-appointment-book-now-button-with-a-bright-teal-or-royal-blue-background-color-e-g-the-site-s-teal-accent-0d9488-or-equivalent-oklch-token-so-it-stands-out-prominently-against-the-white-form-background-the-button-must-have-white-text-a-smooth-hover-state-slightly-darker-shade-or-glow-and-a-css-transition-of-200-300ms-all-other-form-elements-remain-white-light-as-is",
-      "title": "In the BookAppointmentDialog component, style the submit 'Book Appointment' / 'Book Now' button with a bright teal or royal-blue background color (e.g., the site's teal accent — #0D9488 or equivalent OKLCH token) so it stands out prominently against the white form background. The button must have white text, a smooth hover state (slightly darker shade or glow), and a CSS transition of ~200–300ms. All other form elements remain white/light as-is.",
-      "reqIds": [
-        "REQ-71"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-in-bookappointmentdialog-apply-a-solid-pure-white-ffffff-background-to-the-entire-form-dialog-container-with-a-soft-drop-shadow-e-g-box-shadow-0-8px-32px-rgba-0-0-0-0-12-so-the-form-appears-lifted-and-distinct-from-the-animated-mesh-gradient-background-behind-it-remove-any-transparency-or-backdrop-filter-on-the-dialog-container-itself",
-      "title": "In BookAppointmentDialog, apply a solid pure white (#FFFFFF) background to the entire form/dialog container with a soft drop shadow (e.g., box-shadow: 0 8px 32px rgba(0,0,0,0.12)) so the form appears lifted and distinct from the animated mesh gradient background behind it. Remove any transparency or backdrop-filter on the dialog container itself.",
-      "reqIds": [
-        "REQ-72"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-in-bookappointmentdialog-style-all-input-fields-patient-name-phone-number-service-dropdown-preferred-date-with-a-light-grey-border-e-g-d1d5db-by-default-on-focus-each-input-must-display-a-teal-blue-glow-box-shadow-and-border-color-using-the-site-s-teal-accent-0d9488-use-a-css-transition-of-200ms-for-the-focus-effect",
-      "title": "In BookAppointmentDialog, style all input fields (Patient Name, Phone Number, Service dropdown, Preferred Date) with a light grey border (e.g., #D1D5DB) by default. On focus, each input must display a teal-blue glow (box-shadow and border-color using the site's teal accent #0D9488). Use a CSS transition of ~200ms for the focus effect.",
-      "reqIds": [
-        "REQ-73"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-in-bookappointmentdialog-ensure-all-text-inside-the-form-labels-placeholder-text-input-values-helper-text-uses-a-high-contrast-dark-color-e-g-111827-or-1f2937-against-the-white-form-background-remove-any-light-muted-or-low-opacity-text-styles-applied-to-form-labels-or-content",
-      "title": "In BookAppointmentDialog, ensure all text inside the form (labels, placeholder text, input values, helper text) uses a high-contrast dark color (e.g., #111827 or #1F2937) against the white form background. Remove any light, muted, or low-opacity text styles applied to form labels or content.",
-      "reqIds": [
-        "REQ-74"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-confirm-and-enforce-that-the-footer-component-contains-a-small-28-36px-visible-tooth-svg-icon-using-teal-royal-blue-accent-colors-at-the-very-bottom-of-the-footer-a-single-click-on-this-tooth-icon-must-open-the-hiddenadminloginmodal-the-tooth-icon-must-remain-semi-transparent-but-visible-credentials-username-6352174912-password-63521",
-      "title": "Confirm and enforce that the Footer component contains a small (28–36px) visible tooth SVG icon using teal/royal-blue accent colors at the very bottom of the footer. A single click on this tooth icon must open the HiddenAdminLoginModal. The tooth icon must remain semi-transparent but visible. Credentials: username '6352174912', password '63521'.",
-      "reqIds": [
-        "REQ-75"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-confirm-and-enforce-that-clicking-the-xyz-dental-clinic-brand-name-in-header-tsx-calls-window-location-reload-no-router-navigation-should-occur-on-the-brand-name-click-the-visual-styling-of-the-brand-name-must-remain-unchanged",
-      "title": "Confirm and enforce that clicking the 'XYZ Dental Clinic' brand name in Header.tsx calls window.location.reload(). No router navigation should occur on the brand name click. The visual styling of the brand name must remain unchanged.",
-      "reqIds": [
-        "REQ-76"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-confirm-and-enforce-that-the-customcursor-component-renders-nothing-and-no-cursor-none-css-rule-is-applied-to-body-or-html-the-browser-s-native-os-cursor-must-be-active-across-the-entire-site-remove-any-remaining-cursor-override-css-from-index-css-or-any-component-stylesheets",
-      "title": "Confirm and enforce that the CustomCursor component renders nothing and no cursor: none CSS rule is applied to body or html. The browser's native OS cursor must be active across the entire site. Remove any remaining cursor override CSS from index.css or any component stylesheets.",
-      "reqIds": [
-        "REQ-77"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-confirm-and-enforce-scroll-triggered-reveal-animations-site-wide-all-major-sections-servicesgrid-doctorprofile-testimonialcarousel-beforeafterslider-gallery-contactsection-and-service-detail-page-sections-must-fade-in-and-slide-up-translatey-from-30px-to-0-opacity-0-to-1-when-they-scroll-into-the-viewport-use-intersectionobserver-via-the-existing-usescrollreveal-hook-or-equivalent-to-trigger-each-section-s-animation-once-per-page-load",
-      "title": "Confirm and enforce scroll-triggered reveal animations site-wide: all major sections (ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider gallery, ContactSection, and service detail page sections) must fade in and slide up (translateY from ~30px to 0, opacity 0 to 1) when they scroll into the viewport. Use IntersectionObserver (via the existing useScrollReveal hook or equivalent) to trigger each section's animation once per page load.",
-      "reqIds": [
-        "REQ-78"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-confirm-and-enforce-the-animated-mesh-gradient-background-throughout-the-entire-site-all-public-and-admin-pages-the-gradient-must-subtly-shift-between-very-light-shades-of-white-pale-silver-and-soft-blue-over-a-15-20-second-continuous-css-animation-loop-this-must-be-applied-at-the-root-layout-level-app-tsx-or-index-css-body-html-so-it-appears-behind-all-page-content",
-      "title": "Confirm and enforce the animated mesh gradient background throughout the entire site (all public and admin pages). The gradient must subtly shift between very light shades of white, pale silver, and soft blue over a 15–20 second continuous CSS animation loop. This must be applied at the root layout level (App.tsx or index.css body/html) so it appears behind all page content.",
-      "reqIds": [
-        "REQ-79"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-confirm-the-interactive-before-after-drag-slider-beforeafterslider-component-is-prominently-displayed-in-a-dedicated-results-gallery-section-on-the-home-page-the-slider-must-support-both-mouse-drag-and-touch-drag-to-reveal-the-before-left-and-after-right-dental-treatment-images-use-backend-stored-before-after-pairs-if-available-otherwise-fall-back-to-static-example-pairs-the-section-must-be-clearly-labeled",
-      "title": "Confirm the interactive Before/After drag slider (BeforeAfterSlider component) is prominently displayed in a dedicated 'Results Gallery' section on the Home page. The slider must support both mouse drag and touch drag to reveal the before (left) and after (right) dental treatment images. Use backend-stored before/after pairs if available, otherwise fall back to static example pairs. The section must be clearly labeled.",
-      "reqIds": [
-        "REQ-80"
       ],
       "version": 1
     }
@@ -589,318 +60,43 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Scroll-triggered animations (fade-in, slide-up) for text and images",
+      "summary": "Fix appointment booking: use direct backend (no external service), green checkmark animation + 'Appointment Confirmed!' message on submit, no login barrier",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Parallax effect for background images",
+      "summary": "Floating hero animation: dental icon/doctor image floats up-down in hero section on load",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Micro-interactions on buttons (hover glow/scale effects)",
+      "summary": "Magnetic Book Now buttons: buttons attract toward cursor when mouse is nearby",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-4",
-      "summary": "Lottie animations for dental procedures synced with text",
+      "summary": "Staggered text reveal: heading words bounce in one by one from bottom to top",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-5",
-      "summary": "Hero section with video background or animated slider and Book Appointment CTA",
+      "summary": "Liquid blue gradient background that creates wave effect on mouse movement",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-6",
-      "summary": "Interactive before/after slider for treatment results",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-7",
-      "summary": "Services grid with animated icons and detail pages",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-8",
-      "summary": "Doctor profile section with photo and smooth entry animation",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-9",
-      "summary": "Auto-sliding patient testimonial section with Google Reviews integration",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-10",
-      "summary": "Live contact features: WhatsApp chat, Google Maps, clickable phone number",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-11",
-      "summary": "Admin dashboard with clinic status toggle (Emergency/Closed banner)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-12",
-      "summary": "Appointment manager in admin panel",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-13",
-      "summary": "CMS for uploading photos, reviews, and before-after images without coding",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-14",
-      "summary": "Doctor availability scheduler in admin panel",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-15",
-      "summary": "Implement scroll-triggered reveal animations (fade-in and slide-up effects) for text and images throughout the website using Framer Motion or similar React animation library",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-16",
-      "summary": "Add parallax scrolling effect to background images creating depth perception as users scroll",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-18",
-      "summary": "Integrate Lottie animations for dental procedures (cleaning, implants) that sync with accompanying text descriptions",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-25",
-      "summary": "Build backend data model for appointments including patient name, contact info, preferred date/time, service type, and status",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-26",
-      "summary": "Create backend clinic status toggle functionality that tracks whether clinic is open, closed, or in emergency mode",
-      "reqIds": [
-        "REQ-12"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-27",
-      "summary": "Build backend content management system for storing and retrieving photos, reviews, and before-after images with metadata",
-      "reqIds": [
-        "REQ-13"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-28",
-      "summary": "Create backend doctor availability schedule management supporting multiple doctors with time slots and date ranges",
-      "reqIds": [
-        "REQ-14"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-29",
-      "summary": "Hidden admin access via triple-click on footer copyright logo, opening a login popup (username: 6352174912, password: 63521) with Open/Closed toggle, review approval, and before/after photo upload",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-30",
-      "summary": "Add 5 new premium services: Dental Implants (3D animated implant model), Invisalign (slide-to-compare teeth alignment), Pediatric Dentistry (floating bubble animations), Smile Makeover (heavy before/after use), Laser Dentistry (glowing beam animation on service card)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-31",
-      "summary": "Custom cursor interaction: water ripple or medical cross subtle shadow that follows mouse movement",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-32",
-      "summary": "Animated mesh gradient background (slow-moving) instead of plain white background",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-33",
-      "summary": "Text scramble effect on headings: random letters on scroll that resolve into final text (cyberpunk-professional style)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-34",
-      "summary": "Interactive review wall as infinite auto-scroll carousel (floating cloud style) that pauses on mouse hover",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-35",
-      "summary": "Service Manager in admin panel: allow editing text and photos for the 5 premium services (Implants, Invisalign, Kids, Smile Makeover, Laser)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-36",
-      "summary": "Review Approver in admin panel: submitted reviews held for approval before going live on the website",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-37",
-      "summary": "Magnetic cursor: cursor changes to dental icons (tooth or plus sign) when hovering over service cards",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-38",
-      "summary": "Glassmorphism design for cards: blurred glass effect so background animations show through subtly",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-39",
-      "summary": "Scroll-progress bar: thin line at top of screen showing how far user has scrolled",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-40",
-      "summary": "Floating dental elements in corners: small transparent images of dental equipment/teeth floating with parallax effect",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-41",
-      "summary": "Change hidden admin trigger to: invisible 1x1px dot in footer OR long-press (3 seconds) on logo — no OTP, direct credential login (username: 6352174912, password: 63521)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-42",
-      "summary": "Background particles: floating small medical icons / dental shapes moving slowly in background like bubbles",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-43",
-      "summary": "Scroll reveal: text appears letter-by-letter (typewriter) and images zoom-in to settle when scrolled into view",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-44",
-      "summary": "Kids service card: animated cartoons that smile (child-friendly animated characters)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-45",
-      "summary": "Smile Makeover service card: magic wand effect that brightens/transforms before photo on hover",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-46",
-      "summary": "Cursor follower: small circle follows mouse, expands and shows 'View' text when hovering over links/interactive elements",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-47",
-      "summary": "Frictionless appointment booking: no login/OTP/sign-up required. Form has only 3-4 fields (Name, Phone Number, Service, Date). On submit, show 'Thank You' message and send data directly to admin panel.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-48",
-      "summary": "Update the backend appointment booking function to accept anonymous (unauthenticated) calls. The `bookAppointment` function must not require a caller principal/identity check — any anonymous user must be able to submit a booking with Name, Phone Number, Service, and Date/Time fields. Store all submitted appointments in the existing appointments data structure so they appear in the admin panel.",
-      "reqIds": [
-        "REQ-49"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-50",
-      "summary": "Remove the custom cursor follower circle entirely. Revert to default system cursor across the entire site.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-51",
-      "summary": "Clicking the 'XYZ Dental Clinic' brand name in the header triggers a full page reload (window.location.reload()).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-52",
-      "summary": "Use GSAP for all scroll-triggered reveal animations site-wide (replacing or augmenting current CSS/Framer Motion approach).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-53",
-      "summary": "Add soft glow hover effect to all 5 premium service cards (Dental Implants, Invisalign, Pediatric Dentistry, Smile Makeover, Laser Dentistry).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-58",
-      "summary": "Update the backend bookAppointment function in backend/main.mo to accept anonymous (unauthenticated) calls. Remove any principal/identity check that blocks anonymous users from submitting a booking. The function must accept Patient Name, Phone Number, Service, and Date/Time fields from any caller (including anonymous principal) and store the appointment in the existing appointments data structure so it appears in the admin panel.",
-      "reqIds": [
-        "REQ-56"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-59",
-      "summary": "Replace the hidden bottom-right corner invisible hit-box admin trigger with a small elegant tooth logo placed visibly in the footer (bottom of website). Single click on this tooth logo opens the Username/Password login popup. Credentials: username 6352174912, password 63521.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-60",
-      "summary": "Style the 'Book Appointment' button in the booking form with a bright teal or blue color so it stands out prominently against the white form background.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-61",
-      "summary": "Booking form: solid white (#FFFFFF) background with soft drop shadow, light grey input borders that glow teal on focus, high-contrast dark text inside the form.",
+      "summary": "Scroll-triggered progress line animation showing how much of the page has been scrolled",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "XYZ Dental Clinic",
+  "gameProjectType": "none",
+  "projectName": "Dental Clinic Website",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

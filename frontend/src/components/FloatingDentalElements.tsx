@@ -1,70 +1,60 @@
-import { useEffect, useRef, useState } from 'react';
+import React from 'react';
 
-const elements = [
+const floatingElements = [
   {
     src: '/assets/generated/tooth-float-icon.dim_96x96.png',
-    alt: 'Floating tooth',
-    style: { top: '8%', left: '2%' },
-    animDelay: '0s',
-    parallaxFactor: 0.08,
-  },
-  {
-    src: '/assets/generated/dental-mirror-float-icon.dim_96x96.png',
-    alt: 'Floating dental mirror',
-    style: { top: '12%', right: '2%' },
-    animDelay: '1.2s',
-    parallaxFactor: 0.05,
+    alt: 'tooth',
+    style: { top: '15%', left: '3%', width: 48, animationDelay: '0s' },
   },
   {
     src: '/assets/generated/toothbrush-float-icon.dim_96x96.png',
-    alt: 'Floating toothbrush',
-    style: { bottom: '18%', left: '1.5%' },
-    animDelay: '0.6s',
-    parallaxFactor: 0.1,
+    alt: 'toothbrush',
+    style: { top: '40%', right: '3%', width: 44, animationDelay: '1.2s' },
+  },
+  {
+    src: '/assets/generated/dental-mirror-float-icon.dim_96x96.png',
+    alt: 'dental mirror',
+    style: { top: '70%', left: '2%', width: 40, animationDelay: '2.4s' },
   },
   {
     src: '/assets/generated/plus-float-icon.dim_96x96.png',
-    alt: 'Floating plus',
-    style: { bottom: '22%', right: '1.5%' },
-    animDelay: '1.8s',
-    parallaxFactor: 0.07,
+    alt: 'plus',
+    style: { top: '25%', right: '5%', width: 36, animationDelay: '0.8s' },
   },
 ];
 
 export default function FloatingDentalElements() {
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   return (
     <div
       style={{
-        position: 'absolute',
+        position: 'fixed',
         inset: 0,
-        overflow: 'hidden',
+        width: '100%',
+        height: '100%',
+        zIndex: -5,
         pointerEvents: 'none',
-        zIndex: 1,
+        overflow: 'hidden',
       }}
+      aria-hidden="true"
     >
-      {elements.map((el, i) => (
+      {floatingElements.map((el, i) => (
         <img
           key={i}
           src={el.src}
           alt={el.alt}
           style={{
             position: 'absolute',
-            ...el.style,
-            width: 72,
-            height: 72,
-            opacity: 0.55,
-            transform: `translateY(${scrollY * el.parallaxFactor}px)`,
-            animation: `floatBob 4s ease-in-out ${el.animDelay} infinite`,
+            width: el.style.width,
+            height: 'auto',
+            opacity: 0.12,
+            top: el.style.top,
+            left: 'left' in el.style ? el.style.left : undefined,
+            right: 'right' in el.style ? el.style.right : undefined,
+            animation: `bob 4s ease-in-out infinite`,
+            animationDelay: el.style.animationDelay,
             pointerEvents: 'none',
             userSelect: 'none',
+            zIndex: -5,
           }}
         />
       ))}

@@ -1,94 +1,49 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T21:12:49.706Z",
+  "generatedAt": "2026-02-27T08:59:44.148Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 9,
-    "implemented": 9,
+    "total": 6,
+    "implemented": 6,
     "items": [
       {
-        "id": "REQ-72",
-        "summary": "In BookAppointmentDialog, apply a solid pure white (#FFFFFF) background to the entire form/dialog container with a soft drop shadow (e.g., box-shadow: 0 8px 32px rgba(0,0,0,0.12)) so the form appears lifted and distinct from the animated mesh gradient background behind it. Remove any transparency or backdrop-filter on the dialog container itself.",
+        "id": "REQ-1",
+        "summary": "Fix the appointment booking form in BookAppointmentDialog.tsx so that form submissions save directly to the backend actor (no external service). On successful submit, display a green checkmark animation with the text 'Appointment Confirmed!' instead of the current error state. Ensure no Internet Identity login prompt or auth barrier appears for patients during booking — the form must be fully accessible to anonymous users.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/BookAppointmentDialog.tsx"
+          "frontend/src/components/BookAppointmentDialog.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/BookAppointmentDialog.tsx"
+          "frontend/src/components/BookAppointmentDialog.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ]
       },
       {
-        "id": "REQ-73",
-        "summary": "In BookAppointmentDialog, style all input fields (Patient Name, Phone Number, Service dropdown, Preferred Date) with a light grey border (e.g., #D1D5DB) by default. On focus, each input must display a teal-blue glow (box-shadow and border-color using the site's teal accent #0D9488). Use a CSS transition of ~200ms for the focus effect.",
+        "id": "REQ-2",
+        "summary": "Add a floating animation to the Hero section: a dental icon or doctor image should continuously float up and down (bob effect) when the page loads. The animation should be smooth and loop indefinitely.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/BookAppointmentDialog.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/BookAppointmentDialog.tsx"
-        ]
-      },
-      {
-        "id": "REQ-74",
-        "summary": "In BookAppointmentDialog, ensure all text inside the form (labels, placeholder text, input values, helper text) uses a high-contrast dark color (e.g., #111827 or #1F2937) against the white form background. Remove any light, muted, or low-opacity text styles applied to form labels or content.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/BookAppointmentDialog.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/BookAppointmentDialog.tsx"
-        ]
-      },
-      {
-        "id": "REQ-75",
-        "summary": "Confirm and enforce that the Footer component contains a small (28–36px) visible tooth SVG icon using teal/royal-blue accent colors at the very bottom of the footer. A single click on this tooth icon must open the HiddenAdminLoginModal. The tooth icon must remain semi-transparent but visible. Credentials: username '6352174912', password '63521'.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Footer.tsx",
-          "frontend/src/components/HiddenAdminLoginModal.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Footer.tsx"
-        ]
-      },
-      {
-        "id": "REQ-76",
-        "summary": "Confirm and enforce that clicking the 'XYZ Dental Clinic' brand name in Header.tsx calls window.location.reload(). No router navigation should occur on the brand name click. The visual styling of the brand name must remain unchanged.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Header.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Header.tsx"
-        ]
-      },
-      {
-        "id": "REQ-77",
-        "summary": "Confirm and enforce that the CustomCursor component renders nothing and no cursor: none CSS rule is applied to body or html. The browser's native OS cursor must be active across the entire site. Remove any remaining cursor override CSS from index.css or any component stylesheets.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/CustomCursor.tsx",
+          "frontend/src/components/HeroSection.tsx",
           "frontend/src/index.css"
         ],
         "matchedFiles": [
-          "frontend/src/components/CustomCursor.tsx",
+          "frontend/src/components/HeroSection.tsx",
           "frontend/src/index.css"
         ]
       },
       {
-        "id": "REQ-78",
-        "summary": "Confirm and enforce scroll-triggered reveal animations site-wide: all major sections (ServicesGrid, DoctorProfile, TestimonialCarousel, BeforeAfterSlider gallery, ContactSection, and service detail page sections) must fade in and slide up (translateY from ~30px to 0, opacity 0 to 1) when they scroll into the viewport. Use IntersectionObserver (via the existing useScrollReveal hook or equivalent) to trigger each section's animation once per page load.",
+        "id": "REQ-3",
+        "summary": "Make all 'Book Now' buttons magnetic: when the user's mouse cursor moves near a 'Book Now' button, the button should subtly translate toward the cursor, creating a magnetic attraction effect. The button should return to its original position when the cursor moves away.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/ServicesGrid.tsx",
-          "frontend/src/components/DoctorProfile.tsx",
-          "frontend/src/components/TestimonialCarousel.tsx",
-          "frontend/src/components/BeforeAfterSlider.tsx",
-          "frontend/src/components/ContactSection.tsx",
+          "frontend/src/components/MagneticButton.tsx",
+          "frontend/src/components/Header.tsx",
+          "frontend/src/components/HeroSection.tsx",
           "frontend/src/pages/DentalImplantsDetail.tsx",
           "frontend/src/pages/InvisalignDetail.tsx",
           "frontend/src/pages/LaserDentistryDetail.tsx",
@@ -96,34 +51,65 @@
           "frontend/src/pages/SmileMakeoverDetail.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/BeforeAfterSlider.tsx",
+          "frontend/src/components/MagneticButton.tsx",
+          "frontend/src/components/Header.tsx",
+          "frontend/src/components/HeroSection.tsx",
+          "frontend/src/pages/DentalImplantsDetail.tsx",
           "frontend/src/pages/InvisalignDetail.tsx",
+          "frontend/src/pages/LaserDentistryDetail.tsx",
+          "frontend/src/pages/PediatricDentistryDetail.tsx",
           "frontend/src/pages/SmileMakeoverDetail.tsx"
         ]
       },
       {
-        "id": "REQ-79",
-        "summary": "Confirm and enforce the animated mesh gradient background throughout the entire site (all public and admin pages). The gradient must subtly shift between very light shades of white, pale silver, and soft blue over a 15–20 second continuous CSS animation loop. This must be applied at the root layout level (App.tsx or index.css body/html) so it appears behind all page content.",
+        "id": "REQ-4",
+        "summary": "Add a staggered text reveal animation to all major section headings: each word in the heading should animate in one by one from below (bounce/slide up), creating a staggered entrance effect when the section scrolls into view.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/App.tsx"
+          "frontend/src/hooks/useStaggeredTextReveal.ts",
+          "frontend/src/components/HeroSection.tsx",
+          "frontend/src/components/ServicesGrid.tsx",
+          "frontend/src/components/DoctorProfile.tsx",
+          "frontend/src/components/TestimonialCarousel.tsx",
+          "frontend/src/components/ContactSection.tsx",
+          "frontend/src/index.css"
         ],
         "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/App.tsx"
+          "frontend/src/hooks/useStaggeredTextReveal.ts",
+          "frontend/src/components/HeroSection.tsx",
+          "frontend/src/components/ServicesGrid.tsx",
+          "frontend/src/components/DoctorProfile.tsx",
+          "frontend/src/components/TestimonialCarousel.tsx",
+          "frontend/src/components/ContactSection.tsx",
+          "frontend/src/index.css"
         ]
       },
       {
-        "id": "REQ-80",
-        "summary": "Confirm the interactive Before/After drag slider (BeforeAfterSlider component) is prominently displayed in a dedicated 'Results Gallery' section on the Home page. The slider must support both mouse drag and touch drag to reveal the before (left) and after (right) dental treatment images. Use backend-stored before/after pairs if available, otherwise fall back to static example pairs. The section must be clearly labeled.",
+        "id": "REQ-5",
+        "summary": "Replace the static white background with a dynamic liquid blue gradient background. The gradient should animate continuously and create a wave/fluid effect that responds to mouse movement across the page.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/components/BeforeAfterSlider.tsx"
+          "frontend/src/components/LiquidGradientBackground.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/index.css"
         ],
         "matchedFiles": [
-          "frontend/src/components/BeforeAfterSlider.tsx"
+          "frontend/src/components/LiquidGradientBackground.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/index.css"
+        ]
+      },
+      {
+        "id": "REQ-6",
+        "summary": "Add a scroll-triggered progress indicator: a thin animated line (progress bar) fixed at the top of the page that fills from left to right as the user scrolls down, indicating how much of the page content remains.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/ScrollProgressBar.tsx",
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/ScrollProgressBar.tsx",
+          "frontend/src/App.tsx"
         ]
       }
     ]
@@ -134,13 +120,23 @@
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/App.tsx",
-    "frontend/src/components/BeforeAfterSlider.tsx",
     "frontend/src/components/BookAppointmentDialog.tsx",
-    "frontend/src/components/CustomCursor.tsx",
-    "frontend/src/components/Footer.tsx",
+    "frontend/src/components/ContactSection.tsx",
+    "frontend/src/components/DoctorProfile.tsx",
     "frontend/src/components/Header.tsx",
+    "frontend/src/components/HeroSection.tsx",
+    "frontend/src/components/LiquidGradientBackground.tsx",
+    "frontend/src/components/MagneticButton.tsx",
+    "frontend/src/components/ScrollProgressBar.tsx",
+    "frontend/src/components/ServicesGrid.tsx",
+    "frontend/src/components/TestimonialCarousel.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/hooks/useStaggeredTextReveal.ts",
     "frontend/src/index.css",
+    "frontend/src/pages/DentalImplantsDetail.tsx",
     "frontend/src/pages/InvisalignDetail.tsx",
+    "frontend/src/pages/LaserDentistryDetail.tsx",
+    "frontend/src/pages/PediatricDentistryDetail.tsx",
     "frontend/src/pages/ServiceDetail.tsx",
     "frontend/src/pages/SmileMakeoverDetail.tsx",
     "project_state.json",

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type CursorIcon = 'default' | 'dental';
 
@@ -14,6 +14,7 @@ const CursorContext = createContext<CursorContextType>({
 
 export function CursorContextProvider({ children }: { children: ReactNode }) {
   const [cursorIcon, setCursorIcon] = useState<CursorIcon>('default');
+  // No cursor:none applied — native cursor is always visible
   return (
     <CursorContext.Provider value={{ cursorIcon, setCursorIcon }}>
       {children}

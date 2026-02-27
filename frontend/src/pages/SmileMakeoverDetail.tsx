@@ -1,136 +1,128 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import BookAppointmentDialog from '../components/BookAppointmentDialog';
+import MagneticButton from '../components/MagneticButton';
 import BeforeAfterSlider from '../components/BeforeAfterSlider';
-import { useScrollReveal } from '../hooks/useScrollReveal';
-
-function RevealSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      } ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
-
-function RevealImage({ src, alt, className = '' }: { src: string; alt: string; className?: string }) {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ${
-        isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
-      } ${className}`}
-    >
-      <img src={src} alt={alt} className="w-full rounded-2xl shadow-xl object-cover" />
-    </div>
-  );
-}
-
-const smilePairs = [
-  {
-    beforeImage: '/assets/generated/smile-before-1.dim_800x500.png',
-    afterImage: '/assets/generated/smile-after-1.dim_800x500.png',
-    description: 'Smile Transformation',
-  },
-  {
-    beforeImage: '/assets/generated/before-whitening.dim_800x600.png',
-    afterImage: '/assets/generated/after-whitening.dim_800x600.png',
-    description: 'Whitening Results',
-  },
-];
+import { ArrowLeft, Sparkles } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
 
 export default function SmileMakeoverDetail() {
-  const [bookingOpen, setBookingOpen] = useState(false);
-
-  const treatments = [
-    'Teeth Whitening',
-    'Porcelain Veneers',
-    'Dental Bonding',
-    'Gum Contouring',
-    'Dental Crowns',
-    'Orthodontic Treatment',
-  ];
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen">
+    <div style={{ minHeight: '100vh', paddingTop: '80px' }}>
       {/* Hero */}
-      <section className="relative py-24 px-4 bg-gradient-to-br from-pink-900 to-rose-900 text-white overflow-hidden">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <RevealSection>
-            <span className="text-pink-400 font-semibold text-sm uppercase tracking-wider">Complete Transformation</span>
-            <h1 className="text-5xl font-bold font-playfair mt-2 mb-4">Smile Makeover</h1>
-            <p className="text-slate-200 text-lg leading-relaxed mb-6">
-              A comprehensive smile transformation combining multiple cosmetic procedures tailored
-              specifically to your unique facial features and goals.
-            </p>
-            <button
-              onClick={() => setBookingOpen(true)}
-              className="bg-pink-500 hover:bg-pink-400 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all hover:-translate-y-1 shadow-lg"
-            >
-              Book Consultation
-            </button>
-          </RevealSection>
-          <RevealImage
-            src="/assets/generated/smile-makeover-banner.dim_1200x500.png"
-            alt="Smile Makeover"
-          />
-        </div>
-      </section>
+      <section
+        style={{
+          padding: '80px 24px',
+          background: 'linear-gradient(135deg, rgba(30,5,60,0.88) 0%, rgba(50,5,80,0.78) 100%)',
+        }}
+      >
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <button
+            onClick={() => navigate({ to: '/' })}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              color: '#fff',
+              cursor: 'pointer',
+              marginBottom: '32px',
+              fontSize: '14px',
+            }}
+          >
+            <ArrowLeft size={16} /> Back to Home
+          </button>
 
-      {/* Treatments Included */}
-      <section className="py-20 px-4">
-        <div className="max-w-5xl mx-auto">
-          <RevealSection className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-800 font-playfair">What's Included</h2>
-          </RevealSection>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {treatments.map((treatment, i) => (
-              <RevealSection key={i}>
-                <div className="glass rounded-xl p-4 flex items-center gap-3">
-                  <span className="text-pink-500 text-xl">✨</span>
-                  <span className="text-slate-700 font-medium">{treatment}</span>
-                </div>
-              </RevealSection>
-            ))}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '48px', alignItems: 'center' }}>
+            <div>
+              <div style={{ color: '#d8b4fe', fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '12px' }}>
+                Complete Transformation
+              </div>
+              <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 800, color: '#fff', marginBottom: '20px', lineHeight: 1.1 }}>
+                Smile Makeover
+              </h1>
+              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '17px', lineHeight: 1.7, marginBottom: '32px' }}>
+                A comprehensive smile transformation combining multiple treatments for a stunning, confidence-boosting result.
+              </p>
+              <MagneticButton>
+                <button
+                  onClick={() => setDialogOpen(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #a855f7, #7c3aed)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '16px 36px',
+                    fontSize: '16px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 8px 32px rgba(168,85,247,0.4)',
+                  }}
+                >
+                  Book Now
+                </button>
+              </MagneticButton>
+            </div>
+            <div>
+              <img
+                src="/assets/generated/smile-makeover-banner.dim_1200x500.png"
+                alt="Smile Makeover"
+                style={{ width: '100%', borderRadius: '16px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
+              />
+            </div>
           </div>
         </div>
       </section>
 
       {/* Before/After */}
-      <section className="py-16 px-4">
-        <div className="max-w-5xl mx-auto">
-          <RevealSection className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-slate-800 font-playfair">Before &amp; After</h2>
-            <p className="text-slate-500 mt-2">Drag the slider to see the transformation</p>
-          </RevealSection>
-          <BeforeAfterSlider staticPairs={smilePairs} />
+      <section style={{ padding: '80px 24px' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: '36px', fontWeight: 800, color: '#0f172a', marginBottom: '40px', textAlign: 'center' }}>
+            Real Transformations
+          </h2>
+          <BeforeAfterSlider />
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 px-4 bg-pink-700 text-white text-center">
-        <RevealSection>
-          <h2 className="text-3xl font-bold font-playfair mb-4">Transform Your Smile Today</h2>
-          <p className="text-pink-100 mb-8 text-lg">Book a personalized smile consultation.</p>
-          <button
-            onClick={() => setBookingOpen(true)}
-            className="bg-white text-pink-700 hover:bg-pink-50 px-8 py-4 rounded-full text-lg font-semibold transition-all hover:-translate-y-1 shadow-lg"
-          >
-            Book Consultation
-          </button>
-        </RevealSection>
+      {/* Treatments */}
+      <section style={{ padding: '0 24px 80px' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: '32px', fontWeight: 800, color: '#0f172a', marginBottom: '32px', textAlign: 'center' }}>
+            What's Included
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
+            {[
+              { title: 'Teeth Whitening', desc: 'Professional whitening for a brighter, whiter smile.' },
+              { title: 'Veneers', desc: 'Thin porcelain shells that cover imperfections.' },
+              { title: 'Bonding', desc: 'Repair chips, cracks, and gaps with tooth-colored resin.' },
+              { title: 'Gum Contouring', desc: 'Reshape your gum line for a more balanced smile.' },
+            ].map(t => (
+              <div
+                key={t.title}
+                style={{
+                  background: 'rgba(255,255,255,0.85)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(168,85,247,0.12)',
+                  borderRadius: '14px',
+                  padding: '24px',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.05)',
+                }}
+              >
+                <Sparkles size={22} color="#a855f7" style={{ marginBottom: '10px' }} />
+                <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>{t.title}</h3>
+                <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6 }}>{t.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      <BookAppointmentDialog
-        open={bookingOpen}
-        onOpenChange={setBookingOpen}
-        defaultService="Smile Makeover"
-      />
+      <BookAppointmentDialog open={dialogOpen} onOpenChange={setDialogOpen} defaultService="Smile Makeover" />
     </div>
   );
 }

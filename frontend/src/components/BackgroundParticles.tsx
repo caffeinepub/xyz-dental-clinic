@@ -1,98 +1,131 @@
 import React, { useEffect, useRef } from 'react';
 
+const DENTAL_EMOJIS = ['🦷', '✨', '💎', '🌟', '⭐'];
+
 interface Particle {
-  id: number;
+  el: HTMLDivElement;
   x: number;
   y: number;
-  size: number;
-  duration: number;
-  delay: number;
-  type: 'tooth' | 'plus' | 'sparkle' | 'circle';
+  vx: number;
+  vy: number;
   opacity: number;
-  drift: number;
+  size: number;
+  life: number;
+  maxLife: number;
 }
-
-const PARTICLE_COUNT = 18;
-
-function generateParticles(): Particle[] {
-  return Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: 12 + Math.random() * 20,
-    duration: 12 + Math.random() * 16,
-    delay: Math.random() * 10,
-    type: (['tooth', 'plus', 'sparkle', 'circle'] as const)[Math.floor(Math.random() * 4)],
-    opacity: 0.04 + Math.random() * 0.08,
-    drift: (Math.random() - 0.5) * 60,
-  }));
-}
-
-const ToothSVG = ({ size, opacity }: { size: number; opacity: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ opacity }}>
-    <path
-      d="M12 2C9.5 2 7 4 7 7c0 1.5.5 3 1 4.5C8.5 13 9 15 9 17c0 2 1 4 3 4s3-2 3-4c0-2 .5-4 1-5.5.5-1.5 1-3 1-4.5C17 4 14.5 2 12 2z"
-      fill="currentColor"
-    />
-  </svg>
-);
-
-const PlusSVG = ({ size, opacity }: { size: number; opacity: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ opacity }}>
-    <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-  </svg>
-);
-
-const SparkleSVG = ({ size, opacity }: { size: number; opacity: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ opacity }}>
-    <path
-      d="M12 2l2 8 8 2-8 2-2 8-2-8-8-2 8-2 2-8z"
-      fill="currentColor"
-    />
-  </svg>
-);
-
-const CircleSVG = ({ size, opacity }: { size: number; opacity: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ opacity }}>
-    <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" />
-    <circle cx="12" cy="12" r="3" fill="currentColor" />
-  </svg>
-);
-
-const particles = generateParticles();
 
 export default function BackgroundParticles() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
+  const animFrameRef = useRef<number>(0);
+  const activeRef = useRef(true);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    activeRef.current = true;
+
+    function createParticle(): Particle {
+      const el = document.createElement('div');
+      el.style.position = 'absolute';
+      el.style.pointerEvents = 'none';
+      el.style.userSelect = 'none';
+      el.style.zIndex = '-1';
+
+      const size = Math.random() * 16 + 10;
+      el.style.fontSize = `${size}px`;
+      el.style.lineHeight = '1';
+      el.textContent = DENTAL_EMOJIS[Math.floor(Math.random() * DENTAL_EMOJIS.length)];
+
+      const x = Math.random() * window.innerWidth;
+      const y = Math.random() * window.innerHeight;
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+      el.style.opacity = '0';
+
+      container!.appendChild(el);
+
+      return {
+        el,
+        x,
+        y,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: -Math.random() * 0.5 - 0.2,
+        opacity: 0,
+        size,
+        life: 0,
+        maxLife: Math.random() * 200 + 150,
+      };
+    }
+
+    function removeParticle(p: Particle) {
+      if (p.el.parentNode) {
+        p.el.parentNode.removeChild(p.el);
+      }
+    }
+
+    let frameCount = 0;
+
+    function animate() {
+      if (!activeRef.current) return;
+
+      frameCount++;
+
+      // Spawn new particle occasionally (max 12 at a time)
+      if (frameCount % 40 === 0 && particlesRef.current.length < 12) {
+        particlesRef.current.push(createParticle());
+      }
+
+      particlesRef.current = particlesRef.current.filter((p) => {
+        p.life++;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        const halfLife = p.maxLife / 2;
+        if (p.life < halfLife) {
+          p.opacity = (p.life / halfLife) * 0.25;
+        } else {
+          p.opacity = ((p.maxLife - p.life) / halfLife) * 0.25;
+        }
+
+        p.el.style.left = `${p.x}px`;
+        p.el.style.top = `${p.y}px`;
+        p.el.style.opacity = `${p.opacity}`;
+
+        if (p.life >= p.maxLife) {
+          removeParticle(p);
+          return false;
+        }
+        return true;
+      });
+
+      animFrameRef.current = requestAnimationFrame(animate);
+    }
+
+    animFrameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      activeRef.current = false;
+      cancelAnimationFrame(animFrameRef.current);
+      particlesRef.current.forEach(removeParticle);
+      particlesRef.current = [];
+    };
+  }, []);
+
   return (
     <div
-      aria-hidden="true"
+      ref={containerRef}
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: -10,
         pointerEvents: 'none',
         overflow: 'hidden',
       }}
-    >
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="particle-float"
-          style={{
-            position: 'absolute',
-            left: `${p.x}%`,
-            top: `${p.y}%`,
-            color: 'var(--color-primary)',
-            animationDuration: `${p.duration}s`,
-            animationDelay: `${p.delay}s`,
-            '--drift': `${p.drift}px`,
-          } as React.CSSProperties}
-        >
-          {p.type === 'tooth' && <ToothSVG size={p.size} opacity={p.opacity} />}
-          {p.type === 'plus' && <PlusSVG size={p.size} opacity={p.opacity} />}
-          {p.type === 'sparkle' && <SparkleSVG size={p.size} opacity={p.opacity} />}
-          {p.type === 'circle' && <CircleSVG size={p.size} opacity={p.opacity} />}
-        </div>
-      ))}
-    </div>
+      aria-hidden="true"
+    />
   );
 }
