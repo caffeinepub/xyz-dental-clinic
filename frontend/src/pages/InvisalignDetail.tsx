@@ -1,125 +1,92 @@
 import React, { useState } from 'react';
+import { ArrowLeft, CheckCircle } from 'lucide-react';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import BeforeAfterSlider from '../components/BeforeAfterSlider';
 import BookAppointmentDialog from '../components/BookAppointmentDialog';
 import MagneticButton from '../components/MagneticButton';
-import BeforeAfterSlider from '../components/BeforeAfterSlider';
-import { ArrowLeft, CheckCircle } from 'lucide-react';
-import { useNavigate } from '@tanstack/react-router';
+
+const BENEFITS = [
+  'Nearly invisible clear aligners',
+  'Removable for eating and cleaning',
+  'Comfortable with no metal brackets',
+  'Shorter treatment time than braces',
+  'Custom-made for your teeth',
+  'Regular progress check-ins',
+];
 
 export default function InvisalignDetail() {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const navigate = useNavigate();
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   return (
-    <div style={{ minHeight: '100vh', paddingTop: '80px' }}>
-      {/* Hero */}
-      <section
-        style={{
-          padding: '80px 24px',
-          background: 'linear-gradient(135deg, rgba(2,20,50,0.85) 0%, rgba(5,40,80,0.75) 100%)',
-        }}
-      >
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <button
-            onClick={() => navigate({ to: '/' })}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '8px',
-              padding: '8px 16px',
-              color: '#fff',
-              cursor: 'pointer',
-              marginBottom: '32px',
-              fontSize: '14px',
-            }}
-          >
-            <ArrowLeft size={16} /> Back to Home
-          </button>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '48px', alignItems: 'center' }}>
-            <div>
-              <div style={{ color: '#7dd3fc', fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '12px' }}>
-                Clear Aligners
+    <div className="min-h-screen bg-white">
+      <Header />
+      <main>
+        {/* Hero */}
+        <section
+          className="pt-24 pb-16 relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)' }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <button
+              onClick={() => window.history.back()}
+              className="flex items-center gap-2 text-blue-300 hover:text-white mb-8 transition-colors"
+            >
+              <ArrowLeft size={18} />
+              <span>Back</span>
+            </button>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <span className="text-blue-400 font-semibold text-sm uppercase tracking-wider">Clear Aligners</span>
+                <h1 className="text-4xl sm:text-5xl font-bold text-white mt-2 mb-4">Invisalign Treatment</h1>
+                <p className="text-blue-100/80 text-lg leading-relaxed mb-8">
+                  Straighten your teeth discreetly with the world's most advanced clear aligner system. No metal, no wires — just a beautiful smile.
+                </p>
+                <MagneticButton>
+                  <button
+                    onClick={() => setIsBookingOpen(true)}
+                    className="bg-blue-500 text-white px-8 py-3.5 rounded-full font-semibold hover:bg-blue-400 transition-colors shadow-lg"
+                  >
+                    Book Free Consultation
+                  </button>
+                </MagneticButton>
               </div>
-              <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 800, color: '#fff', marginBottom: '20px', lineHeight: 1.1 }}>
-                Invisalign
-              </h1>
-              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '17px', lineHeight: 1.7, marginBottom: '32px' }}>
-                Straighten your teeth discreetly with our custom clear aligners. No metal, no wires — just a beautiful smile.
-              </p>
-              <MagneticButton>
-                <button
-                  onClick={() => setDialogOpen(true)}
-                  style={{
-                    background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '10px',
-                    padding: '16px 36px',
-                    fontSize: '16px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    boxShadow: '0 8px 32px rgba(14,165,233,0.4)',
-                  }}
-                >
-                  Book Now
-                </button>
-              </MagneticButton>
-            </div>
-            <div>
-              <img
-                src="/assets/generated/invisalign-aligner.dim_600x400.png"
-                alt="Invisalign Aligner"
-                style={{ width: '100%', borderRadius: '16px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
-              />
+              <div className="rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src="/assets/generated/invisalign-aligner.dim_600x400.png"
+                  alt="Invisalign Aligner"
+                  className="w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Before/After */}
-      <section style={{ padding: '80px 24px' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '36px', fontWeight: 800, color: '#0f172a', marginBottom: '40px', textAlign: 'center' }}>
-            See the Transformation
-          </h2>
-          <BeforeAfterSlider />
-        </div>
-      </section>
+        {/* Before/After */}
+        <BeforeAfterSlider />
 
-      {/* Benefits */}
-      <section style={{ padding: '0 24px 80px' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
-            {[
-              { title: 'Nearly Invisible', desc: 'Clear aligners are virtually undetectable when worn.' },
-              { title: 'Removable', desc: 'Take them out to eat, drink, and brush your teeth.' },
-              { title: 'Comfortable', desc: 'Smooth plastic with no sharp metal edges.' },
-              { title: 'Predictable Results', desc: 'See your expected results before treatment begins.' },
-            ].map(b => (
-              <div
-                key={b.title}
-                style={{
-                  background: 'rgba(255,255,255,0.85)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(14,165,233,0.12)',
-                  borderRadius: '14px',
-                  padding: '24px',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.05)',
-                }}
-              >
-                <CheckCircle size={22} color="#0ea5e9" style={{ marginBottom: '10px' }} />
-                <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>{b.title}</h3>
-                <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6 }}>{b.desc}</p>
-              </div>
-            ))}
+        {/* Benefits */}
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Why Choose Invisalign?</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {BENEFITS.map((b, i) => (
+                <div key={i} className="flex items-start gap-3 p-4 bg-white rounded-xl shadow-sm">
+                  <CheckCircle size={20} className="text-blue-600 mt-0.5 shrink-0" />
+                  <span className="text-gray-700">{b}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-
-      <BookAppointmentDialog open={dialogOpen} onOpenChange={setDialogOpen} defaultService="Invisalign" />
+        </section>
+      </main>
+      <Footer />
+      <BookAppointmentDialog
+        isOpen={isBookingOpen}
+        onClose={() => setIsBookingOpen(false)}
+        preselectedService="Invisalign"
+      />
     </div>
   );
 }

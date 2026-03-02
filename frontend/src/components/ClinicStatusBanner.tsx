@@ -1,37 +1,32 @@
 import React from 'react';
-import { useGetClinicStatus } from '../hooks/useQueries';
+import { AlertTriangle, XCircle } from 'lucide-react';
+import { useClinicStatusContext } from '../context/ClinicStatusContext';
 import { ClinicStatus } from '../backend';
 
 export default function ClinicStatusBanner() {
-  const { data: status } = useGetClinicStatus();
+  const { clinicStatus, isLoading } = useClinicStatusContext();
 
-  if (!status || status === ClinicStatus.open) return null;
+  if (isLoading || clinicStatus === ClinicStatus.open || clinicStatus === undefined) {
+    return null;
+  }
 
-  const isEmergency = status === ClinicStatus.emergency;
+  if (clinicStatus === ClinicStatus.emergency) {
+    return (
+      <div className="bg-red-600 text-white py-2 px-4 text-center text-sm font-medium flex items-center justify-center gap-2">
+        <AlertTriangle size={16} />
+        <span>⚠️ Emergency: Clinic is currently handling emergency cases only. Please call for urgent assistance.</span>
+      </div>
+    );
+  }
 
-  return (
-    <div
-      style={{
-        backgroundColor: isEmergency ? '#fef2f2' : '#fffbeb',
-        borderBottom: `2px solid ${isEmergency ? '#fca5a5' : '#fcd34d'}`,
-        padding: '0.75rem 1.5rem',
-        textAlign: 'center',
-        position: 'relative',
-        zIndex: 999,
-      }}
-    >
-      <p
-        style={{
-          color: isEmergency ? '#dc2626' : '#92400e',
-          fontWeight: 600,
-          fontSize: '0.9rem',
-          margin: 0,
-        }}
-      >
-        {isEmergency
-          ? '🚨 Emergency Only — Please call +91 63521 74912 for urgent dental care'
-          : '🔒 Clinic Currently Closed — We will reopen soon. Call us for appointments.'}
-      </p>
-    </div>
-  );
+  if (clinicStatus === ClinicStatus.closed) {
+    return (
+      <div className="bg-gray-800 text-white py-2 px-4 text-center text-sm font-medium flex items-center justify-center gap-2">
+        <XCircle size={16} />
+        <span>Clinic is currently closed. Online booking is temporarily unavailable.</span>
+      </div>
+    );
+  }
+
+  return null;
 }

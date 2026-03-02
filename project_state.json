@@ -1,16 +1,14 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Appointment booking app with a known connection issue showing 'Connection issue. Your data has been saved locally. Please click Retry to try again' error unexpectedly.",
+  "summary": "New project",
   "architectural_notes": [],
-  "known_issues": [
-    "Appointment booking: 'Connection issue. Your data has been saved locally. Please click Retry to try again' message appearing unexpectedly during appointment booking flow."
-  ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-fix-the-bookappointmentdialog-component-so-that-the-connection-issue-your-data-has-been-saved-locally-please-click-retry-to-try-again-message-does-not-appear-unexpectedly-the-error-retry-banner-should-only-be-shown-when-there-is-an-actual-confirmed-network-or-canister-call-failure-not-on-initial-load-not-when-localstorage-contains-stale-data-from-a-previous-session-and-not-when-the-form-has-not-yet-been-submitted-clear-any-stale-localstorage-pending-appointment-data-that-would-incorrectly-trigger-this-state-on-mount",
-      "title": "Fix the BookAppointmentDialog component so that the 'Connection issue. Your data has been saved locally. Please click \"Retry\" to try again' message does not appear unexpectedly. The error/retry banner should only be shown when there is an actual, confirmed network or canister call failure — not on initial load, not when localStorage contains stale data from a previous session, and not when the form has not yet been submitted. Clear any stale localStorage pending appointment data that would incorrectly trigger this state on mount.",
+      "id": "feature-restore-and-redeploy-the-full-dental-clinic-booking-website-with-all-previously-implemented-features-appointment-booking-doctor-profiles-services-grid-testimonials-carousel-before-after-slider-contact-section-admin-dashboard-appointments-reviews-services-doctor-scheduler-before-after-manager-clinic-status-control-and-internet-identity-authentication",
+      "title": "Restore and redeploy the full dental clinic booking website with all previously implemented features: appointment booking, doctor profiles, services grid, testimonials carousel, before/after slider, contact section, admin dashboard (appointments, reviews, services, doctor scheduler, before/after manager, clinic status control), and Internet Identity authentication.",
       "reqIds": [
         "REQ-1"
       ],
@@ -18,8 +16,7 @@
     }
   ],
   "new_feature_requests": [],
-  "gameProjectType": "none",
-  "projectName": "Appointment Booking App",
+  "projectName": "XYZ Dental Clinic",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

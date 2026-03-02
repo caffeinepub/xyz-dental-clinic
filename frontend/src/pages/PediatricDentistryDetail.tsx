@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BookAppointmentDialog from '../components/BookAppointmentDialog';
 import MagneticButton from '../components/MagneticButton';
-import { ArrowLeft, Heart, Star } from 'lucide-react';
+import { ArrowLeft, Heart } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 
 export default function PediatricDentistryDetail() {
@@ -111,7 +111,11 @@ export default function PediatricDentistryDetail() {
         </div>
       </section>
 
-      <BookAppointmentDialog open={dialogOpen} onOpenChange={setDialogOpen} defaultService="Pediatric Dentistry" />
+      <BookAppointmentDialog
+        isOpen={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        defaultService="Pediatric Dentistry"
+      />
     </div>
   );
 }

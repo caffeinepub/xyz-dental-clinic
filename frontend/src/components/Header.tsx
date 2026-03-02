@@ -1,280 +1,178 @@
 import React, { useState, useEffect } from 'react';
+import { Phone, Menu, X, ChevronDown } from 'lucide-react';
 import BookAppointmentDialog from './BookAppointmentDialog';
-import MagneticButton from './MagneticButton';
-import { useGetClinicStatus } from '../hooks/useQueries';
-import { ClinicStatus } from '../backend';
+import { useClinicStatusContext } from '../context/ClinicStatusContext';
 
 export default function Header() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const { isClosed, isEmergency } = useClinicStatusContext();
 
-  const { data: clinicStatus } = useGetClinicStatus();
-  const isClinicOpen = clinicStatus === ClinicStatus.open || clinicStatus === undefined;
+  const canBook = !isClosed;
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollTo = (id: string) => {
-    setMobileOpen(false);
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
+  const navLinks = [
+    { label: 'Home', href: '#home' },
+    { label: 'Services', href: '#services' },
+    { label: 'About', href: '#about' },
+    { label: 'Contact', href: '#contact' },
+  ];
 
-  const handleBookNow = () => {
-    if (!isClinicOpen) return;
-    setDialogOpen(true);
+  const scrollToSection = (href: string) => {
+    const id = href.replace('#', '');
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsMobileMenuOpen(false);
   };
 
   return (
     <>
       <header
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-          transition: 'all 0.3s ease',
-          background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(12px)' : 'none',
-          boxShadow: scrolled ? '0 2px 20px rgba(0,0,0,0.08)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(0,0,0,0.06)' : 'none',
-        }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? 'bg-white/95 backdrop-blur-md shadow-md py-3'
+            : 'bg-transparent py-5'
+        }`}
       >
-        <div
-          style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '0 24px',
-            height: '70px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          {/* Logo — click to reload */}
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: 0,
-            }}
-            aria-label="Reload page"
-          >
-            <img
-              src="/assets/generated/tooth-logo-icon.dim_64x64.png"
-              alt="Logo"
-              style={{ width: '36px', height: '36px' }}
-            />
-            <span
-              style={{
-                fontSize: '18px',
-                fontWeight: 800,
-                color: scrolled ? '#0f172a' : '#ffffff',
-                letterSpacing: '-0.02em',
-                fontFamily: 'Playfair Display, serif',
-              }}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <button
+              onClick={() => window.location.reload()}
+              className="flex items-center gap-2 group"
             >
-              SmileCare Dental
-            </span>
-          </button>
-
-          {/* Desktop Nav */}
-          <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }} className="hidden-mobile">
-            {[
-              { label: 'Services', id: 'services' },
-              { label: 'Gallery', id: 'gallery' },
-              { label: 'Doctor', id: 'doctor' },
-              { label: 'Testimonials', id: 'testimonials' },
-              { label: 'Contact', id: 'contact' },
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollTo(item.id)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: scrolled ? '#374151' : 'rgba(255,255,255,0.85)',
-                  letterSpacing: '0.01em',
-                  transition: 'color 0.2s',
-                  padding: '4px 0',
-                }}
-              >
-                {item.label}
-              </button>
-            ))}
-
-            {isClinicOpen ? (
-              <MagneticButton>
-                <button
-                  onClick={handleBookNow}
-                  style={{
-                    background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '10px 24px',
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 16px rgba(14,165,233,0.35)',
-                    letterSpacing: '0.02em',
-                  }}
-                >
-                  Book Now
-                </button>
-              </MagneticButton>
-            ) : (
-              <span
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '8px',
-                  background: 'rgba(239,68,68,0.1)',
-                  border: '1.5px solid rgba(239,68,68,0.3)',
-                  color: scrolled ? '#dc2626' : '#fca5a5',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                }}
-              >
-                🔴 Clinic Closed
-              </span>
-            )}
-          </nav>
-
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'none',
-              flexDirection: 'column',
-              gap: '5px',
-              padding: '4px',
-            }}
-            className="show-mobile"
-            aria-label="Toggle menu"
-          >
-            {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                style={{
-                  display: 'block',
-                  width: '24px',
-                  height: '2px',
-                  background: scrolled ? '#0f172a' : '#ffffff',
-                  borderRadius: '2px',
-                  transition: 'all 0.3s',
+              <img
+                src="/assets/generated/tooth-logo-icon.dim_64x64.png"
+                alt="XYZ Dental"
+                className="w-10 h-10 object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
-            ))}
-          </button>
-        </div>
+              <div>
+                <span
+                  className={`font-bold text-xl tracking-tight transition-colors ${
+                    isScrolled ? 'text-blue-900' : 'text-white'
+                  }`}
+                >
+                  XYZ Dental
+                </span>
+                <span
+                  className={`block text-xs transition-colors ${
+                    isScrolled ? 'text-blue-600' : 'text-blue-200'
+                  }`}
+                >
+                  Clinic
+                </span>
+              </div>
+            </button>
 
-        {/* Mobile menu */}
-        {mobileOpen && (
-          <div
-            style={{
-              background: 'rgba(255,255,255,0.98)',
-              backdropFilter: 'blur(12px)',
-              borderTop: '1px solid rgba(0,0,0,0.06)',
-              padding: '16px 24px 24px',
-            }}
-          >
-            {[
-              { label: 'Services', id: 'services' },
-              { label: 'Gallery', id: 'gallery' },
-              { label: 'Doctor', id: 'doctor' },
-              { label: 'Testimonials', id: 'testimonials' },
-              { label: 'Contact', id: 'contact' },
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollTo(item.id)}
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  textAlign: 'left',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  color: '#374151',
-                  padding: '12px 0',
-                  borderBottom: '1px solid rgba(0,0,0,0.05)',
-                }}
+            {/* Desktop Nav */}
+            <nav className="hidden md:flex items-center gap-8">
+              {navLinks.map((link) => (
+                <button
+                  key={link.label}
+                  onClick={() => scrollToSection(link.href)}
+                  className={`text-sm font-medium transition-colors hover:text-blue-500 ${
+                    isScrolled ? 'text-gray-700' : 'text-white/90'
+                  }`}
+                >
+                  {link.label}
+                </button>
+              ))}
+            </nav>
+
+            {/* Right Actions */}
+            <div className="hidden md:flex items-center gap-4">
+              <a
+                href="tel:+916352174912"
+                className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                  isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-white/90 hover:text-white'
+                }`}
               >
-                {item.label}
-              </button>
-            ))}
-
-            {isClinicOpen ? (
+                <Phone size={16} />
+                <span>+91 63521 74912</span>
+              </a>
               <button
-                onClick={() => { setMobileOpen(false); handleBookNow(); }}
-                style={{
-                  marginTop: '16px',
-                  width: '100%',
-                  background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '14px',
-                  fontSize: '15px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                }}
+                onClick={() => canBook && setIsBookingOpen(true)}
+                disabled={!canBook}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                  canBook
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               >
                 Book Now
               </button>
-            ) : (
-              <div
-                style={{
-                  marginTop: '16px',
-                  width: '100%',
-                  background: '#fef2f2',
-                  border: '1.5px solid #fca5a5',
-                  borderRadius: '8px',
-                  padding: '14px',
-                  fontSize: '15px',
-                  fontWeight: 700,
-                  color: '#dc2626',
-                  textAlign: 'center',
-                }}
+            </div>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className={`md:hidden p-2 rounded-lg transition-colors ${
+                isScrolled ? 'text-gray-700' : 'text-white'
+              }`}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
+            <div className="px-4 py-4 space-y-3">
+              {navLinks.map((link) => (
+                <button
+                  key={link.label}
+                  onClick={() => scrollToSection(link.href)}
+                  className="block w-full text-left text-gray-700 font-medium py-2 hover:text-blue-600 transition-colors"
+                >
+                  {link.label}
+                </button>
+              ))}
+              <a
+                href="tel:+916352174912"
+                className="flex items-center gap-2 text-gray-700 font-medium py-2"
               >
-                🔴 Clinic is Closed
-              </div>
-            )}
+                <Phone size={16} />
+                +91 63521 74912
+              </a>
+              <button
+                onClick={() => {
+                  if (canBook) {
+                    setIsBookingOpen(true);
+                    setIsMobileMenuOpen(false);
+                  }
+                }}
+                disabled={!canBook}
+                className={`w-full py-3 rounded-full text-sm font-semibold transition-all ${
+                  canBook
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Book Appointment
+              </button>
+            </div>
           </div>
         )}
       </header>
 
-      {isClinicOpen && (
-        <BookAppointmentDialog open={dialogOpen} onOpenChange={setDialogOpen} />
-      )}
-
-      <style>{`
-        @media (max-width: 768px) {
-          .hidden-mobile { display: none !important; }
-          .show-mobile { display: flex !important; }
-        }
-        @media (min-width: 769px) {
-          .show-mobile { display: none !important; }
-        }
-      `}</style>
+      <BookAppointmentDialog
+        isOpen={isBookingOpen}
+        onClose={() => setIsBookingOpen(false)}
+      />
     </>
   );
 }

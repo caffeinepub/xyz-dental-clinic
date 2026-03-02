@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { isAdminAuthenticated } from '../../components/AdminGuard';
 import { ArrowLeft, Upload, Save, Loader2 } from 'lucide-react';
 import { useGetAllServices, useUpdateService } from '../../hooks/useQueries';
 import { ExternalBlob } from '../../backend';
@@ -33,10 +34,22 @@ export default function ServiceManager() {
     Object.fromEntries(
       PREMIUM_SERVICES.map((s) => [
         s.id,
-        { displayName: s.name, description: '', photoFile: null, uploadProgress: 0, isSaving: false, savedOk: false },
+        {
+          displayName: s.name,
+          description: '',
+          photoFile: null,
+          uploadProgress: 0,
+          isSaving: false,
+          savedOk: false,
+        },
       ])
     )
   );
+
+  if (!isAdminAuthenticated()) {
+    navigate({ to: '/' });
+    return null;
+  }
 
   const getForm = (id: string): ServiceForm => {
     const backendService = services?.find((s) => s.id === id);
@@ -80,95 +93,225 @@ export default function ServiceManager() {
   };
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate({ to: '/admin/dashboard' })}
-            className="flex items-center gap-2 text-gray-500 hover:text-royal-blue transition-colors"
-          >
-            <ArrowLeft size={18} /> Dashboard
-          </button>
-          <h1 className="text-3xl font-playfair font-bold text-royal-blue">Service Manager</h1>
-        </div>
+    <div style={{ minHeight: '100vh', background: '#f1f5f9' }}>
+      {/* Header */}
+      <div
+        style={{
+          background: '#FFFFFF',
+          borderBottom: '1px solid #e5e7eb',
+          padding: '16px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+        }}
+      >
+        <button
+          onClick={() => navigate({ to: '/admin' })}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#6b7280',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <h1 style={{ color: '#1a1a1a', fontWeight: 800, fontSize: '1.3rem', margin: 0 }}>
+          Service Manager
+        </h1>
+      </div>
 
-        <div className="space-y-6">
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {PREMIUM_SERVICES.map((service) => {
             const form = getForm(service.id);
             const backendService = services?.find((s) => s.id === service.id);
 
             return (
-              <div key={service.id} className="glass-card rounded-2xl p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">{service.name}</h2>
+              <div
+                key={service.id}
+                style={{
+                  background: '#FFFFFF',
+                  borderRadius: '16px',
+                  padding: '28px',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                  border: '1px solid #e5e7eb',
+                }}
+              >
+                <h2
+                  style={{
+                    color: '#1a1a1a',
+                    fontWeight: 700,
+                    fontSize: '1.05rem',
+                    marginBottom: '20px',
+                  }}
+                >
+                  {service.name}
+                </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-1">
-                    <Label>Display Name</Label>
+                <div
+                  style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}
+                  className="service-form-grid"
+                >
+                  <div>
+                    <Label
+                      style={{
+                        color: '#1a1a1a',
+                        fontWeight: 600,
+                        fontSize: '0.875rem',
+                        display: 'block',
+                        marginBottom: '6px',
+                      }}
+                    >
+                      Display Name
+                    </Label>
                     <Input
                       value={form.displayName}
                       onChange={(e) => updateForm(service.id, { displayName: e.target.value })}
                       placeholder="Service display name"
+                      style={{
+                        background: '#FFFFFF',
+                        border: '1.5px solid #d1d5db',
+                        color: '#1a1a1a',
+                        borderRadius: '8px',
+                      }}
                     />
                   </div>
 
-                  <div className="space-y-1">
-                    <Label>Featured Photo</Label>
-                    <div className="flex items-center gap-2">
-                      <label className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 text-sm text-gray-600 transition-colors">
-                        <Upload size={14} />
+                  <div>
+                    <Label
+                      style={{
+                        color: '#1a1a1a',
+                        fontWeight: 600,
+                        fontSize: '0.875rem',
+                        display: 'block',
+                        marginBottom: '6px',
+                      }}
+                    >
+                      Featured Photo
+                    </Label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <label
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '8px 14px',
+                          border: '1.5px solid #d1d5db',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontSize: '0.875rem',
+                          color: '#374151',
+                          background: '#FFFFFF',
+                          transition: 'all 0.2s',
+                        }}
+                      >
+                        <Upload className="w-4 h-4" />
                         {form.photoFile ? form.photoFile.name : 'Choose photo'}
                         <input
                           type="file"
                           accept="image/*"
-                          className="hidden"
-                          onChange={(e) => updateForm(service.id, { photoFile: e.target.files?.[0] || null })}
+                          style={{ display: 'none' }}
+                          onChange={(e) =>
+                            updateForm(service.id, { photoFile: e.target.files?.[0] || null })
+                          }
                         />
                       </label>
                       {backendService?.featuredPhoto && !form.photoFile && (
                         <img
                           src={backendService.featuredPhoto.getDirectURL()}
                           alt="Current"
-                          className="w-10 h-10 rounded-lg object-cover border"
+                          style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '8px',
+                            objectFit: 'cover',
+                            border: '1px solid #e5e7eb',
+                          }}
                         />
                       )}
                     </div>
                     {form.uploadProgress > 0 && form.uploadProgress < 100 && (
-                      <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                      <div
+                        style={{
+                          width: '100%',
+                          background: '#e5e7eb',
+                          borderRadius: '999px',
+                          height: '6px',
+                          marginTop: '6px',
+                        }}
+                      >
                         <div
-                          className="bg-teal h-1.5 rounded-full transition-all"
-                          style={{ width: `${form.uploadProgress}%` }}
+                          style={{
+                            background: '#0d9488',
+                            height: '6px',
+                            borderRadius: '999px',
+                            width: `${form.uploadProgress}%`,
+                            transition: 'width 0.3s',
+                          }}
                         />
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="space-y-1 mb-4">
-                  <Label>Description</Label>
+                <div style={{ marginBottom: '16px' }}>
+                  <Label
+                    style={{
+                      color: '#1a1a1a',
+                      fontWeight: 600,
+                      fontSize: '0.875rem',
+                      display: 'block',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    Description
+                  </Label>
                   <textarea
                     value={form.description}
                     onChange={(e) => updateForm(service.id, { description: e.target.value })}
                     placeholder="Service description..."
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-royal-blue/30 resize-none"
+                    style={{
+                      width: '100%',
+                      background: '#FFFFFF',
+                      border: '1.5px solid #d1d5db',
+                      borderRadius: '8px',
+                      padding: '10px 14px',
+                      color: '#1a1a1a',
+                      fontSize: '0.95rem',
+                      outline: 'none',
+                      resize: 'none',
+                      boxSizing: 'border-box',
+                    }}
                   />
                 </div>
 
                 <Button
                   onClick={() => handleSave(service.id)}
                   disabled={form.isSaving}
-                  className="bg-royal-blue hover:bg-teal text-white rounded-full px-6"
+                  style={{
+                    background: form.savedOk ? '#10b981' : '#0d9488',
+                    color: '#fff',
+                    borderRadius: '10px',
+                    fontWeight: 700,
+                    padding: '10px 24px',
+                  }}
                 >
                   {form.isSaving ? (
-                    <span className="flex items-center gap-2">
-                      <Loader2 size={14} className="animate-spin" />
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Loader2 className="w-4 h-4 animate-spin" />
                       Saving...
                     </span>
                   ) : form.savedOk ? (
                     '✓ Saved!'
                   ) : (
-                    <span className="flex items-center gap-2">
-                      <Save size={14} /> Save Changes
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Save className="w-4 h-4" />
+                      Save Changes
                     </span>
                   )}
                 </Button>
@@ -177,6 +320,12 @@ export default function ServiceManager() {
           })}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 600px) {
+          .service-form-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }

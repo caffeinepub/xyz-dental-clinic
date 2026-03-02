@@ -1,140 +1,72 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, CheckCircle } from 'lucide-react';
-import BookAppointmentDialog from '../components/BookAppointmentDialog';
+import { useParams } from '@tanstack/react-router';
+import { ArrowLeft, Calendar } from 'lucide-react';
 import { useGetService } from '../hooks/useQueries';
+import BookAppointmentDialog from '../components/BookAppointmentDialog';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 export default function ServiceDetail() {
   const { serviceId } = useParams({ strict: false });
-  const navigate = useNavigate();
-  const [bookingOpen, setBookingOpen] = useState(false);
-  const { data: service, isLoading } = useGetService(serviceId ?? '');
-
-  const displayName =
-    service?.displayName ||
-    (serviceId ?? '')
-      .replace(/-/g, ' ')
-      .replace(/\b\w/g, (c) => c.toUpperCase());
-
-  const description =
-    service?.description || 'Professional dental care tailored to your needs.';
+  const { data: service, isLoading } = useGetService(serviceId || '');
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   return (
-    <div style={{ minHeight: '100vh', paddingTop: '80px' }}>
-      <section style={{ padding: '60px 24px' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+    <div className="min-h-screen bg-white">
+      <Header />
+      <main className="pt-24 pb-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <button
-            onClick={() => navigate({ to: '/' })}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#0ea5e9',
-              fontSize: '15px',
-              fontWeight: 600,
-              marginBottom: '32px',
-              padding: 0,
-            }}
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-8 transition-colors"
           >
-            <ArrowLeft size={18} /> Back to Home
+            <ArrowLeft size={18} />
+            <span>Back</span>
           </button>
 
           {isLoading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
-              <div
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  border: '4px solid rgba(14,165,233,0.2)',
-                  borderTopColor: '#0ea5e9',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                }}
-              />
+            <div className="flex items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
             </div>
-          ) : (
-            <div
-              style={{
-                background: 'rgba(255,255,255,0.88)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(14,165,233,0.15)',
-                borderRadius: '20px',
-                padding: '48px',
-                boxShadow: '0 8px 40px rgba(0,0,0,0.08)',
-              }}
-            >
-              {service?.featuredPhoto && (
-                <div style={{ borderRadius: '14px', overflow: 'hidden', marginBottom: '32px' }}>
+          ) : service ? (
+            <div>
+              {service.featuredPhoto && (
+                <div className="rounded-2xl overflow-hidden mb-8 shadow-lg" style={{ aspectRatio: '16/9' }}>
                   <img
                     src={service.featuredPhoto.getDirectURL()}
-                    alt={displayName}
-                    style={{ width: '100%', height: '280px', objectFit: 'cover', display: 'block' }}
+                    alt={service.displayName}
+                    className="w-full h-full object-cover"
                   />
                 </div>
               )}
-
-              <h1
-                style={{
-                  fontSize: 'clamp(28px, 4vw, 44px)',
-                  fontWeight: 800,
-                  color: '#0f172a',
-                  marginBottom: '16px',
-                  letterSpacing: '-0.02em',
-                  fontFamily: 'Playfair Display, serif',
-                }}
-              >
-                {displayName}
-              </h1>
-              <p style={{ color: '#64748b', fontSize: '17px', lineHeight: 1.7, marginBottom: '36px' }}>
-                {description}
-              </p>
-
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '16px',
-                  marginBottom: '36px',
-                }}
-              >
-                {['Expert Care', 'Modern Equipment', 'Comfortable Experience', 'Affordable Pricing'].map(
-                  (feature) => (
-                    <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <CheckCircle size={18} color="#0ea5e9" style={{ flexShrink: 0 }} />
-                      <span style={{ color: '#374151', fontSize: '14px', fontWeight: 500 }}>{feature}</span>
-                    </div>
-                  )
-                )}
-              </div>
-
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{service.displayName}</h1>
+              <p className="text-gray-600 leading-relaxed text-lg mb-8">{service.description}</p>
               <button
-                onClick={() => setBookingOpen(true)}
-                style={{
-                  background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '10px',
-                  padding: '14px 36px',
-                  fontSize: '16px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  boxShadow: '0 6px 24px rgba(14,165,233,0.35)',
-                }}
+                onClick={() => setIsBookingOpen(true)}
+                className="flex items-center gap-2 bg-blue-600 text-white px-8 py-3.5 rounded-full font-semibold hover:bg-blue-700 transition-colors shadow-md"
               >
+                <Calendar size={18} />
                 Book Appointment
+              </button>
+            </div>
+          ) : (
+            <div className="text-center py-20">
+              <p className="text-gray-500 text-lg">Service not found.</p>
+              <button
+                onClick={() => window.location.href = '/'}
+                className="mt-4 text-blue-600 hover:underline"
+              >
+                Return to Home
               </button>
             </div>
           )}
         </div>
-      </section>
-
+      </main>
+      <Footer />
       <BookAppointmentDialog
-        open={bookingOpen}
-        onOpenChange={setBookingOpen}
-        defaultService={displayName}
+        isOpen={isBookingOpen}
+        onClose={() => setIsBookingOpen(false)}
+        defaultService={service?.displayName}
       />
     </div>
   );

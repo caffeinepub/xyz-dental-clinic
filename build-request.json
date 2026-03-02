@@ -1,38 +1,42 @@
 {
   "kind": "build_request",
-  "title": "Fix unexpected 'Connection issue' error in appointment booking",
+  "title": "Rebuild dental clinic app after deployment failure",
   "projectName": "XYZ Dental Clinic",
-  "priority": "high",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the BookAppointmentDialog component so that the 'Connection issue. Your data has been saved locally. Please click \"Retry\" to try again' message does not appear unexpectedly. The error/retry banner should only be shown when there is an actual, confirmed network or canister call failure — not on initial load, not when localStorage contains stale data from a previous session, and not when the form has not yet been submitted. Clear any stale localStorage pending appointment data that would incorrectly trigger this state on mount.",
-      "target": "frontend",
+      "text": "Restore and redeploy the full dental clinic booking website with all previously implemented features: appointment booking, doctor profiles, services grid, testimonials carousel, before/after slider, contact section, admin dashboard (appointments, reviews, services, doctor scheduler, before/after manager, clinic status control), and Internet Identity authentication.",
+      "target": "both",
       "source": {
         "messageIds": [
+          "msg-1",
           "msg-4"
         ],
         "quotes": [
-          "now solve it apoint ment book vala problem hau Connection issue. Your data has been saved locally. Please click \"Retry\" to try again"
+          "ok",
+          "make again"
         ]
       },
       "acceptanceCriteria": [
-        "Opening the BookAppointmentDialog for the first time does not show the 'Connection issue' banner.",
-        "The 'Connection issue. Your data has been saved locally. Please click \"Retry\" to try again' banner only appears after a real failed backend submission attempt.",
-        "Stale localStorage pending appointment entries from previous sessions do not trigger the connection error/retry UI on dialog open.",
-        "After a successful appointment submission, any pending localStorage entry is cleared and the retry banner is not shown on the next dialog open.",
-        "The Retry button, when clicked after a genuine failure, re-attempts submission using the locally saved data."
+        "The home page loads with hero section, services, doctor profile, before/after slider, testimonials, and contact sections.",
+        "The appointment booking dialog opens and allows patients to submit bookings.",
+        "The admin dashboard is accessible via the hidden footer tooth logo login and shows all management pages.",
+        "Clinic status (open/closed/emergency) is fetched from the backend and reflected in the header and hero section.",
+        "Internet Identity login/logout works correctly.",
+        "All backend queries (appointments, services, reviews, doctors, clinic status) return data without errors.",
+        "The app deploys successfully without errors."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "Only fix the connection error banner logic — do not alter unrelated booking form fields or submission flow."
+    "Do not change the existing backend data schema or stable state.",
+    "Admin authentication must remain sessionStorage-based with the hidden footer tooth logo trigger.",
+    "Immutable frontend paths must not be modified."
   ],
   "nonGoals": [
-    "Redesigning the appointment booking form UI.",
-    "Changing backend appointment storage or schema.",
-    "Adding new form fields or validation rules."
+    "Adding new features beyond what was previously implemented.",
+    "Changing the visual design or branding."
   ],
   "imageRequirements": {
     "required": [],

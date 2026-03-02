@@ -1,253 +1,189 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ChevronDown, Star, Users, Award, Clock } from 'lucide-react';
 import BookAppointmentDialog from './BookAppointmentDialog';
-import MagneticButton from './MagneticButton';
-import { useGetClinicStatus } from '../hooks/useQueries';
-import { ClinicStatus } from '../backend';
+import { useClinicStatusContext } from '../context/ClinicStatusContext';
 
-const floatingIcons = [
-  { src: '/assets/generated/tooth-float-icon.dim_96x96.png', alt: 'tooth', top: '15%', left: '5%', delay: '0s' },
-  { src: '/assets/generated/dental-mirror-float-icon.dim_96x96.png', alt: 'mirror', top: '25%', right: '8%', delay: '1.2s' },
-  { src: '/assets/generated/toothbrush-float-icon.dim_96x96.png', alt: 'toothbrush', bottom: '30%', left: '3%', delay: '0.6s' },
-  { src: '/assets/generated/plus-float-icon.dim_96x96.png', alt: 'plus', bottom: '20%', right: '5%', delay: '1.8s' },
-];
-
-const stats = [
-  { value: '5000+', label: 'Happy Patients' },
-  { value: '15+', label: 'Years Experience' },
-  { value: '98%', label: 'Success Rate' },
-  { value: '20+', label: 'Treatments' },
-];
+const WORDS = ['Beautiful', 'Healthy', 'Confident', 'Radiant'];
 
 export default function HeroSection() {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const { data: clinicStatus } = useGetClinicStatus();
-  const isClinicOpen = clinicStatus === ClinicStatus.open || clinicStatus === undefined;
+  const [currentWord, setCurrentWord] = useState(0);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const { isClosed, isEmergency } = useClinicStatusContext();
+  const canBook = !isClosed;
+
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentWord((prev) => (prev + 1) % WORDS.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const elements = [subtitleRef.current, ctaRef.current, statsRef.current, imageRef.current];
+    const delays = [200, 400, 600, 300];
+
+    elements.forEach((el, i) => {
+      if (!el) return;
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = `opacity 0.8s ease ${delays[i]}ms, transform 0.8s ease ${delays[i]}ms`;
+      setTimeout(() => {
+        if (el) {
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        }
+      }, 100);
+    });
+  }, []);
+
+  const stats = [
+    { icon: <Users size={20} />, value: '5000+', label: 'Happy Patients' },
+    { icon: <Award size={20} />, value: '15+', label: 'Years Experience' },
+    { icon: <Star size={20} />, value: '4.9★', label: 'Average Rating' },
+    { icon: <Clock size={20} />, value: '24/7', label: 'Emergency Care' },
+  ];
 
   return (
     <section
+      id="home"
+      className="relative min-h-screen flex items-center overflow-hidden"
       style={{
-        position: 'relative',
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f4c75 100%)',
       }}
     >
       {/* Background Image */}
       <div
+        className="absolute inset-0 opacity-20"
         style={{
-          position: 'absolute',
-          inset: 0,
           backgroundImage: 'url(/assets/generated/hero-bg.dim_1920x1080.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          zIndex: 0,
-        }}
-      />
-      {/* Dark overlay */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(135deg, rgba(2,20,50,0.82) 0%, rgba(5,40,80,0.70) 60%, rgba(0,0,0,0.55) 100%)',
-          zIndex: 1,
         }}
       />
 
-      {/* Floating Icons */}
-      {floatingIcons.map((icon) => (
-        <img
-          key={icon.alt}
-          src={icon.src}
-          alt=""
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            width: '56px',
-            height: '56px',
-            opacity: 0.25,
-            pointerEvents: 'none',
-            zIndex: 2,
-            animation: `floatBob 4s ease-in-out infinite`,
-            animationDelay: icon.delay,
-            top: icon.top,
-            left: (icon as any).left,
-            right: (icon as any).right,
-            bottom: (icon as any).bottom,
-          }}
-        />
-      ))}
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-950/80 via-blue-900/60 to-transparent" />
 
-      {/* Content */}
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 3,
-          textAlign: 'center',
-          padding: '0 24px',
-          maxWidth: '860px',
-          width: '100%',
-        }}
-      >
-        <div
-          style={{
-            display: 'inline-block',
-            background: 'rgba(14,165,233,0.2)',
-            border: '1px solid rgba(14,165,233,0.4)',
-            borderRadius: '100px',
-            padding: '6px 20px',
-            marginBottom: '20px',
-            color: '#7dd3fc',
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-          }}
-        >
-          ✦ Premium Dental Care
-        </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left Content */}
+          <div>
+            <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1.5 mb-6">
+              <Star size={14} className="text-yellow-400" />
+              <span className="text-blue-200 text-sm font-medium">Trusted by 5000+ patients</span>
+            </div>
 
-        <h1
-          style={{
-            fontSize: 'clamp(36px, 6vw, 72px)',
-            fontWeight: 800,
-            color: '#ffffff',
-            lineHeight: 1.1,
-            marginBottom: '20px',
-            letterSpacing: '-0.02em',
-            fontFamily: 'Playfair Display, serif',
-          }}
-        >
-          Your Perfect Smile Starts Here
-        </h1>
-
-        <p
-          style={{
-            fontSize: 'clamp(16px, 2vw, 20px)',
-            color: 'rgba(255,255,255,0.8)',
-            marginBottom: '36px',
-            lineHeight: 1.6,
-            maxWidth: '560px',
-            margin: '0 auto 36px',
-          }}
-        >
-          World-class dental treatments with cutting-edge technology and compassionate care.
-        </p>
-
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {isClinicOpen ? (
-            <MagneticButton>
-              <button
-                onClick={() => setDialogOpen(true)}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4">
+              Your{' '}
+              <span
+                key={currentWord}
+                className="text-blue-400"
                 style={{
-                  background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '16px 36px',
-                  fontSize: '16px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  boxShadow: '0 8px 32px rgba(14,165,233,0.4)',
-                  letterSpacing: '0.02em',
+                  display: 'inline-block',
+                  animation: 'fadeSlideUp 0.5s ease forwards',
                 }}
               >
-                Book Your Smile Transformation
-              </button>
-            </MagneticButton>
-          ) : (
-            <div
-              style={{
-                padding: '16px 36px',
-                borderRadius: '8px',
-                background: 'rgba(239,68,68,0.2)',
-                border: '1.5px solid rgba(239,68,68,0.4)',
-                color: '#fca5a5',
-                fontSize: '16px',
-                fontWeight: 700,
-              }}
-            >
-              🔴 Clinic is Currently Closed
-            </div>
-          )}
+                {WORDS[currentWord]}
+              </span>
+              <br />
+              Smile Starts Here
+            </h1>
 
-          <button
-            onClick={() => {
-              const el = document.getElementById('services');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-            style={{
-              background: 'rgba(255,255,255,0.12)',
-              color: '#fff',
-              border: '1.5px solid rgba(255,255,255,0.35)',
-              borderRadius: '8px',
-              padding: '16px 36px',
-              fontSize: '16px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              backdropFilter: 'blur(8px)',
-            }}
-          >
-            Our Services
-          </button>
+            <p ref={subtitleRef} className="text-blue-100/80 text-lg leading-relaxed mb-8 max-w-lg">
+              Experience world-class dental care with cutting-edge technology and a compassionate team dedicated to your perfect smile.
+            </p>
+
+            <div ref={ctaRef} className="flex flex-wrap gap-4">
+              <button
+                onClick={() => canBook && setIsBookingOpen(true)}
+                disabled={!canBook}
+                className={`px-8 py-3.5 rounded-full font-semibold text-base transition-all shadow-lg ${
+                  canBook
+                    ? 'bg-blue-500 text-white hover:bg-blue-400 hover:shadow-blue-500/30 hover:shadow-xl hover:-translate-y-0.5'
+                    : 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                }`}
+              >
+                {isClosed ? 'Booking Unavailable' : 'Book Appointment'}
+              </button>
+              <button
+                onClick={() => {
+                  const el = document.getElementById('services');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-8 py-3.5 rounded-full font-semibold text-base border-2 border-white/30 text-white hover:bg-white/10 transition-all"
+              >
+                Our Services
+              </button>
+            </div>
+
+            {isEmergency && (
+              <div className="mt-4 p-3 bg-red-500/20 border border-red-400/30 rounded-lg">
+                <p className="text-red-300 text-sm">⚠️ Emergency mode active. Call us directly for urgent care.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Right Image */}
+          <div ref={imageRef} className="hidden lg:block">
+            <div className="relative">
+              <div
+                className="rounded-2xl overflow-hidden shadow-2xl"
+                style={{ aspectRatio: '4/5' }}
+              >
+                <img
+                  src="/assets/generated/doctor-profile.dim_600x800.png"
+                  alt="Our Dentist"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/assets/generated/hero-bg.dim_1920x1080.png';
+                  }}
+                />
+              </div>
+              {/* Floating card */}
+              <div className="absolute -bottom-4 -left-4 bg-white rounded-xl p-4 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <Award size={20} className="text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-gray-900 font-bold text-sm">ISO Certified</p>
+                    <p className="text-gray-500 text-xs">Dental Excellence</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Stats */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '40px',
-            justifyContent: 'center',
-            marginTop: '56px',
-            flexWrap: 'wrap',
-          }}
-        >
-          {stats.map((stat) => (
-            <div key={stat.label} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#38bdf8', fontFamily: 'Playfair Display, serif' }}>
-                {stat.value}
-              </div>
-              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.65)', marginTop: '2px' }}>
-                {stat.label}
-              </div>
+        <div ref={statsRef} className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-16">
+          {stats.map((stat, i) => (
+            <div
+              key={i}
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center"
+            >
+              <div className="text-blue-300 flex justify-center mb-2">{stat.icon}</div>
+              <p className="text-white font-bold text-xl">{stat.value}</p>
+              <p className="text-blue-200 text-xs">{stat.label}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Scroll indicator */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '32px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '6px',
-          color: 'rgba(255,255,255,0.5)',
-          fontSize: '11px',
-          letterSpacing: '0.1em',
-          textTransform: 'uppercase',
-        }}
-      >
-        <span>Scroll</span>
-        <div
-          style={{
-            width: '1px',
-            height: '40px',
-            background: 'linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)',
-            animation: 'scrollPulse 1.5s ease-in-out infinite',
-          }}
-        />
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        <ChevronDown size={24} className="text-white/50" />
       </div>
 
-      {isClinicOpen && (
-        <BookAppointmentDialog open={dialogOpen} onOpenChange={setDialogOpen} />
-      )}
+      <BookAppointmentDialog
+        isOpen={isBookingOpen}
+        onClose={() => setIsBookingOpen(false)}
+      />
     </section>
   );
 }

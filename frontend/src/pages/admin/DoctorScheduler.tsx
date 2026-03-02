@@ -1,103 +1,239 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { isAdminAuthenticated } from '../../components/AdminGuard';
 import { useGetAllDoctors, useAddDoctor } from '../../hooks/useQueries';
-import { toast } from 'sonner';
+import { ArrowLeft, UserPlus, Loader2, Stethoscope } from 'lucide-react';
 
 export default function DoctorScheduler() {
   const navigate = useNavigate();
   const { data: doctors, isLoading } = useGetAllDoctors();
   const addDoctor = useAddDoctor();
+
   const [form, setForm] = useState({ name: '', specialty: '' });
+  const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+
+  if (!isAdminAuthenticated()) {
+    navigate({ to: '/' });
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSuccessMsg('');
+    setErrorMsg('');
+
     if (!form.name.trim() || !form.specialty.trim()) {
-      toast.error('Please fill in all fields');
+      setErrorMsg('Please fill in all fields.');
       return;
     }
+
     try {
-      await addDoctor.mutateAsync({ name: form.name, specialty: form.specialty, availability: [] });
-      toast.success('Doctor added successfully!');
+      await addDoctor.mutateAsync({ name: form.name.trim(), specialty: form.specialty.trim() });
+      setSuccessMsg(`Dr. ${form.name} added successfully!`);
       setForm({ name: '', specialty: '' });
-    } catch {
-      toast.error('Failed to add doctor');
+    } catch (err) {
+      setErrorMsg('Failed to add doctor. Please try again.');
     }
   };
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate({ to: '/admin/dashboard' })}
-            className="text-slate-500 hover:text-slate-800 transition-colors"
-          >
-            ← Back
-          </button>
-          <h1 className="text-3xl font-bold text-slate-800 font-playfair">Doctor Scheduler</h1>
-        </div>
+    <div style={{ minHeight: '100vh', background: '#f1f5f9' }}>
+      {/* Header */}
+      <div
+        style={{
+          background: '#FFFFFF',
+          borderBottom: '1px solid #e5e7eb',
+          padding: '16px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px',
+        }}
+      >
+        <button
+          onClick={() => navigate({ to: '/admin' })}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#6b7280',
+            fontWeight: 500,
+          }}
+        >
+          <ArrowLeft size={18} />
+          Back
+        </button>
+        <h1 style={{ color: '#1a1a1a', fontWeight: 800, fontSize: '1.3rem', margin: 0 }}>
+          Doctor Scheduler
+        </h1>
+      </div>
 
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px' }}>
         {/* Add Doctor Form */}
-        <div className="glass-card rounded-2xl p-6 mb-8">
-          <h2 className="text-lg font-semibold text-slate-800 mb-4">Add New Doctor</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-slate-600 text-sm mb-1.5">Doctor Name</label>
-                <input
-                  type="text"
-                  value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  placeholder="Dr. Full Name"
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-400 transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-600 text-sm mb-1.5">Specialty</label>
-                <input
-                  type="text"
-                  value={form.specialty}
-                  onChange={(e) => setForm((f) => ({ ...f, specialty: e.target.value }))}
-                  placeholder="e.g. Orthodontics"
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-400 transition-colors"
-                />
-              </div>
+        <div
+          style={{
+            background: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '28px',
+            marginBottom: '32px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            border: '1px solid #e5e7eb',
+          }}
+        >
+          <h2 style={{ color: '#1a1a1a', fontWeight: 700, fontSize: '1.1rem', marginBottom: '20px' }}>
+            Add New Doctor
+          </h2>
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <label style={{ display: 'block', color: '#374151', fontWeight: 600, marginBottom: '6px', fontSize: '0.875rem' }}>
+                Doctor Name
+              </label>
+              <input
+                type="text"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="e.g. Dr. Rajesh Kumar"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  border: '1.5px solid #d1d5db',
+                  borderRadius: '8px',
+                  fontSize: '0.9rem',
+                  color: '#1a1a1a',
+                  background: '#FFFFFF',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
             </div>
+
+            <div>
+              <label style={{ display: 'block', color: '#374151', fontWeight: 600, marginBottom: '6px', fontSize: '0.875rem' }}>
+                Specialty
+              </label>
+              <input
+                type="text"
+                value={form.specialty}
+                onChange={(e) => setForm({ ...form, specialty: e.target.value })}
+                placeholder="e.g. Orthodontist"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  border: '1.5px solid #d1d5db',
+                  borderRadius: '8px',
+                  fontSize: '0.9rem',
+                  color: '#1a1a1a',
+                  background: '#FFFFFF',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {successMsg && (
+              <p style={{ color: '#16a34a', fontSize: '0.875rem', fontWeight: 500 }}>{successMsg}</p>
+            )}
+            {errorMsg && (
+              <p style={{ color: '#dc2626', fontSize: '0.875rem', fontWeight: 500 }}>{errorMsg}</p>
+            )}
+
             <button
               type="submit"
               disabled={addDoctor.isPending}
-              className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-full transition-colors disabled:opacity-50"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                background: addDoctor.isPending ? '#93c5fd' : '#1e40af',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '12px 24px',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                cursor: addDoctor.isPending ? 'not-allowed' : 'pointer',
+                alignSelf: 'flex-start',
+              }}
             >
-              {addDoctor.isPending ? 'Adding...' : 'Add Doctor'}
+              {addDoctor.isPending ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                <>
+                  <UserPlus size={16} />
+                  Add Doctor
+                </>
+              )}
             </button>
           </form>
         </div>
 
         {/* Doctors List */}
-        <div className="glass-card rounded-2xl p-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-4">
-            Doctors ({doctors?.length ?? 0})
+        <div
+          style={{
+            background: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '28px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            border: '1px solid #e5e7eb',
+          }}
+        >
+          <h2 style={{ color: '#1a1a1a', fontWeight: 700, fontSize: '1.1rem', marginBottom: '20px' }}>
+            Our Doctors
           </h2>
+
           {isLoading ? (
-            <div className="text-center py-8 text-slate-400">Loading...</div>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '32px' }}>
+              <Loader2 size={24} className="animate-spin" style={{ color: '#6b7280' }} />
+            </div>
           ) : !doctors || doctors.length === 0 ? (
-            <div className="text-center py-8 text-slate-400">
-              <div className="text-4xl mb-3">👨‍⚕️</div>
+            <div style={{ textAlign: 'center', padding: '32px', color: '#9ca3af' }}>
+              <Stethoscope size={40} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
               <p>No doctors added yet.</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {doctors.map((doctor) => (
                 <div
                   key={String(doctor.id)}
-                  className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                    padding: '16px',
+                    background: '#f8fafc',
+                    borderRadius: '10px',
+                    border: '1px solid #e5e7eb',
+                  }}
                 >
-                  <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-teal-700 font-bold">
-                    {doctor.name.charAt(0)}
+                  <div
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '50%',
+                      background: '#dbeafe',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Stethoscope size={20} style={{ color: '#1e40af' }} />
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-800">{doctor.name}</p>
-                    <p className="text-slate-500 text-sm">{doctor.specialty}</p>
+                    <p style={{ fontWeight: 700, color: '#1a1a1a', fontSize: '0.95rem', margin: 0 }}>
+                      {doctor.name}
+                    </p>
+                    <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: 0 }}>
+                      {doctor.specialty}
+                    </p>
                   </div>
                 </div>
               ))}

@@ -1,129 +1,102 @@
-import React from 'react';
-import { useStaggeredTextReveal } from '../hooks/useStaggeredTextReveal';
+import React, { useRef, useEffect } from 'react';
+import { Award, GraduationCap, Star, Heart } from 'lucide-react';
+
+const CREDENTIALS = [
+  { icon: <GraduationCap size={18} />, title: 'BDS, MDS', subtitle: 'Dental Surgery' },
+  { icon: <Award size={18} />, title: '15+ Years', subtitle: 'Experience' },
+  { icon: <Star size={18} />, title: '5000+', subtitle: 'Patients Treated' },
+  { icon: <Heart size={18} />, title: 'Gentle Care', subtitle: 'Patient-First Approach' },
+];
 
 export default function DoctorProfile() {
-  const headingText = 'Meet Dr. Priya Sharma';
-  const { ref: headingRef, wordElements } = useStaggeredTextReveal(headingText);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const elements = [imageRef.current, contentRef.current];
+    elements.forEach((el, i) => {
+      if (!el) return;
+      el.style.opacity = '0';
+      el.style.transform = i === 0 ? 'scale(0.9)' : 'translateX(40px)';
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (imageRef.current) {
+              imageRef.current.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+              imageRef.current.style.opacity = '1';
+              imageRef.current.style.transform = 'scale(1)';
+            }
+            if (contentRef.current) {
+              contentRef.current.style.transition = 'opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s';
+              contentRef.current.style.opacity = '1';
+              contentRef.current.style.transform = 'translateX(0)';
+            }
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section
-      id="doctor"
-      style={{
-        padding: '100px 24px',
-        position: 'relative',
-      }}
-    >
-      <div
-        style={{
-          maxWidth: '1100px',
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '60px',
-          alignItems: 'center',
-        }}
-      >
-        {/* Photo */}
-        <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              position: 'absolute',
-              inset: '-12px',
-              background: 'linear-gradient(135deg, rgba(14,165,233,0.2), rgba(6,182,212,0.15))',
-              borderRadius: '24px',
-              zIndex: 0,
-            }}
-          />
-          <img
-            src="/assets/generated/doctor-profile.dim_600x800.png"
-            alt="Dr. Priya Sharma"
-            style={{
-              width: '100%',
-              maxWidth: '380px',
-              borderRadius: '20px',
-              position: 'relative',
-              zIndex: 1,
-              boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-              display: 'block',
-              margin: '0 auto',
-            }}
-          />
-        </div>
-
-        {/* Info */}
-        <div>
-          <div
-            style={{
-              display: 'inline-block',
-              background: 'rgba(14,165,233,0.1)',
-              border: '1px solid rgba(14,165,233,0.25)',
-              borderRadius: '100px',
-              padding: '5px 16px',
-              marginBottom: '16px',
-              color: '#0284c7',
-              fontSize: '12px',
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-            }}
-          >
-            Chief Dental Surgeon
-          </div>
-
-          <h2
-            ref={headingRef as React.RefObject<HTMLHeadingElement>}
-            style={{
-              fontSize: 'clamp(26px, 3.5vw, 42px)',
-              fontWeight: 800,
-              color: '#0f172a',
-              marginBottom: '16px',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.15,
-            }}
-          >
-            {wordElements.map(({ word, style }, i) => (
-              <span key={i} style={style}>{word}</span>
-            ))}
-          </h2>
-
-          <p style={{ color: '#64748b', fontSize: '16px', lineHeight: 1.7, marginBottom: '28px' }}>
-            With over 15 years of experience in cosmetic and restorative dentistry, Dr. Sharma combines
-            artistry with precision to deliver exceptional results. She trained at AIIMS Delhi and completed
-            her fellowship in Cosmetic Dentistry at Harvard School of Dental Medicine.
-          </p>
-
-          {/* Stats */}
-          <div style={{ display: 'flex', gap: '32px', marginBottom: '28px', flexWrap: 'wrap' }}>
-            {[
-              { value: '5000+', label: 'Patients Treated' },
-              { value: '15+', label: 'Years Experience' },
-              { value: '98%', label: 'Satisfaction Rate' },
-            ].map(stat => (
-              <div key={stat.label}>
-                <div style={{ fontSize: '24px', fontWeight: 800, color: '#0ea5e9' }}>{stat.value}</div>
-                <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>{stat.label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Specialties */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            {['Cosmetic Dentistry', 'Dental Implants', 'Invisalign', 'Laser Dentistry', 'Smile Makeover'].map(tag => (
-              <span
-                key={tag}
-                style={{
-                  background: 'rgba(14,165,233,0.1)',
-                  color: '#0284c7',
-                  border: '1px solid rgba(14,165,233,0.2)',
-                  borderRadius: '100px',
-                  padding: '5px 14px',
-                  fontSize: '13px',
-                  fontWeight: 600,
+    <section id="about" className="py-20 bg-white" ref={sectionRef}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Image */}
+          <div ref={imageRef} className="relative">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl" style={{ aspectRatio: '3/4', maxHeight: '600px' }}>
+              <img
+                src="/assets/generated/doctor-profile.dim_600x800.png"
+                alt="Dr. XYZ"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
                 }}
-              >
-                {tag}
-              </span>
-            ))}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-blue-900/40 to-transparent" />
+            </div>
+            {/* Floating badge */}
+            <div className="absolute -bottom-4 -right-4 bg-blue-600 text-white rounded-xl p-4 shadow-xl">
+              <p className="font-bold text-2xl">15+</p>
+              <p className="text-blue-200 text-xs">Years of Excellence</p>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div ref={contentRef}>
+            <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Meet Our Lead Dentist</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-2 mb-4">
+              Dr. Rajesh Kumar
+            </h2>
+            <p className="text-gray-600 leading-relaxed mb-6">
+              With over 15 years of experience in comprehensive dental care, Dr. Rajesh Kumar has transformed thousands of smiles. His patient-first philosophy combined with cutting-edge techniques ensures every visit is comfortable and effective.
+            </p>
+            <p className="text-gray-600 leading-relaxed mb-8">
+              Specializing in cosmetic dentistry, implantology, and orthodontics, Dr. Kumar stays at the forefront of dental innovation to provide you with the best possible care.
+            </p>
+
+            <div className="grid grid-cols-2 gap-4">
+              {CREDENTIALS.map((cred, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl"
+                >
+                  <div className="text-blue-600 mt-0.5">{cred.icon}</div>
+                  <div>
+                    <p className="font-bold text-gray-900 text-sm">{cred.title}</p>
+                    <p className="text-gray-500 text-xs">{cred.subtitle}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

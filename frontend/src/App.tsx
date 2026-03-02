@@ -1,191 +1,236 @@
-import React from 'react';
-import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
+import React, { Suspense, lazy } from 'react';
+import { createRouter, createRoute, createRootRoute, RouterProvider, Outlet, redirect } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from 'next-themes';
-import Home from './pages/Home';
-import AccessDenied from './pages/AccessDenied';
-import ServiceDetail from './pages/ServiceDetail';
-import DentalImplantsDetail from './pages/DentalImplantsDetail';
-import InvisalignDetail from './pages/InvisalignDetail';
-import SmileMakeoverDetail from './pages/SmileMakeoverDetail';
-import PediatricDentistryDetail from './pages/PediatricDentistryDetail';
-import LaserDentistryDetail from './pages/LaserDentistryDetail';
-import AdminGuard from './components/AdminGuard';
-import Dashboard from './pages/admin/Dashboard';
-import Appointments from './pages/admin/Appointments';
-import ContentManager from './pages/admin/ContentManager';
-import DoctorScheduler from './pages/admin/DoctorScheduler';
-import ServiceManager from './pages/admin/ServiceManager';
-import ReviewApprover from './pages/admin/ReviewApprover';
-import BeforeAfterManager from './pages/admin/BeforeAfterManager';
-import LiquidGradientBackground from './components/LiquidGradientBackground';
-import ScrollProgressBar from './components/ScrollProgressBar';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import ClinicStatusBanner from './components/ClinicStatusBanner';
+import { ClinicStatusProvider } from './context/ClinicStatusContext';
+import { useLenis } from './hooks/useLenis';
+
+// Lazy-loaded pages
+const Home = lazy(() => import('./pages/Home'));
+const ServiceDetail = lazy(() => import('./pages/ServiceDetail'));
+const InvisalignDetail = lazy(() => import('./pages/InvisalignDetail'));
+const DentalImplantsDetail = lazy(() => import('./pages/DentalImplantsDetail'));
+const LaserDentistryDetail = lazy(() => import('./pages/LaserDentistryDetail'));
+const PediatricDentistryDetail = lazy(() => import('./pages/PediatricDentistryDetail'));
+const SmileMakeoverDetail = lazy(() => import('./pages/SmileMakeoverDetail'));
+const AccessDenied = lazy(() => import('./pages/AccessDenied'));
+
+// Admin pages
+const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
+const AdminAppointments = lazy(() => import('./pages/admin/Appointments'));
+const AdminServiceManager = lazy(() => import('./pages/admin/ServiceManager'));
+const AdminReviewApprover = lazy(() => import('./pages/admin/ReviewApprover'));
+const AdminContentManager = lazy(() => import('./pages/admin/ContentManager'));
+const AdminBeforeAfterManager = lazy(() => import('./pages/admin/BeforeAfterManager'));
+const AdminDoctorScheduler = lazy(() => import('./pages/admin/DoctorScheduler'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 30000,
+      staleTime: 1000 * 60 * 5,
       retry: 1,
     },
   },
 });
 
-// Layout component for public pages
-function PublicLayout() {
-  return (
-    <>
-      <Header />
-      <ClinicStatusBanner />
-      <main>
-        <Outlet />
-      </main>
-      <Footer />
-    </>
-  );
+function AppLayout() {
+  useLenis();
+  return <Outlet />;
 }
 
-// Wrapper so AdminGuard can be used as a route component (no children prop from router)
-function AdminGuardWrapper() {
-  return (
-    <AdminGuard>
-      <Outlet />
-    </AdminGuard>
-  );
+function AdminGuardWrapper({ children }: { children: React.ReactNode }) {
+  const isAdmin = sessionStorage.getItem('adminAuthenticated') === 'true';
+  if (!isAdmin) {
+    return (
+      <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>}>
+        <AccessDenied />
+      </Suspense>
+    );
+  }
+  return <>{children}</>;
 }
 
-// Root route
-const rootRoute = createRootRoute({
-  component: () => <Outlet />,
-});
+const rootRoute = createRootRoute({ component: AppLayout });
 
-// Public layout route
-const publicLayoutRoute = createRoute({
+const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  id: 'public-layout',
-  component: PublicLayout,
-});
-
-// Public routes
-const homeRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
   path: '/',
-  component: Home,
-});
-
-const dentalImplantsRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
-  path: '/services/dental-implants',
-  component: DentalImplantsDetail,
-});
-
-const invisalignRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
-  path: '/services/invisalign',
-  component: InvisalignDetail,
-});
-
-const smileMakeoverRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
-  path: '/services/smile-makeover',
-  component: SmileMakeoverDetail,
-});
-
-const pediatricRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
-  path: '/services/pediatric-dentistry',
-  component: PediatricDentistryDetail,
-});
-
-const laserRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
-  path: '/services/laser-dentistry',
-  component: LaserDentistryDetail,
+  component: () => (
+    <Suspense fallback={<PageLoader />}>
+      <Home />
+    </Suspense>
+  ),
 });
 
 const serviceDetailRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
+  getParentRoute: () => rootRoute,
   path: '/services/$serviceId',
-  component: ServiceDetail,
+  component: () => (
+    <Suspense fallback={<PageLoader />}>
+      <ServiceDetail />
+    </Suspense>
+  ),
+});
+
+const invisalignRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/services/invisalign',
+  component: () => (
+    <Suspense fallback={<PageLoader />}>
+      <InvisalignDetail />
+    </Suspense>
+  ),
+});
+
+const dentalImplantsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/services/dental-implants',
+  component: () => (
+    <Suspense fallback={<PageLoader />}>
+      <DentalImplantsDetail />
+    </Suspense>
+  ),
+});
+
+const laserDentistryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/services/laser-dentistry',
+  component: () => (
+    <Suspense fallback={<PageLoader />}>
+      <LaserDentistryDetail />
+    </Suspense>
+  ),
+});
+
+const pediatricDentistryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/services/pediatric-dentistry',
+  component: () => (
+    <Suspense fallback={<PageLoader />}>
+      <PediatricDentistryDetail />
+    </Suspense>
+  ),
+});
+
+const smileMakeoverRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/services/smile-makeover',
+  component: () => (
+    <Suspense fallback={<PageLoader />}>
+      <SmileMakeoverDetail />
+    </Suspense>
+  ),
 });
 
 const accessDeniedRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/access-denied',
-  component: AccessDenied,
+  component: () => (
+    <Suspense fallback={<PageLoader />}>
+      <AccessDenied />
+    </Suspense>
+  ),
 });
 
-// Admin routes (no public layout, wrapped in AdminGuardWrapper)
-const adminGuardRoute = createRoute({
+const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
-  id: 'admin-guard',
-  component: AdminGuardWrapper,
-});
-
-const adminDashboardRoute = createRoute({
-  getParentRoute: () => adminGuardRoute,
-  path: '/admin/dashboard',
-  component: Dashboard,
+  path: '/admin',
+  component: () => (
+    <AdminGuardWrapper>
+      <Suspense fallback={<PageLoader />}>
+        <AdminDashboard />
+      </Suspense>
+    </AdminGuardWrapper>
+  ),
 });
 
 const adminAppointmentsRoute = createRoute({
-  getParentRoute: () => adminGuardRoute,
+  getParentRoute: () => rootRoute,
   path: '/admin/appointments',
-  component: Appointments,
-});
-
-const adminContentRoute = createRoute({
-  getParentRoute: () => adminGuardRoute,
-  path: '/admin/content',
-  component: ContentManager,
-});
-
-const adminDoctorsRoute = createRoute({
-  getParentRoute: () => adminGuardRoute,
-  path: '/admin/doctors',
-  component: DoctorScheduler,
+  component: () => (
+    <AdminGuardWrapper>
+      <Suspense fallback={<PageLoader />}>
+        <AdminAppointments />
+      </Suspense>
+    </AdminGuardWrapper>
+  ),
 });
 
 const adminServicesRoute = createRoute({
-  getParentRoute: () => adminGuardRoute,
+  getParentRoute: () => rootRoute,
   path: '/admin/services',
-  component: ServiceManager,
+  component: () => (
+    <AdminGuardWrapper>
+      <Suspense fallback={<PageLoader />}>
+        <AdminServiceManager />
+      </Suspense>
+    </AdminGuardWrapper>
+  ),
 });
 
 const adminReviewsRoute = createRoute({
-  getParentRoute: () => adminGuardRoute,
+  getParentRoute: () => rootRoute,
   path: '/admin/reviews',
-  component: ReviewApprover,
+  component: () => (
+    <AdminGuardWrapper>
+      <Suspense fallback={<PageLoader />}>
+        <AdminReviewApprover />
+      </Suspense>
+    </AdminGuardWrapper>
+  ),
+});
+
+const adminContentRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/admin/content',
+  component: () => (
+    <AdminGuardWrapper>
+      <Suspense fallback={<PageLoader />}>
+        <AdminContentManager />
+      </Suspense>
+    </AdminGuardWrapper>
+  ),
 });
 
 const adminBeforeAfterRoute = createRoute({
-  getParentRoute: () => adminGuardRoute,
+  getParentRoute: () => rootRoute,
   path: '/admin/before-after',
-  component: BeforeAfterManager,
+  component: () => (
+    <AdminGuardWrapper>
+      <Suspense fallback={<PageLoader />}>
+        <AdminBeforeAfterManager />
+      </Suspense>
+    </AdminGuardWrapper>
+  ),
+});
+
+const adminDoctorsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/admin/doctors',
+  component: () => (
+    <AdminGuardWrapper>
+      <Suspense fallback={<PageLoader />}>
+        <AdminDoctorScheduler />
+      </Suspense>
+    </AdminGuardWrapper>
+  ),
 });
 
 const routeTree = rootRoute.addChildren([
-  publicLayoutRoute.addChildren([
-    homeRoute,
-    dentalImplantsRoute,
-    invisalignRoute,
-    smileMakeoverRoute,
-    pediatricRoute,
-    laserRoute,
-    serviceDetailRoute,
-  ]),
+  indexRoute,
+  invisalignRoute,
+  dentalImplantsRoute,
+  laserDentistryRoute,
+  pediatricDentistryRoute,
+  smileMakeoverRoute,
+  serviceDetailRoute,
   accessDeniedRoute,
-  adminGuardRoute.addChildren([
-    adminDashboardRoute,
-    adminAppointmentsRoute,
-    adminContentRoute,
-    adminDoctorsRoute,
-    adminServicesRoute,
-    adminReviewsRoute,
-    adminBeforeAfterRoute,
-  ]),
+  adminRoute,
+  adminAppointmentsRoute,
+  adminServicesRoute,
+  adminReviewsRoute,
+  adminContentRoute,
+  adminBeforeAfterRoute,
+  adminDoctorsRoute,
 ]);
 
 const router = createRouter({ routeTree });
@@ -196,14 +241,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="flex flex-col items-center gap-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <p className="text-gray-500 text-sm">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-        <LiquidGradientBackground />
-        <ScrollProgressBar />
+      <ClinicStatusProvider>
         <RouterProvider router={router} />
-      </ThemeProvider>
+      </ClinicStatusProvider>
     </QueryClientProvider>
   );
 }

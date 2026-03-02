@@ -1,133 +1,203 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useGetClinicStatus, useSetClinicStatus } from '../../hooks/useQueries';
+import { isAdminAuthenticated } from '../../components/AdminGuard';
+import { useClinicStatusContext } from '../../context/ClinicStatusContext';
+import { useSetClinicStatus } from '../../hooks/useQueries';
 import { ClinicStatus } from '../../backend';
+import {
+  Calendar,
+  Settings,
+  Star,
+  Image,
+  Users,
+  FileText,
+  LogOut,
+  Activity,
+} from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { data: clinicStatus, isLoading: statusLoading } = useGetClinicStatus();
+  const { clinicStatus } = useClinicStatusContext();
   const setClinicStatusMutation = useSetClinicStatus();
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  if (!isAdminAuthenticated()) {
+    navigate({ to: '/' });
+    return null;
+  }
 
   const handleLogout = () => {
-    sessionStorage.removeItem('adminAuth');
+    sessionStorage.removeItem('adminAuthenticated');
     navigate({ to: '/' });
   };
 
-  const handleStatusChange = (status: ClinicStatus) => {
-    setClinicStatusMutation.mutate(status);
+  const handleStatusChange = async (newStatus: ClinicStatus) => {
+    setIsUpdating(true);
+    try {
+      await setClinicStatusMutation.mutateAsync(newStatus);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const navCards = [
-    { title: 'Appointments', icon: '📅', desc: 'View and manage all patient bookings', path: '/admin/appointments', color: '#0ea5e9' },
-    { title: 'Services CMS', icon: '⚙️', desc: 'Edit service text and photos', path: '/admin/services', color: '#8b5cf6' },
-    { title: 'Reviews', icon: '⭐', desc: 'Approve or reject patient reviews', path: '/admin/reviews', color: '#f59e0b' },
-    { title: 'Before & After', icon: '📸', desc: 'Manage gallery pairs', path: '/admin/before-after', color: '#10b981' },
-    { title: 'Doctors', icon: '👨‍⚕️', desc: 'Add and manage doctors', path: '/admin/doctors', color: '#06b6d4' },
-    { title: 'Content', icon: '📝', desc: 'Add patient reviews', path: '/admin/content', color: '#ec4899' },
+    { label: 'Appointments', icon: Calendar, route: '/admin/appointments', color: '#0d9488' },
+    { label: 'Services', icon: Settings, route: '/admin/services', color: '#0ea5e9' },
+    { label: 'Reviews', icon: Star, route: '/admin/reviews', color: '#f59e0b' },
+    { label: 'Before/After', icon: Image, route: '/admin/before-after', color: '#8b5cf6' },
+    { label: 'Doctors', icon: Users, route: '/admin/doctors', color: '#ec4899' },
+    { label: 'Content', icon: FileText, route: '/admin/content', color: '#10b981' },
+  ];
+
+  const statusOptions: { value: ClinicStatus; label: string; color: string }[] = [
+    { value: ClinicStatus.open, label: '🟢 Open', color: '#10b981' },
+    { value: ClinicStatus.closed, label: '🔴 Closed', color: '#ef4444' },
+    { value: ClinicStatus.emergency, label: '🟡 Emergency Only', color: '#f59e0b' },
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: 'Inter, sans-serif' }}>
-      {/* Top Bar */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)', padding: '20px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <div style={{ minHeight: '100vh', background: '#f1f5f9' }}>
+      {/* Header */}
+      <div
+        style={{
+          background: '#FFFFFF',
+          borderBottom: '1px solid #e5e7eb',
+          padding: '16px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #0ea5e9, #06b6d4)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>🦷</div>
-          <div>
-            <div style={{ color: '#fff', fontWeight: 700, fontSize: '18px' }}>Admin Dashboard</div>
-            <div style={{ color: '#94a3b8', fontSize: '12px' }}>SmileCare Dental</div>
-          </div>
+          <Activity className="w-6 h-6" style={{ color: '#0d9488' }} />
+          <h1 style={{ color: '#1a1a1a', fontWeight: 800, fontSize: '1.3rem', margin: 0 }}>
+            Admin Dashboard
+          </h1>
         </div>
         <button
           onClick={handleLogout}
-          style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', padding: '8px 18px', fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s' }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.2)')}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.1)')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: '#fee2e2',
+            color: '#dc2626',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '8px 16px',
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
         >
+          <LogOut className="w-4 h-4" />
           Logout
         </button>
       </div>
 
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 24px' }}>
-        {/* Clinic Status Toggle */}
-        <div style={{ background: '#fff', borderRadius: '16px', padding: '28px', marginBottom: '32px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>🏥 Clinic Status</h2>
-          <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>
-            Control the public-facing clinic open/closed status. Changes reflect on the website immediately.
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '32px 24px' }}>
+        {/* Clinic Status Card */}
+        <div
+          style={{
+            background: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '28px',
+            marginBottom: '32px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            border: '1px solid #e5e7eb',
+          }}
+        >
+          <h2 style={{ color: '#1a1a1a', fontWeight: 700, fontSize: '1.1rem', marginBottom: '20px' }}>
+            Clinic Status
+          </h2>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            {statusOptions.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => handleStatusChange(opt.value)}
+                disabled={isUpdating || setClinicStatusMutation.isPending}
+                style={{
+                  padding: '10px 24px',
+                  borderRadius: '10px',
+                  border: '2px solid',
+                  borderColor: clinicStatus === opt.value ? opt.color : '#e5e7eb',
+                  background: clinicStatus === opt.value ? opt.color : '#FFFFFF',
+                  color: clinicStatus === opt.value ? '#fff' : '#374151',
+                  fontWeight: 700,
+                  fontSize: '0.95rem',
+                  cursor: (isUpdating || setClinicStatusMutation.isPending) ? 'not-allowed' : 'pointer',
+                  opacity: (isUpdating || setClinicStatusMutation.isPending) ? 0.7 : 1,
+                  transition: 'all 0.2s',
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          <p style={{ color: '#6b7280', fontSize: '0.85rem', marginTop: '12px' }}>
+            Current status:{' '}
+            <strong style={{ color: '#1a1a1a' }}>
+              {statusOptions.find((o) => o.value === clinicStatus)?.label ?? clinicStatus ?? 'Loading...'}
+            </strong>
+            {(isUpdating || setClinicStatusMutation.isPending) && ' (updating...)'}
           </p>
-
-          {statusLoading ? (
-            <div style={{ color: '#94a3b8', fontSize: '14px' }}>Loading status...</div>
-          ) : (
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              {[
-                { value: ClinicStatus.open, label: '✅ Open', color: '#10b981', bg: '#f0fdf4', border: '#86efac' },
-                { value: ClinicStatus.closed, label: '🔴 Closed', color: '#ef4444', bg: '#fef2f2', border: '#fca5a5' },
-                { value: ClinicStatus.emergency, label: '⚠️ Emergency', color: '#f59e0b', bg: '#fffbeb', border: '#fcd34d' },
-              ].map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => handleStatusChange(opt.value)}
-                  disabled={setClinicStatusMutation.isPending}
-                  style={{
-                    padding: '12px 24px',
-                    borderRadius: '10px',
-                    border: `2px solid ${clinicStatus === opt.value ? opt.color : '#e2e8f0'}`,
-                    background: clinicStatus === opt.value ? opt.bg : '#fff',
-                    color: clinicStatus === opt.value ? opt.color : '#64748b',
-                    fontSize: '14px',
-                    fontWeight: clinicStatus === opt.value ? 700 : 500,
-                    cursor: setClinicStatusMutation.isPending ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.2s',
-                    opacity: setClinicStatusMutation.isPending ? 0.7 : 1,
-                  }}
-                >
-                  {opt.label}
-                  {clinicStatus === opt.value && ' ✓'}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {setClinicStatusMutation.isPending && (
-            <p style={{ color: '#0ea5e9', fontSize: '13px', marginTop: '12px' }}>Updating status...</p>
-          )}
         </div>
 
         {/* Navigation Cards */}
-        <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', marginBottom: '20px' }}>Quick Access</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
-          {navCards.map((card) => (
-            <button
-              key={card.title}
-              onClick={() => navigate({ to: card.path })}
-              style={{
-                background: '#fff',
-                border: '1px solid #e2e8f0',
-                borderRadius: '14px',
-                padding: '24px',
-                textAlign: 'left',
-                cursor: 'pointer',
-                transition: 'all 0.25s',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLButtonElement;
-                el.style.transform = 'translateY(-4px)';
-                el.style.boxShadow = '0 12px 32px rgba(0,0,0,0.1)';
-                el.style.borderColor = card.color;
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLButtonElement;
-                el.style.transform = 'translateY(0)';
-                el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
-                el.style.borderColor = '#e2e8f0';
-              }}
-            >
-              <div style={{ fontSize: '32px', marginBottom: '12px' }}>{card.icon}</div>
-              <div style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '6px' }}>{card.title}</div>
-              <div style={{ fontSize: '13px', color: '#64748b' }}>{card.desc}</div>
-            </button>
-          ))}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+            gap: '16px',
+          }}
+        >
+          {navCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <button
+                key={card.label}
+                onClick={() => navigate({ to: card.route })}
+                style={{
+                  background: '#FFFFFF',
+                  borderRadius: '14px',
+                  padding: '24px 16px',
+                  border: '1.5px solid #e5e7eb',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '12px',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = card.color;
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 8px 24px ${card.color}22`;
+                  (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-3px)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#e5e7eb';
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
+                  (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
+                }}
+              >
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '12px',
+                    background: `${card.color}15`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Icon className="w-6 h-6" style={{ color: card.color }} />
+                </div>
+                <span style={{ color: '#1a1a1a', fontWeight: 700, fontSize: '0.95rem' }}>
+                  {card.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

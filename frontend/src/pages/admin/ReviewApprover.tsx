@@ -1,14 +1,21 @@
 import React from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { isAdminAuthenticated } from '../../components/AdminGuard';
 import { toast } from 'sonner';
 import { useGetPendingReviews, useApproveReview, useDeleteReview } from '@/hooks/useQueries';
 import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 export default function ReviewApprover() {
   const navigate = useNavigate();
   const { data: pendingReviews, isLoading } = useGetPendingReviews();
   const { mutate: approveReview, isPending: approving } = useApproveReview();
   const { mutate: deleteReview, isPending: deleting } = useDeleteReview();
+
+  if (!isAdminAuthenticated()) {
+    navigate({ to: '/' });
+    return null;
+  }
 
   const handleApprove = (reviewId: bigint) => {
     approveReview(reviewId, {
@@ -30,65 +37,128 @@ export default function ReviewApprover() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate({ to: '/admin/dashboard' })}
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            ← Back
-          </button>
-          <div>
-            <h1 className="text-2xl font-display font-bold text-foreground">Review Moderator</h1>
-            <p className="text-muted-foreground text-sm">Approve or reject pending patient reviews</p>
-          </div>
+    <div style={{ minHeight: '100vh', background: '#f1f5f9' }}>
+      {/* Header */}
+      <div
+        style={{
+          background: '#FFFFFF',
+          borderBottom: '1px solid #e5e7eb',
+          padding: '16px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+        }}
+      >
+        <button
+          onClick={() => navigate({ to: '/admin' })}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#6b7280',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <div>
+          <h1 style={{ color: '#1a1a1a', fontWeight: 800, fontSize: '1.3rem', margin: 0 }}>
+            Review Moderator
+          </h1>
+          <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: 0 }}>
+            Approve or reject pending patient reviews
+          </p>
         </div>
+      </div>
 
+      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '32px 24px' }}>
         {isLoading ? (
-          <div className="text-center py-16 text-muted-foreground">Loading reviews...</div>
+          <div style={{ textAlign: 'center', padding: '60px', color: '#6b7280' }}>
+            Loading reviews...
+          </div>
         ) : !pendingReviews || pendingReviews.length === 0 ? (
-          <div className="glass-card rounded-2xl border border-border/40 p-12 text-center">
-            <div className="text-5xl mb-4">✅</div>
-            <h3 className="text-lg font-semibold text-foreground">All caught up!</h3>
-            <p className="text-muted-foreground mt-2">No pending reviews to moderate.</p>
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: '16px',
+              padding: '60px',
+              textAlign: 'center',
+              border: '1px solid #e5e7eb',
+            }}
+          >
+            <div style={{ fontSize: '3rem', marginBottom: '12px' }}>✅</div>
+            <h3 style={{ color: '#1a1a1a', fontWeight: 700, fontSize: '1.1rem' }}>All caught up!</h3>
+            <p style={{ color: '#6b7280', marginTop: '8px' }}>No pending reviews to moderate.</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
               {pendingReviews.length} review{pendingReviews.length !== 1 ? 's' : ''} pending moderation
             </p>
             {pendingReviews.map((review) => (
               <div
                 key={String(review.id)}
-                className="glass-card rounded-2xl border border-border/40 p-6"
+                style={{
+                  background: '#FFFFFF',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  border: '1px solid #e5e7eb',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                }}
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+                      <div
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '50%',
+                          background: '#ccfbf1',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#0d9488',
+                          fontWeight: 800,
+                          fontSize: '1rem',
+                          flexShrink: 0,
+                        }}
+                      >
                         {review.reviewerName.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">{review.reviewerName}</p>
-                        <p className="text-yellow-500 text-sm">{renderStars(review.rating)}</p>
+                        <p style={{ fontWeight: 700, color: '#1a1a1a', margin: 0 }}>
+                          {review.reviewerName}
+                        </p>
+                        <p style={{ color: '#f59e0b', fontSize: '0.875rem', margin: 0 }}>
+                          {renderStars(review.rating)}
+                        </p>
                       </div>
                     </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{review.text}</p>
+                    <p style={{ color: '#374151', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                      {review.text}
+                    </p>
                     {review.photo && (
                       <img
                         src={review.photo.getDirectURL()}
                         alt="Review photo"
-                        className="mt-3 w-24 h-24 object-cover rounded-lg"
+                        style={{
+                          marginTop: '12px',
+                          width: '96px',
+                          height: '96px',
+                          objectFit: 'cover',
+                          borderRadius: '8px',
+                        }}
                       />
                     )}
                   </div>
-                  <div className="flex flex-col gap-2 shrink-0">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
                     <Button
                       size="sm"
                       onClick={() => handleApprove(review.id)}
                       disabled={approving || deleting}
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      style={{ background: '#10b981', color: '#fff', fontWeight: 700 }}
                     >
                       ✓ Approve
                     </Button>

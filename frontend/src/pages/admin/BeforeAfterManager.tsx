@@ -1,11 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { isAdminAuthenticated } from '../../components/AdminGuard';
 import { toast } from 'sonner';
 import { ExternalBlob } from '../../backend';
 import { useGetAllBeforeAfterPairs, useAddBeforeAfterPair } from '../../hooks/useQueries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ArrowLeft } from 'lucide-react';
 
 function ImageUploadZone({
   label,
@@ -30,36 +32,46 @@ function ImageUploadZone({
 
   return (
     <div>
-      <Label className="text-sm font-semibold mb-2 block">{label}</Label>
+      <Label
+        style={{ color: '#1a1a1a', fontWeight: 600, fontSize: '0.875rem', display: 'block', marginBottom: '8px' }}
+      >
+        {label}
+      </Label>
       <div
-        className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors ${
-          dragging ? 'border-teal-500 bg-teal-50' : 'border-slate-300 hover:border-teal-400'
-        }`}
+        style={{
+          border: `2px dashed ${dragging ? '#0d9488' : '#d1d5db'}`,
+          borderRadius: '12px',
+          padding: '16px',
+          textAlign: 'center',
+          cursor: 'pointer',
+          background: dragging ? '#f0fdfa' : '#fafafa',
+          transition: 'all 0.2s',
+        }}
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
       >
         {preview ? (
-          <img src={preview} alt={label} className="w-full h-32 object-cover rounded-lg" />
+          <img src={preview} alt={label} style={{ width: '100%', height: '128px', objectFit: 'cover', borderRadius: '8px' }} />
         ) : (
-          <div className="py-6 text-slate-400">
-            <div className="text-3xl mb-2">📷</div>
-            <p className="text-sm">Drag & drop or click to upload</p>
+          <div style={{ padding: '24px 0', color: '#9ca3af' }}>
+            <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📷</div>
+            <p style={{ fontSize: '0.875rem' }}>Drag & drop or click to upload</p>
           </div>
         )}
         <input
           ref={inputRef}
           type="file"
           accept="image/*"
-          className="hidden"
+          style={{ display: 'none' }}
           onChange={(e) => {
             const f = e.target.files?.[0];
             if (f) onFileSelect(f);
           }}
         />
       </div>
-      {file && <p className="text-xs text-slate-500 mt-1">{file.name}</p>}
+      {file && <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '4px' }}>{file.name}</p>}
     </div>
   );
 }
@@ -74,7 +86,15 @@ export default function BeforeAfterManager() {
   const [beforePreview, setBeforePreview] = useState<string | null>(null);
   const [afterPreview, setAfterPreview] = useState<string | null>(null);
   const [description, setDescription] = useState('');
-  const [uploadProgress, setUploadProgress] = useState<{ before: number; after: number }>({ before: 0, after: 0 });
+  const [uploadProgress, setUploadProgress] = useState<{ before: number; after: number }>({
+    before: 0,
+    after: 0,
+  });
+
+  if (!isAdminAuthenticated()) {
+    navigate({ to: '/' });
+    return null;
+  }
 
   const handleFileSelect = (type: 'before' | 'after', file: File) => {
     const url = URL.createObjectURL(file);
@@ -128,26 +148,61 @@ export default function BeforeAfterManager() {
   };
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate({ to: '/admin/dashboard' })}
-            className="text-slate-500 hover:text-slate-800 transition-colors"
-          >
-            ← Back
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800 font-playfair">Before/After Manager</h1>
-            <p className="text-slate-500 text-sm">Upload and manage transformation photo pairs</p>
-          </div>
+    <div style={{ minHeight: '100vh', background: '#f1f5f9' }}>
+      {/* Header */}
+      <div
+        style={{
+          background: '#FFFFFF',
+          borderBottom: '1px solid #e5e7eb',
+          padding: '16px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+        }}
+      >
+        <button
+          onClick={() => navigate({ to: '/admin' })}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#6b7280',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        <div>
+          <h1 style={{ color: '#1a1a1a', fontWeight: 800, fontSize: '1.3rem', margin: 0 }}>
+            Before/After Manager
+          </h1>
+          <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: 0 }}>
+            Upload and manage transformation photo pairs
+          </p>
         </div>
+      </div>
 
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px' }}>
         {/* Upload Form */}
-        <div className="glass-card rounded-2xl p-6 mb-8">
-          <h2 className="text-lg font-bold text-slate-800 mb-4">Upload New Pair</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div
+          style={{
+            background: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '28px',
+            marginBottom: '24px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            border: '1px solid #e5e7eb',
+          }}
+        >
+          <h2 style={{ color: '#1a1a1a', fontWeight: 700, fontSize: '1.05rem', marginBottom: '20px' }}>
+            Upload New Pair
+          </h2>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div
+              style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}
+              className="ba-upload-grid"
+            >
               <ImageUploadZone
                 label="Before Image"
                 file={beforeFile}
@@ -163,27 +218,56 @@ export default function BeforeAfterManager() {
             </div>
 
             <div>
-              <Label htmlFor="description" className="text-sm font-semibold mb-2 block">
+              <Label
+                htmlFor="ba-description"
+                style={{ color: '#1a1a1a', fontWeight: 600, fontSize: '0.875rem', display: 'block', marginBottom: '6px' }}
+              >
                 Description
               </Label>
               <Input
-                id="description"
+                id="ba-description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="e.g. Smile Makeover - Patient transformation"
+                style={{
+                  background: '#FFFFFF',
+                  border: '1.5px solid #d1d5db',
+                  color: '#1a1a1a',
+                  borderRadius: '8px',
+                }}
               />
             </div>
 
             {isPending && (
-              <div className="space-y-1">
-                <div className="flex justify-between text-xs text-slate-500">
+              <div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontSize: '0.75rem',
+                    color: '#6b7280',
+                    marginBottom: '4px',
+                  }}
+                >
                   <span>Before: {uploadProgress.before}%</span>
                   <span>After: {uploadProgress.after}%</span>
                 </div>
-                <div className="w-full bg-slate-200 rounded-full h-2">
+                <div
+                  style={{
+                    width: '100%',
+                    background: '#e5e7eb',
+                    borderRadius: '999px',
+                    height: '8px',
+                  }}
+                >
                   <div
-                    className="bg-teal-500 h-2 rounded-full transition-all"
-                    style={{ width: `${(uploadProgress.before + uploadProgress.after) / 2}%` }}
+                    style={{
+                      background: '#0d9488',
+                      height: '8px',
+                      borderRadius: '999px',
+                      transition: 'width 0.3s',
+                      width: `${(uploadProgress.before + uploadProgress.after) / 2}%`,
+                    }}
                   />
                 </div>
               </div>
@@ -192,7 +276,12 @@ export default function BeforeAfterManager() {
             <Button
               type="submit"
               disabled={isPending || !beforeFile || !afterFile}
-              className="w-full bg-teal-600 hover:bg-teal-700 text-white"
+              style={{
+                background: '#0d9488',
+                color: '#fff',
+                borderRadius: '10px',
+                fontWeight: 700,
+              }}
             >
               {isPending ? 'Uploading...' : 'Upload Pair'}
             </Button>
@@ -200,42 +289,87 @@ export default function BeforeAfterManager() {
         </div>
 
         {/* Existing Pairs */}
-        <div className="glass-card rounded-2xl p-6">
-          <h2 className="text-lg font-bold text-slate-800 mb-4">
+        <div
+          style={{
+            background: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '28px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            border: '1px solid #e5e7eb',
+          }}
+        >
+          <h2 style={{ color: '#1a1a1a', fontWeight: 700, fontSize: '1.05rem', marginBottom: '20px' }}>
             Existing Pairs ({pairs?.length ?? 0})
           </h2>
           {isLoading ? (
-            <div className="text-center py-8 text-slate-400">Loading...</div>
+            <div style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}>Loading...</div>
           ) : !pairs || pairs.length === 0 ? (
-            <div className="text-center py-8 text-slate-400">No pairs uploaded yet.</div>
+            <div style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}>
+              No pairs uploaded yet.
+            </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div
+              style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}
+            >
               {pairs.map((pair) => (
-                <div key={String(pair.id)} className="border border-slate-200 rounded-xl overflow-hidden">
-                  <div className="grid grid-cols-2">
-                    <div className="relative">
+                <div
+                  key={String(pair.id)}
+                  style={{
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                    <div style={{ position: 'relative' }}>
                       <img
                         src={pair.beforeImage.getDirectURL()}
                         alt="Before"
-                        className="w-full h-32 object-cover"
+                        style={{ width: '100%', height: '128px', objectFit: 'cover', display: 'block' }}
                       />
-                      <span className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded">
+                      <span
+                        style={{
+                          position: 'absolute',
+                          top: '8px',
+                          left: '8px',
+                          background: 'rgba(0,0,0,0.6)',
+                          color: '#fff',
+                          fontSize: '0.7rem',
+                          padding: '2px 8px',
+                          borderRadius: '999px',
+                          fontWeight: 700,
+                        }}
+                      >
                         Before
                       </span>
                     </div>
-                    <div className="relative">
+                    <div style={{ position: 'relative' }}>
                       <img
                         src={pair.afterImage.getDirectURL()}
                         alt="After"
-                        className="w-full h-32 object-cover"
+                        style={{ width: '100%', height: '128px', objectFit: 'cover', display: 'block' }}
                       />
-                      <span className="absolute top-2 left-2 bg-teal-600/80 text-white text-xs px-2 py-0.5 rounded">
+                      <span
+                        style={{
+                          position: 'absolute',
+                          top: '8px',
+                          left: '8px',
+                          background: 'rgba(13,148,136,0.8)',
+                          color: '#fff',
+                          fontSize: '0.7rem',
+                          padding: '2px 8px',
+                          borderRadius: '999px',
+                          fontWeight: 700,
+                        }}
+                      >
                         After
                       </span>
                     </div>
                   </div>
                   {pair.description && (
-                    <div className="p-3 text-sm text-slate-500">{pair.description}</div>
+                    <div style={{ padding: '10px 14px', fontSize: '0.875rem', color: '#6b7280' }}>
+                      {pair.description}
+                    </div>
                   )}
                 </div>
               ))}
@@ -243,6 +377,12 @@ export default function BeforeAfterManager() {
           )}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 600px) {
+          .ba-upload-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }

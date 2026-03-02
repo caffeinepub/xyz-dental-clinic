@@ -115,7 +115,11 @@ export default function DentalImplantsDetail() {
         </div>
       </section>
 
-      <BookAppointmentDialog open={dialogOpen} onOpenChange={setDialogOpen} defaultService="Dental Implants" />
+      <BookAppointmentDialog
+        isOpen={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        defaultService="Dental Implants"
+      />
     </div>
   );
 }

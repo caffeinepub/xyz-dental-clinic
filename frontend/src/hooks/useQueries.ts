@@ -1,83 +1,35 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import {
-  AppointmentStatus,
-  ClinicStatus,
-  ReviewInput,
-  UserProfile,
-  ExternalBlob,
-} from '../backend';
-import type { Appointment, Review, Service, Doctor, BeforeAfterPair } from '../backend';
+import { ClinicStatus, AppointmentStatus, ReviewInput, UserProfile } from '../backend';
+import { ExternalBlob } from '../backend';
 
-// ─── User Profile ────────────────────────────────────────────────────────────
-
-export function useGetCallerUserProfile() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  const query = useQuery<UserProfile | null>({
-    queryKey: ['currentUserProfile'],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getCallerUserProfile();
-    },
-    enabled: !!actor && !actorFetching,
-    retry: false,
-  });
-
-  return {
-    ...query,
-    isLoading: actorFetching || query.isLoading,
-    isFetched: !!actor && query.isFetched,
-  };
-}
-
-export function useSaveCallerUserProfile() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (profile: UserProfile) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.saveCallerUserProfile(profile);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
-    },
-  });
-}
-
-// ─── Clinic Status ────────────────────────────────────────────────────────────
-
+// Clinic Status
 export function useGetClinicStatus() {
-  const { actor, isFetching: actorFetching } = useActor();
-
+  const { actor, isFetching } = useActor();
   return useQuery<ClinicStatus>({
     queryKey: ['clinicStatus'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return ClinicStatus.open;
       return actor.getClinicStatus();
     },
-    enabled: !!actor && !actorFetching,
-    refetchInterval: 10000,
-    staleTime: 5000,
+    enabled: !!actor && !isFetching,
+    refetchInterval: 30000,
   });
 }
 
-// Alias for components that use the shorter name
+// Alias for backward compatibility
 export const useClinicStatus = useGetClinicStatus;
 
 export function useSetClinicStatus() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (status: ClinicStatus) => {
       if (!actor) throw new Error('Actor not available');
-      // The backend setClinicStatus requires adminPrincipal; pass the caller's principal
-      // We pass a dummy principal since the backend uses the caller's identity for auth
+      // setClinicStatus requires adminPrincipal as first arg; pass a dummy principal
+      // The backend checks caller permissions, not the passed principal
       const { Principal } = await import('@dfinity/principal');
-      const principal = Principal.anonymous();
-      return actor.setClinicStatus(principal as any, status);
+      await actor.setClinicStatus(Principal.anonymous(), status);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clinicStatus'] });
@@ -85,12 +37,37 @@ export function useSetClinicStatus() {
   });
 }
 
-// ─── Appointments ─────────────────────────────────────────────────────────────
+// Appointments
+export function useGetAllAppointments(refetchInterval?: number) {
+  const { actor, isFetching } = useActor();
+  return useQuery({
+    queryKey: ['appointments'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllAppointments();
+    },
+    enabled: !!actor && !isFetching,
+    refetchInterval: refetchInterval,
+  });
+}
+
+export function useUpdateAppointmentStatus() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ appointmentId, newStatus }: { appointmentId: bigint; newStatus: AppointmentStatus }) => {
+      if (!actor) throw new Error('Actor not available');
+      await actor.updateAppointmentStatus(appointmentId, newStatus);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    },
+  });
+}
 
 export function useBookAppointment() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({
       patientName,
@@ -112,189 +89,34 @@ export function useBookAppointment() {
   });
 }
 
-export function useGetAllAppointments(options?: { enabled?: boolean; refetchInterval?: number }) {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<Appointment[]>({
-    queryKey: ['appointments'],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getAllAppointments();
-    },
-    enabled: (options?.enabled !== undefined ? options.enabled : true) && !!actor && !actorFetching,
-    retry: false,
-    refetchInterval: options?.refetchInterval,
-  });
-}
-
-export function useUpdateAppointmentStatus() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      appointmentId,
-      newStatus,
-    }: {
-      appointmentId: bigint;
-      newStatus: AppointmentStatus;
-    }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.updateAppointmentStatus(appointmentId, newStatus);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-    },
-  });
-}
-
-// ─── Reviews ──────────────────────────────────────────────────────────────────
-
-export function useAddReview() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (reviewInput: ReviewInput) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.addReview(reviewInput);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['pendingReviews'] });
-    },
-  });
-}
-
-export function useGetApprovedReviews() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<Review[]>({
-    queryKey: ['reviews', 'approved'],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getApprovedReviews();
-    },
-    enabled: !!actor && !actorFetching,
-  });
-}
-
-export function useGetPendingReviews() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<Review[]>({
-    queryKey: ['pendingReviews'],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getPendingReviews();
-    },
-    enabled: !!actor && !actorFetching,
-    retry: false,
-  });
-}
-
-export function useApproveReview() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (reviewId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.approveReview(reviewId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['pendingReviews'] });
-    },
-  });
-}
-
-export function useDeleteReview() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (reviewId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.deleteReview(reviewId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['pendingReviews'] });
-    },
-  });
-}
-
-// ─── Doctors ──────────────────────────────────────────────────────────────────
-
-export function useGetAllDoctors() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<Doctor[]>({
-    queryKey: ['doctors'],
-    queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getAllDoctors();
-    },
-    enabled: !!actor && !actorFetching,
-  });
-}
-
-export function useAddDoctor() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      name,
-      specialty,
-      availability,
-    }: {
-      name: string;
-      specialty: string;
-      availability: any[];
-    }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.addDoctor(name, specialty, availability);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['doctors'] });
-    },
-  });
-}
-
-// ─── Services ─────────────────────────────────────────────────────────────────
-
+// Services
 export function useGetAllServices() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<Service[]>({
+  const { actor, isFetching } = useActor();
+  return useQuery({
     queryKey: ['services'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       return actor.getAllServices();
     },
-    enabled: !!actor && !actorFetching,
+    enabled: !!actor && !isFetching,
   });
 }
 
 export function useGetService(serviceId: string) {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<Service | null>({
+  const { actor, isFetching } = useActor();
+  return useQuery({
     queryKey: ['service', serviceId],
     queryFn: async () => {
       if (!actor) return null;
       return actor.getService(serviceId);
     },
-    enabled: !!actor && !actorFetching && !!serviceId,
+    enabled: !!actor && !isFetching && !!serviceId,
   });
 }
 
 export function useUpdateService() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({
       id,
@@ -308,7 +130,7 @@ export function useUpdateService() {
       featuredPhoto: ExternalBlob | null;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.addOrUpdateService(id, displayName, description, featuredPhoto);
+      await actor.addOrUpdateService(id, displayName, description, featuredPhoto);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] });
@@ -316,25 +138,91 @@ export function useUpdateService() {
   });
 }
 
-// ─── Before/After Gallery ─────────────────────────────────────────────────────
+// Reviews
+export function useGetApprovedReviews() {
+  const { actor, isFetching } = useActor();
+  return useQuery({
+    queryKey: ['approvedReviews'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getApprovedReviews();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
 
+export function useGetPendingReviews() {
+  const { actor, isFetching } = useActor();
+  return useQuery({
+    queryKey: ['pendingReviews'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getPendingReviews();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useApproveReview() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (reviewId: bigint) => {
+      if (!actor) throw new Error('Actor not available');
+      await actor.approveReview(reviewId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pendingReviews'] });
+      queryClient.invalidateQueries({ queryKey: ['approvedReviews'] });
+    },
+  });
+}
+
+export function useDeleteReview() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (reviewId: bigint) => {
+      if (!actor) throw new Error('Actor not available');
+      await actor.deleteReview(reviewId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pendingReviews'] });
+      queryClient.invalidateQueries({ queryKey: ['approvedReviews'] });
+    },
+  });
+}
+
+export function useAddReview() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (reviewInput: ReviewInput) => {
+      if (!actor) throw new Error('Actor not available');
+      await actor.addReview(reviewInput);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pendingReviews'] });
+    },
+  });
+}
+
+// Before/After Gallery
 export function useGetAllBeforeAfterPairs() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<BeforeAfterPair[]>({
+  const { actor, isFetching } = useActor();
+  return useQuery({
     queryKey: ['beforeAfterPairs'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       return actor.getAllBeforeAfterPairs();
     },
-    enabled: !!actor && !actorFetching,
+    enabled: !!actor && !isFetching,
   });
 }
 
 export function useAddBeforeAfterPair() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({
       beforeImage,
@@ -350,6 +238,67 @@ export function useAddBeforeAfterPair() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['beforeAfterPairs'] });
+    },
+  });
+}
+
+// Doctors
+export function useGetAllDoctors() {
+  const { actor, isFetching } = useActor();
+  return useQuery({
+    queryKey: ['doctors'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllDoctors();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useAddDoctor() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ name, specialty }: { name: string; specialty: string }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.addDoctor(name, specialty, []);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['doctors'] });
+    },
+  });
+}
+
+// User Profile
+export function useGetCallerUserProfile() {
+  const { actor, isFetching: actorFetching } = useActor();
+  const query = useQuery<UserProfile | null>({
+    queryKey: ['currentUserProfile'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getCallerUserProfile();
+    },
+    enabled: !!actor && !actorFetching,
+    retry: false,
+  });
+
+  return {
+    ...query,
+    isLoading: actorFetching || query.isLoading,
+    isFetched: !!actor && query.isFetched,
+  };
+}
+
+export function useSaveCallerUserProfile() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (profile: UserProfile) => {
+      if (!actor) throw new Error('Actor not available');
+      await actor.saveCallerUserProfile(profile);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
     },
   });
 }

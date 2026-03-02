@@ -1,23 +1,225 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix unexpected 'Connection issue' error in appointment booking",
+  "title": "Restore XYZ Dental Clinic Frontend After Deployment Failure",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Fix BookAppointmentDialog component so the 'Connection issue. Your data has been saved locally. Please click \"Retry\" to try again' message only appears after actual backend submission failures, not on initial load or when stale localStorage data exists from previous sessions",
+      "summary": "Restore and redeploy the full dental clinic booking website with all previously implemented features including appointment booking, doctor profiles, services grid, testimonials carousel, before/after slider, contact section, admin dashboard, and Internet Identity authentication.",
       "acceptanceCriteria": [
-        "Opening the BookAppointmentDialog for the first time does not show the 'Connection issue' banner.",
-        "The 'Connection issue. Your data has been saved locally. Please click \"Retry\" to try again' banner only appears after a real failed backend submission attempt.",
-        "Stale localStorage pending appointment entries from previous sessions do not trigger the connection error/retry UI on dialog open.",
-        "After a successful appointment submission, any pending localStorage entry is cleared and the retry banner is not shown on the next dialog open.",
-        "The Retry button, when clicked after a genuine failure, re-attempts submission using the locally saved data."
+        "The home page loads with hero section, services, doctor profile, before/after slider, testimonials, and contact sections.",
+        "The appointment booking dialog opens and allows patients to submit bookings.",
+        "The admin dashboard is accessible via the hidden footer tooth logo login and shows all management pages.",
+        "Clinic status (open/closed/emergency) is fetched from the backend and reflected in the header and hero section.",
+        "Internet Identity login/logout works correctly.",
+        "All backend queries (appointments, services, reviews, doctors, clinic status) return data without errors.",
+        "The app deploys successfully without errors."
       ],
       "file_operations": [
         {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Verify router configuration includes all public routes (/, /services/:serviceId, /services/invisalign, /services/dental-implants, /services/laser-dentistry, /services/pediatric-dentistry, /services/smile-makeover) and admin routes (/admin, /admin/appointments, /admin/services, /admin/reviews, /admin/content, /admin/before-after, /admin/doctors). Ensure TanStack Router lazy loading, React Query, InternetIdentityProvider, ClinicStatusProvider, and Lenis smooth scroll are correctly initialized."
+        },
+        {
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Verify the Home page correctly composes HeroSection, ServicesGrid, DoctorProfile, BeforeAfterSlider, TestimonialCarousel, and ContactSection components in sequence. Ensure all components are imported and rendered without errors."
+        },
+        {
+          "path": "frontend/src/components/HeroSection.tsx",
+          "operation": "modify",
+          "description": "Verify the hero section renders the animated heading, subtitle, CTA buttons (Book Appointment, Learn More), and clinic stats. Ensure GSAP scroll reveal animations work correctly. Verify the BookAppointmentDialog opens when the Book Appointment button is clicked. Ensure clinic status is fetched from ClinicStatusContext and booking is disabled when the clinic is closed. Reference the generated hero background image at frontend/public/assets/generated/hero-bg.dim_1920x1080.png."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Verify the fixed header displays navigation links (Home, Services, About, Contact), responsive mobile menu, phone icon, and Book Appointment button. Ensure the booking button opens the BookAppointmentDialog and is disabled when the clinic is closed based on ClinicStatusContext. Verify scroll-aware styling changes the header appearance on scroll."
+        },
+        {
+          "path": "frontend/src/components/ClinicStatusBanner.tsx",
+          "operation": "modify",
+          "description": "Verify the banner displays a warning message when the clinic status is 'closed' or 'emergency', and is hidden when the status is 'open' or loading. Ensure it fetches clinic status from ClinicStatusContext."
+        },
+        {
           "path": "frontend/src/components/BookAppointmentDialog.tsx",
           "operation": "modify",
-          "description": "Refactor the component's state management and localStorage logic to distinguish between stale data and actual failed submission attempts. On mount, clear any stale localStorage pending appointment entries that would incorrectly trigger the connection error banner. Track submission attempts explicitly so the error/retry banner only appears after a confirmed backend call failure (not on initial load or when localStorage contains old data). Ensure that successful submissions clear the localStorage entry and reset any error/retry state. The Retry button should re-attempt submission using the locally saved data only when a genuine failure has occurred. Do not show the connection issue banner on dialog open unless there is an active, unresolved submission failure."
+          "description": "Verify the dialog collects patient name, contact info, preferred date, and service type. Ensure it calls the useBookAppointment mutation hook to submit the booking to the backend. Verify the success confirmation screen displays after successful booking. Ensure form validation works correctly."
+        },
+        {
+          "path": "frontend/src/components/ServicesGrid.tsx",
+          "operation": "modify",
+          "description": "Verify the grid displays five premium dental services (Invisalign, Dental Implants, Laser Dentistry, Pediatric Dentistry, Smile Makeover) with icons, descriptions, and hover effects. Ensure each service card navigates to its detail route on click. Verify GSAP scroll reveal animations trigger correctly. Reference generated service icons at frontend/public/assets/generated/icon-*.dim_256x256.png and service-specific images."
+        },
+        {
+          "path": "frontend/src/components/DoctorProfile.tsx",
+          "operation": "modify",
+          "description": "Verify the section showcases the lead dentist's photo, bio, and credential cards with GSAP scroll-reveal animations. Reference the generated doctor profile image at frontend/public/assets/generated/doctor-profile.dim_600x800.png."
+        },
+        {
+          "path": "frontend/src/components/BeforeAfterSlider.tsx",
+          "operation": "modify",
+          "description": "Verify the interactive before/after image comparison slider supports mouse and touch drag. Ensure tab selection allows switching between three treatment pairs. Verify GSAP scale-in scroll reveal animation triggers correctly. Reference generated before/after images at frontend/public/assets/generated/before-*.dim_800x600.png and frontend/public/assets/generated/after-*.dim_800x600.png."
+        },
+        {
+          "path": "frontend/src/components/TestimonialCarousel.tsx",
+          "operation": "modify",
+          "description": "Verify the auto-scrolling infinite carousel displays approved patient testimonials with star ratings. Ensure the carousel animation uses requestAnimationFrame. Verify GSAP scroll reveal animates the section heading. Ensure testimonials are fetched from the backend using the useGetApprovedReviews hook."
+        },
+        {
+          "path": "frontend/src/components/ContactSection.tsx",
+          "operation": "modify",
+          "description": "Verify the section displays clinic contact details (phone, email, address, hours) as animated cards, a WhatsApp button, and an embedded map. Ensure GSAP scroll-reveal animations trigger correctly for each contact card."
+        },
+        {
+          "path": "frontend/src/components/Footer.tsx",
+          "operation": "modify",
+          "description": "Verify the footer displays branding, quick links (Home, Services, About, Contact), services list, and contact info. Ensure clicking the tooth logo opens the HiddenAdminLoginModal for admin access. Reference the tooth logo at frontend/public/assets/generated/tooth-logo-footer.dim_48x48.png."
+        },
+        {
+          "path": "frontend/src/components/HiddenAdminLoginModal.tsx",
+          "operation": "modify",
+          "description": "Verify the modal validates hardcoded admin credentials (admin/admin123), stores authentication state in sessionStorage.adminAuthenticated, and navigates to /admin on successful login. Ensure the modal opens when the footer tooth logo is clicked."
+        },
+        {
+          "path": "frontend/src/components/AdminGuard.tsx",
+          "operation": "modify",
+          "description": "Verify the route guard redirects to home if sessionStorage.adminAuthenticated is not set. Ensure the isAdminAuthenticated helper function is exported and used by admin routes."
+        },
+        {
+          "path": "frontend/src/pages/admin/Dashboard.tsx",
+          "operation": "modify",
+          "description": "Verify the admin dashboard displays navigation cards to all admin sections (Appointments, Services, Reviews, Content, Before/After Manager, Doctor Scheduler). Ensure the clinic status control allows toggling between open, closed, and emergency states via the useSetClinicStatus mutation hook. Verify the AdminGuard protects this route."
+        },
+        {
+          "path": "frontend/src/pages/admin/Appointments.tsx",
+          "operation": "modify",
+          "description": "Verify the page displays all clinic appointments in a filterable, live-updating table using the useGetAllAppointments hook. Ensure each appointment row allows updating the status via the useUpdateAppointmentStatus mutation hook. Verify the AdminGuard protects this route."
+        },
+        {
+          "path": "frontend/src/pages/admin/ServiceManager.tsx",
+          "operation": "modify",
+          "description": "Verify the page displays a list of the five premium services with editable fields for display name, description, and featured photo. Ensure the useUpdateService mutation hook saves changes to the backend. Use the blob-storage component for featured photo uploads with progress tracking via ExternalBlob.withUploadProgress(). Verify the AdminGuard protects this route. Verify the component's usage instructions before implementing blob storage."
+        },
+        {
+          "path": "frontend/src/pages/admin/ReviewApprover.tsx",
+          "operation": "modify",
+          "description": "Verify the page fetches pending patient reviews using the useGetPendingReviews hook and displays them with star ratings and action buttons. Ensure admins can approve reviews via the useApproveReview mutation hook or delete them via the useDeleteReview mutation hook. Verify the AdminGuard protects this route."
+        },
+        {
+          "path": "frontend/src/pages/admin/ContentManager.tsx",
+          "operation": "modify",
+          "description": "Verify the form collects reviewer name, rating, review text, and optional photo to add a new patient review in pending state via the useAddReview mutation hook. Use the blob-storage component for photo uploads. Verify the AdminGuard protects this route. Verify the component's usage instructions before implementing blob storage."
+        },
+        {
+          "path": "frontend/src/pages/admin/BeforeAfterManager.tsx",
+          "operation": "modify",
+          "description": "Verify the page allows uploading before/after image pairs with drag-and-drop support, a description field, and upload progress tracking via the useAddBeforeAfterPair mutation hook. Use the blob-storage component with ExternalBlob.withUploadProgress() for image uploads. Verify the AdminGuard protects this route. Verify the component's usage instructions before implementing blob storage."
+        },
+        {
+          "path": "frontend/src/pages/admin/DoctorScheduler.tsx",
+          "operation": "modify",
+          "description": "Verify the form allows adding new doctors with name and specialty fields via the useAddDoctor mutation hook. Ensure the page displays a list of existing doctors fetched from the useGetAllDoctors hook. Verify the AdminGuard protects this route."
+        },
+        {
+          "path": "frontend/src/pages/ServiceDetail.tsx",
+          "operation": "modify",
+          "description": "Verify the generic dynamic service detail page fetches service data by ID using the useGetService hook and renders a hero image, description, and BookAppointmentDialog. Ensure the page handles loading and error states correctly."
+        },
+        {
+          "path": "frontend/src/pages/InvisalignDetail.tsx",
+          "operation": "modify",
+          "description": "Verify the Invisalign detail page includes a hero section, before/after slider, benefits grid, and a booking dialog trigger. Reference generated Invisalign images at frontend/public/assets/generated/invisalign-*.dim_800x500.png and frontend/public/assets/generated/invisalign-aligner.dim_600x400.png."
+        },
+        {
+          "path": "frontend/src/pages/DentalImplantsDetail.tsx",
+          "operation": "modify",
+          "description": "Verify the Dental Implants detail page features a hero section, benefits grid, and a booking dialog trigger. Reference the generated dental implant diagram at frontend/public/assets/generated/dental-implant-diagram.dim_600x400.png."
+        },
+        {
+          "path": "frontend/src/pages/LaserDentistryDetail.tsx",
+          "operation": "modify",
+          "description": "Verify the Laser Dentistry detail page includes a styled hero section with laser beam decoration, benefits grid, and a booking dialog trigger. Reference the generated laser dentistry card image at frontend/public/assets/generated/laser-dentistry-card.dim_600x400.png."
+        },
+        {
+          "path": "frontend/src/pages/PediatricDentistryDetail.tsx",
+          "operation": "modify",
+          "description": "Verify the Pediatric Dentistry detail page showcases a child-friendly hero section, features grid, and a booking dialog trigger. Reference generated pediatric images at frontend/public/assets/generated/pediatric-dentistry-icon.dim_600x400.png and frontend/public/assets/generated/kids-tooth-cartoon.dim_200x200.png."
+        },
+        {
+          "path": "frontend/src/pages/SmileMakeoverDetail.tsx",
+          "operation": "modify",
+          "description": "Verify the Smile Makeover detail page features a hero section, before/after slider, and a list of included treatments with a booking dialog trigger. Reference generated smile makeover images at frontend/public/assets/generated/smile-*.dim_800x500.png, frontend/public/assets/generated/smile-hero.dim_1200x800.png, and frontend/public/assets/generated/smile-makeover-banner.dim_1200x500.png."
+        },
+        {
+          "path": "frontend/src/context/ClinicStatusContext.tsx",
+          "operation": "modify",
+          "description": "Verify the context fetches clinic status from the backend using the useGetClinicStatus hook and exposes it to child components. Ensure optimistic updates and query invalidation work correctly when the status changes via the useSetClinicStatus mutation hook."
+        },
+        {
+          "path": "frontend/src/hooks/useInternetIdentity.ts",
+          "operation": "modify",
+          "description": "Verify the Internet Identity authentication hook manages AuthClient lifecycle, login/logout, and exposes identity state and status flags. Ensure the InternetIdentityProvider wraps the app in main.tsx. Use the authorization component to handle authentication; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Verify all React Query hooks for backend operations are present and correctly configured: useGetClinicStatus, useSetClinicStatus, useGetAllAppointments, useUpdateAppointmentStatus, useBookAppointment, useGetAllServices, useGetService, useUpdateService, useGetApprovedReviews, useGetPendingReviews, useApproveReview, useDeleteReview, useAddReview, useGetAllBeforeAfterPairs, useAddBeforeAfterPair, useGetAllDoctors, useAddDoctor, useGetCallerUserProfile, useSaveCallerUserProfile. Ensure each hook uses the correct backend method from the actor. Use the authorization component for profile operations; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useActor.ts",
+          "operation": "modify",
+          "description": "Verify the custom hook creates and caches a backend actor instance using React Query, supporting both anonymous and authenticated (Internet Identity) usage. Ensure the actor invalidates dependent queries when it changes. Use the authorization component to initialize the actor; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/LoginButton.tsx",
+          "operation": "modify",
+          "description": "Verify the button handles Internet Identity login/logout, shows loading state, and clears the React Query cache on logout. Use the authorization component's login flow; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/UserProfileSetup.tsx",
+          "operation": "modify",
+          "description": "Verify the modal prompts authenticated users without a profile to enter their name, then saves it via the useSaveCallerUserProfile mutation hook. Ensure the modal only appears when the user is authenticated, the profile query has completed, and no profile exists. Use the authorization component's profile setup pattern to prevent modal flash; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useGSAPScrollReveal.ts",
+          "operation": "modify",
+          "description": "Verify the CSS/IntersectionObserver-based scroll reveal hook animates elements into view with configurable fade, slide, scale, and stagger effects. Ensure it works correctly across all components that use scroll animations."
+        },
+        {
+          "path": "frontend/src/hooks/useLenis.ts",
+          "operation": "modify",
+          "description": "Verify the hook enables native CSS smooth scrolling on mount and removes it on unmount. Ensure it is initialized in App.tsx."
+        },
+        {
+          "path": "frontend/src/main.tsx",
+          "operation": "modify",
+          "description": "Verify the application entry point correctly wraps the app with QueryClientProvider and InternetIdentityProvider. Ensure React Query is configured with appropriate defaults and the Internet Identity provider is initialized before the app renders."
+        },
+        {
+          "path": "frontend/index.html",
+          "operation": "modify",
+          "description": "Verify the HTML shell has the correct title 'XYZ Dental Clinic' and mounts the React app at #root by loading main.tsx. Ensure no build-time errors occur."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Verify the global stylesheet defines CSS custom properties for light/dark themes, includes Tailwind directives, and provides keyframe animations and utility classes used throughout the app. Ensure all animation classes (fade-in, slide-up, etc.) are defined."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Verify the Tailwind configuration extends the default theme with custom colors (royal-blue, teal), fonts, border radii, and custom keyframe animations. Ensure dark mode is enabled via class and all source files are scanned for class usage."
+        },
+        {
+          "path": "frontend/src/components/LiquidGradientBackground.tsx",
+          "operation": "modify",
+          "description": "Verify the component renders a fixed full-screen decorative background with animated radial and linear gradients to create a liquid smoke visual effect. Ensure it does not impact performance or block user interactions."
+        },
+        {
+          "path": "frontend/src/pages/AccessDenied.tsx",
+          "operation": "modify",
+          "description": "Verify the page displays a full-page 'Access Denied' message with a button that navigates back to the home route. Ensure it is wired into the router for use when authorization fails."
         }
       ]
     }

@@ -1,153 +1,167 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useNavigate } from '@tanstack/react-router';
-import { Loader2, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { Eye, EyeOff, X } from 'lucide-react';
 
 interface HiddenAdminLoginModalProps {
-  open: boolean;
+  isOpen: boolean;
   onClose: () => void;
 }
 
-const ADMIN_USERNAME = '6352174912';
-const ADMIN_PASSWORD = '63521';
-
-type Step = 'credentials' | 'ii-login' | 'success';
-
-export default function HiddenAdminLoginModal({ open, onClose }: HiddenAdminLoginModalProps) {
+export default function HiddenAdminLoginModal({ isOpen, onClose }: HiddenAdminLoginModalProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [step, setStep] = useState<Step>('credentials');
-  const { login, loginStatus, identity } = useInternetIdentity();
-  const navigate = useNavigate();
 
-  // When identity becomes available after II login, complete admin auth
-  useEffect(() => {
-    if (step === 'ii-login' && identity) {
-      sessionStorage.setItem('adminAuth', 'true');
-      setStep('success');
-      setTimeout(() => {
-        onClose();
-        navigate({ to: '/admin/dashboard' });
-      }, 800);
-    }
-  }, [identity, step, navigate, onClose]);
+  if (!isOpen) return null;
 
-  // Reset state when modal closes
-  useEffect(() => {
-    if (!open) {
-      setUsername('');
-      setPassword('');
-      setError('');
-      setStep('credentials');
-    }
-  }, [open]);
-
-  const handleCredentialSubmit = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      // If already logged in with II, skip II step
-      if (identity) {
-        sessionStorage.setItem('adminAuth', 'true');
-        setStep('success');
-        setTimeout(() => {
-          onClose();
-          navigate({ to: '/admin/dashboard' });
-        }, 800);
-        return;
-      }
-      // Proceed to II login
-      setStep('ii-login');
-      try {
-        await login();
-      } catch (err: any) {
-        console.error('II login error:', err);
-        setError('Login failed. Please try again.');
-        setStep('credentials');
-      }
+    if (username === '6352174912' && password === '63521') {
+      sessionStorage.setItem('adminAuthenticated', 'true');
+      onClose();
+      window.location.href = '/admin';
     } else {
       setError('Invalid credentials. Please try again.');
     }
   };
 
-  const isLoggingIn = loginStatus === 'logging-in';
-
   return (
-    <Dialog open={open} onOpenChange={(o) => { if (!o && step !== 'ii-login') onClose(); }}>
-      <DialogContent className="sm:max-w-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-            <img src="/assets/generated/tooth-logo-icon.dim_64x64.png" alt="tooth" className="w-6 h-6" />
-            Admin Access
-          </DialogTitle>
-        </DialogHeader>
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '15px',
+          padding: '2rem',
+          width: '100%',
+          maxWidth: '400px',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+          position: 'relative',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '1rem',
+            right: '1rem',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#666',
+          }}
+        >
+          <X size={20} />
+        </button>
 
-        {step === 'credentials' && (
-          <form onSubmit={handleCredentialSubmit} className="space-y-4 mt-2">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Username
-              </label>
-              <Input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
-                autoComplete="off"
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Password
-              </label>
-              <Input
-                type="password"
+        <h2 style={{ color: '#1a1a1a', fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>
+          Admin Access
+        </h2>
+        <p style={{ color: '#666', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+          Enter your credentials to continue
+        </p>
+
+        <form onSubmit={handleLogin}>
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', color: '#333', fontWeight: 600, marginBottom: '0.5rem', fontSize: '0.875rem' }}>
+              Username
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter username"
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                color: '#1a1a1a',
+                backgroundColor: '#fff',
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '1rem' }}>
+            <label style={{ display: 'block', color: '#333', fontWeight: 600, marginBottom: '0.5rem', fontSize: '0.875rem' }}>
+              Password
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
-                autoComplete="off"
-                className="bg-gray-50 dark:bg-gray-800"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  paddingRight: '3rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem',
+                  color: '#1a1a1a',
+                  backgroundColor: '#fff',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '0.75rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#666',
+                }}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
-            {error && (
-              <p className="text-sm text-red-500">{error}</p>
-            )}
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-              Continue
-            </Button>
-          </form>
-        )}
-
-        {step === 'ii-login' && (
-          <div className="flex flex-col items-center gap-4 py-6">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-            <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-              {isLoggingIn
-                ? 'Waiting for Internet Identity authentication...'
-                : 'Connecting to Internet Identity...'}
-            </p>
-            <p className="text-xs text-gray-400 text-center">
-              Please complete the login in the popup window.
-            </p>
-            {error && <p className="text-sm text-red-500">{error}</p>}
           </div>
-        )}
 
-        {step === 'success' && (
-          <div className="flex flex-col items-center gap-4 py-6">
-            <ShieldCheck className="w-10 h-10 text-green-500" />
-            <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-              Admin access granted! Redirecting...
-            </p>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+          {error && (
+            <p style={{ color: '#dc2626', fontSize: '0.875rem', marginBottom: '1rem' }}>{error}</p>
+          )}
+
+          <button
+            type="submit"
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              backgroundColor: '#1e40af',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            Login
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }

@@ -70,9 +70,10 @@ export default function SmileMakeoverDetail() {
             </div>
             <div>
               <img
-                src="/assets/generated/smile-makeover-banner.dim_1200x500.png"
+                src="/assets/generated/smile-hero.dim_1200x800.png"
                 alt="Smile Makeover"
                 style={{ width: '100%', borderRadius: '16px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
+                onError={(e) => { (e.target as HTMLImageElement).src = '/assets/generated/smile-makeover-banner.dim_1200x500.png'; }}
               />
             </div>
           </div>
@@ -80,33 +81,27 @@ export default function SmileMakeoverDetail() {
       </section>
 
       {/* Before/After */}
-      <section style={{ padding: '80px 24px' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '36px', fontWeight: 800, color: '#0f172a', marginBottom: '40px', textAlign: 'center' }}>
-            Real Transformations
-          </h2>
-          <BeforeAfterSlider />
-        </div>
-      </section>
+      <BeforeAfterSlider />
 
       {/* Treatments */}
-      <section style={{ padding: '0 24px 80px' }}>
+      <section style={{ padding: '80px 24px', background: '#f8fafc' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '32px', fontWeight: 800, color: '#0f172a', marginBottom: '32px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: '36px', fontWeight: 800, color: '#0f172a', marginBottom: '40px', textAlign: 'center' }}>
             What's Included
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px' }}>
             {[
               { title: 'Teeth Whitening', desc: 'Professional whitening for a brighter, whiter smile.' },
-              { title: 'Veneers', desc: 'Thin porcelain shells that cover imperfections.' },
-              { title: 'Bonding', desc: 'Repair chips, cracks, and gaps with tooth-colored resin.' },
-              { title: 'Gum Contouring', desc: 'Reshape your gum line for a more balanced smile.' },
-            ].map(t => (
+              { title: 'Dental Veneers', desc: 'Porcelain veneers to reshape and perfect your teeth.' },
+              { title: 'Invisalign', desc: 'Clear aligners to straighten misaligned teeth.' },
+              { title: 'Gum Contouring', desc: 'Reshape your gum line for a balanced smile.' },
+              { title: 'Dental Bonding', desc: 'Repair chips and gaps with tooth-colored resin.' },
+              { title: 'Crown & Bridge', desc: 'Restore damaged or missing teeth seamlessly.' },
+            ].map(b => (
               <div
-                key={t.title}
+                key={b.title}
                 style={{
-                  background: 'rgba(255,255,255,0.85)',
-                  backdropFilter: 'blur(12px)',
+                  background: '#fff',
                   border: '1px solid rgba(168,85,247,0.12)',
                   borderRadius: '14px',
                   padding: '24px',
@@ -114,15 +109,19 @@ export default function SmileMakeoverDetail() {
                 }}
               >
                 <Sparkles size={22} color="#a855f7" style={{ marginBottom: '10px' }} />
-                <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>{t.title}</h3>
-                <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6 }}>{t.desc}</p>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>{b.title}</h3>
+                <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6 }}>{b.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <BookAppointmentDialog open={dialogOpen} onOpenChange={setDialogOpen} defaultService="Smile Makeover" />
+      <BookAppointmentDialog
+        isOpen={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        defaultService="Smile Makeover"
+      />
     </div>
   );
 }
