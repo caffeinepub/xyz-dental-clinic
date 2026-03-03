@@ -64,6 +64,7 @@ export default function HeroSection() {
   const { isClosed } = useClinicStatusContext();
   const canBook = !isClosed;
 
+  const leftContentRef = useRef<HTMLDivElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
@@ -76,27 +77,58 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
+  // Left content: slide from left
   useEffect(() => {
-    const elements = [
-      subtitleRef.current,
-      ctaRef.current,
-      statsRef.current,
-      imageRef.current,
-    ];
-    const delays = [200, 400, 600, 300];
+    const el = leftContentRef.current;
+    if (!el) return;
+    el.style.opacity = "0";
+    el.style.transform = "translateX(-80px)";
+    el.style.transition = "opacity 0.8s ease 0ms, transform 0.8s ease 0ms";
+    const t = setTimeout(() => {
+      if (el) {
+        el.style.opacity = "1";
+        el.style.transform = "translateX(0)";
+      }
+    }, 80);
+    return () => clearTimeout(t);
+  }, []);
 
-    elements.forEach((el, i) => {
-      if (!el) return;
+  // Image: scale up from right with spring bounce
+  useEffect(() => {
+    const el = imageRef.current;
+    if (!el) return;
+    el.style.opacity = "0";
+    el.style.transform = "scale(0.5)";
+    el.style.transition =
+      "opacity 0.9s cubic-bezier(0.34,1.56,0.64,1) 200ms, transform 0.9s cubic-bezier(0.34,1.56,0.64,1) 200ms";
+    const t = setTimeout(() => {
+      if (el) {
+        el.style.opacity = "1";
+        el.style.transform = "scale(1)";
+      }
+    }, 80);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Subtitle and CTA: slide up from bottom
+  useEffect(() => {
+    const elements = [subtitleRef.current, ctaRef.current, statsRef.current];
+    const delays = [200, 400, 600];
+
+    for (const [i, el] of elements.entries()) {
+      if (!el) continue;
       el.style.opacity = "0";
       el.style.transform = "translateY(30px)";
       el.style.transition = `opacity 0.8s ease ${delays[i]}ms, transform 0.8s ease ${delays[i]}ms`;
+      const idx = i;
       setTimeout(() => {
-        if (el) {
-          el.style.opacity = "1";
-          el.style.transform = "translateY(0)";
+        const elem = elements[idx];
+        if (elem) {
+          elem.style.opacity = "1";
+          elem.style.transform = "translateY(0)";
         }
       }, 100);
-    });
+    }
   }, []);
 
   return (
@@ -123,8 +155,8 @@ export default function HeroSection() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
-          <div>
+          {/* Left Content — slides in from left */}
+          <div ref={leftContentRef}>
             <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1.5 mb-6">
               <Star size={14} className="text-yellow-400" />
               <span className="text-blue-200 text-sm font-medium">
@@ -161,11 +193,17 @@ export default function HeroSection() {
                 type="button"
                 onClick={() => canBook && setIsBookingOpen(true)}
                 disabled={!canBook}
+                data-ocid="hero.primary_button"
                 className={`px-8 py-3.5 rounded-full font-semibold text-base transition-all shadow-lg ${
                   canBook
                     ? "bg-blue-500 text-white hover:bg-blue-400 hover:shadow-blue-500/30 hover:shadow-xl hover:-translate-y-0.5"
                     : "bg-gray-500 text-gray-300 cursor-not-allowed"
                 }`}
+                style={
+                  canBook
+                    ? { animation: "heartbeat 2s ease infinite" }
+                    : undefined
+                }
               >
                 {isClosed ? "Booking Unavailable" : "Book Appointment"}
               </button>
@@ -175,6 +213,7 @@ export default function HeroSection() {
                   const el = document.getElementById("services");
                   if (el) el.scrollIntoView({ behavior: "smooth" });
                 }}
+                data-ocid="hero.secondary_button"
                 className="px-8 py-3.5 rounded-full font-semibold text-base border-2 border-white/30 text-white hover:bg-white/10 transition-all"
               >
                 Our Services
@@ -182,7 +221,7 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right Image */}
+          {/* Right Image — scales up from small */}
           <div ref={imageRef} className="hidden lg:block">
             <div className="relative">
               <div
@@ -256,6 +295,20 @@ export default function HeroSection() {
         isOpen={isBookingOpen}
         onClose={() => setIsBookingOpen(false)}
       />
+
+      <style>{`
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes heartbeat {
+          0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59,130,246,0.5); }
+          14% { transform: scale(1.06); }
+          28% { transform: scale(1); }
+          42% { transform: scale(1.06); box-shadow: 0 0 0 8px rgba(59,130,246,0); }
+          70% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+        }
+      `}</style>
     </section>
   );
 }

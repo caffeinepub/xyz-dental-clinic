@@ -187,7 +187,7 @@ export default function BookAppointmentDialog({
           position: "relative",
           maxHeight: "92vh",
           overflowY: "auto",
-          animation: "slideUpModal 0.25s ease",
+          animation: "slideUpModal 0.35s cubic-bezier(0.34,1.56,0.64,1)",
         }}
       >
         <button
@@ -215,9 +215,63 @@ export default function BookAppointmentDialog({
 
         {isSuccess ? (
           <div
-            style={{ textAlign: "center", padding: "2rem 0" }}
+            style={{
+              textAlign: "center",
+              padding: "2rem 0",
+              position: "relative",
+            }}
             data-ocid="booking.success_state"
           >
+            {/* Confetti burst */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                overflow: "hidden",
+                pointerEvents: "none",
+              }}
+            >
+              {(
+                [
+                  ["#ef4444", "5%", "0.00s", "0deg"],
+                  ["#3b82f6", "9.5%", "0.04s", "36deg"],
+                  ["#eab308", "14%", "0.08s", "72deg"],
+                  ["#22c55e", "18.5%", "0.12s", "108deg"],
+                  ["#a855f7", "23%", "0.16s", "144deg"],
+                  ["#14b8a6", "27.5%", "0.20s", "180deg"],
+                  ["#ef4444", "32%", "0.24s", "216deg"],
+                  ["#3b82f6", "36.5%", "0.28s", "252deg"],
+                  ["#eab308", "41%", "0.32s", "288deg"],
+                  ["#22c55e", "45.5%", "0.36s", "324deg"],
+                  ["#a855f7", "50%", "0.40s", "0deg"],
+                  ["#14b8a6", "54.5%", "0.44s", "36deg"],
+                  ["#ef4444", "59%", "0.48s", "72deg"],
+                  ["#3b82f6", "63.5%", "0.52s", "108deg"],
+                  ["#eab308", "68%", "0.56s", "144deg"],
+                  ["#22c55e", "72.5%", "0.60s", "180deg"],
+                  ["#a855f7", "77%", "0.64s", "216deg"],
+                  ["#14b8a6", "81.5%", "0.68s", "252deg"],
+                  ["#ef4444", "86%", "0.72s", "288deg"],
+                  ["#3b82f6", "90.5%", "0.76s", "324deg"],
+                ] as [string, string, string, string][]
+              ).map(([color, left, delay, rotation]) => (
+                <span
+                  key={`confetti-${left}`}
+                  style={{
+                    position: "absolute",
+                    bottom: "40%",
+                    left,
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "2px",
+                    backgroundColor: color,
+                    animation: "confettiFall 1.5s ease forwards",
+                    animationDelay: delay,
+                    transform: `rotate(${rotation})`,
+                  }}
+                />
+              ))}
+            </div>
             <div
               style={{
                 width: "80px",
@@ -229,6 +283,8 @@ export default function BookAppointmentDialog({
                 justifyContent: "center",
                 margin: "0 auto 1.25rem",
                 animation: "bounceIn 0.4s ease",
+                position: "relative",
+                zIndex: 1,
               }}
             >
               <CheckCircle size={40} style={{ color: "#16a34a" }} />
@@ -529,13 +585,17 @@ export default function BookAppointmentDialog({
           to { opacity: 1; }
         }
         @keyframes slideUpModal {
-          from { opacity: 0; transform: translateY(30px) scale(0.97); }
+          from { opacity: 0; transform: translateY(60px) scale(0.95); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes bounceIn {
           0% { transform: scale(0.5); opacity: 0; }
           70% { transform: scale(1.1); }
           100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes confettiFall {
+          0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+          100% { transform: translateY(-200px) rotate(720deg) scale(0); opacity: 0; }
         }
       `}</style>
     </div>

@@ -111,8 +111,7 @@ export default function Footer() {
 
           <div className="border-t border-gray-800 mt-10 pt-6 text-center">
             <p className="text-xs text-gray-500">
-              © {year} XYZ Dental Clinic. All rights reserved. | Your Smile, Our
-              Priority
+              © {year} XYZ Dental Clinic - Quality Dental Care
             </p>
           </div>
         </div>

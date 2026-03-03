@@ -40,6 +40,31 @@ export default function TestimonialCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<number>(0);
   const posRef = useRef(0);
+  const sectionContainerRef = useRef<HTMLElement>(null);
+
+  // Scroll-reveal fade-in for the whole section
+  useEffect(() => {
+    const el = sectionContainerRef.current;
+    if (!el) return;
+    el.style.opacity = "0";
+    el.style.transform = "translateY(40px)";
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            el.style.transition = "opacity 0.7s ease, transform 0.7s ease";
+            el.style.opacity = "1";
+            el.style.transform = "translateY(0)";
+            observer.unobserve(el);
+          }
+        }
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const testimonials =
     reviews && reviews.length > 0
@@ -76,7 +101,10 @@ export default function TestimonialCarousel() {
   }, [testimonials.length]);
 
   return (
-    <section className="py-20 bg-blue-50 overflow-hidden">
+    <section
+      className="py-20 bg-blue-50 overflow-hidden"
+      ref={sectionContainerRef}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <div className="text-center">
           <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">

@@ -1,36 +1,63 @@
 # XYZ Dental Clinic
 
 ## Current State
-- Full-stack dental clinic website with React frontend + Motoko backend
-- Admin panel requires ICP Internet Identity (Internet Computer auth) to view appointments — this causes "Authorization error" because admin is authenticated via sessionStorage only (simple password), not via ICP principal
-- Footer has "caffeine.ai" branding link
-- Booking form works but admin appointments table fails due to ICP auth mismatch
-- Animations exist but can be smoother
+- Full dental clinic website with Hero, Services Grid, Doctor Profile, Before/After Slider, Testimonials, Contact, Footer
+- Footer has Tooth Logo that opens Admin login popup (credentials: 6352174912 / 63521)
+- Admin panel at /admin with appointments, services, reviews, before/after, doctor scheduler
+- Appointments saved to localStorage, displayed in admin panel
+- BookAppointmentDialog already slides up from bottom (slideUpModal animation)
+- ServicesGrid shows 5 services with scroll reveal
+- HeroSection has entry animations but basic (translateY only)
+- No heartbeat animation on Book Appointment button
+- No confetti/success animation on booking confirm
+- No expandable service cards with detailed descriptions
+- Footer already has custom copyright (no Caffeine AI branding)
+- No scroll-reveal fade-in for photos/testimonials
+- No hover lift effect explicitly on service cards (only hover:shadow-xl and hover:-translate-y-1)
 
 ## Requested Changes (Diff)
 
 ### Add
-- Ding notification sound + red blinking dot in admin appointments panel when new appointment arrives
-- Smooth page transition animations using CSS keyframes (Framer Motion style fade/slide)
-- Footer copyright: "XYZ Dental Clinic © 2026" replacing Caffeine AI link
+- Hero Section: Left text slides in from left (translateX), doctor image scales up from small (scale 0 → 1) on load
+- Hero "Book Appointment" button: heartbeat/pulse animation (dhak-dhak effect)
+- ServicesGrid: Expandable cards — click to expand with service details below the icon/title
+  - Root Canal: "Dard-mukt ilaaj, 30 min mein."
+  - Implants: "Zindagi bhar ka saath, asli danton jaisi mazbooti."
+  - All 5 services get expand text
+- Appointment booking: Already a modal that slides up — enhance modal entry animation to be smoother (slide from bottom)
+- Success state: Add confetti animation + green checkmark bounce on appointment success
+- Scroll Reveal: Photos, testimonials, service cards fade-in on scroll (already partial — enhance)
+- Hover Lift: All cards get translateY(-6px) lift + box-shadow glow on hover
+- Footer: Ensure footer only shows "© 2026 XYZ Dental Clinic - Quality Dental Care" — no third-party branding
 
 ### Modify
-- Backend: Change `getAllAppointments` to be a public query (no auth check) — admin auth is handled on frontend via sessionStorage password. This eliminates ICP principal auth errors.
-- Backend: Change `bookAppointment` to always succeed regardless of clinic status (remove closed check that returns false silently) — instead return meaningful data
-- Frontend `useGetAllAppointments`: Remove the actor dependency auth issue by making the query always enabled even with anonymous actor
-- Admin Appointments page: Add new appointment notification with ding sound + red dot blink when appointment count increases
-- Footer: Remove caffeine.ai link, replace with "XYZ Dental Clinic © 2026. All rights reserved."
-- BookAppointmentDialog: Add error handling fallback — if backend call fails, save to localStorage as backup and show success anyway (never show "failed" to user)
-- Header: Ensure clinic name click triggers window.location.reload()
+- HeroSection: Left text block animates from left (translateX(-60px) → 0), doctor image animates scale(0.5) → scale(1) with spring-like ease
+- HeroSection "Book Appointment" button: Add CSS heartbeat animation (@keyframes heartbeat)
+- ServicesGrid: Convert service buttons to expandable cards with toggle expand/collapse logic, showing description text on click
+- BookAppointmentDialog: Enhance slideUpModal animation from bottom
+- BookAppointmentDialog success state: Add confetti burst effect using CSS/JS particles
+- Footer: Clean copyright line to "© 2026 XYZ Dental Clinic - Quality Dental Care"
+- TestimonialCarousel / photos: Add IntersectionObserver fade-in on scroll
+- Service card hover: Ensure all cards lift up (translateY) with glow box-shadow
 
 ### Remove
-- ICP auth requirement from `getAllAppointments` backend function
-- Caffeine AI branding link from footer
+- Any remaining Caffeine AI references in footer or elsewhere
+- Custom cursor circle (already removed per previous versions)
 
 ## Implementation Plan
-1. Update `main.mo`: Make `getAllAppointments` a public query without auth check
-2. Update `useQueries.ts`: Fix appointment fetching to work without ICP auth
-3. Update `Appointments.tsx` admin page: Add ding sound + red dot notification
-4. Update `BookAppointmentDialog.tsx`: Add localStorage fallback so booking never "fails"
-5. Update `Footer.tsx`: Remove caffeine.ai branding, add clinic copyright
-6. Add CSS transition animations for smooth page feel
+1. Update HeroSection.tsx:
+   - Left content: animate from translateX(-60px) to 0 with opacity fade-in
+   - Image: animate from scale(0.6) rotate(-5deg) to scale(1) rotate(0) on mount
+   - Book Appointment button: add @keyframes heartbeat CSS animation (scale pulse)
+2. Update ServicesGrid.tsx:
+   - Add expandedId state to track which card is open
+   - On click, toggle expanded state for that service card
+   - Show detailed description text that slides down smoothly
+   - Include expand/collapse text for all 5 services
+   - Keep hover lift + glow effects
+3. Update BookAppointmentDialog.tsx:
+   - Enhance success state with confetti particle burst (CSS keyframes with multiple colored particles)
+   - Green checkmark with bounceIn animation already present — enhance it
+4. Update Footer.tsx:
+   - Ensure copyright says "© 2026 XYZ Dental Clinic - Quality Dental Care"
+5. Scroll reveal enhancements in TestimonialCarousel and BeforeAfterSlider with IntersectionObserver fade-in

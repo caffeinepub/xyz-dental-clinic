@@ -30,20 +30,20 @@ export default function BeforeAfterSlider() {
     const el = sectionRef.current;
     if (!el) return;
     el.style.opacity = "0";
-    el.style.transform = "scale(0.95)";
+    el.style.transform = "translateY(40px)";
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            el.style.transition = "opacity 0.8s ease, transform 0.8s ease";
+            el.style.transition = "opacity 0.7s ease, transform 0.7s ease";
             el.style.opacity = "1";
-            el.style.transform = "scale(1)";
+            el.style.transform = "translateY(0)";
             observer.unobserve(el);
           }
         }
       },
-      { threshold: 0.2 },
+      { threshold: 0.1 },
     );
     observer.observe(el);
     return () => observer.disconnect();
